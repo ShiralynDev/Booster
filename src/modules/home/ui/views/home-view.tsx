@@ -40,27 +40,19 @@ export const HomeView = () => {
   if (!video) return null;
 
   const variants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 1000 : -1000,
-      opacity: 0
-    }),
+    enter: (direction: number) => ({ x: direction > 0 ? 1000 : -1000, opacity: 0 }),
     center: { x: 0, opacity: 1 },
-    exit: (direction: number) => ({
-      x: direction < 0 ? 1000 : -1000,
-      opacity: 0
-    })
+    exit: (direction: number) => ({ x: direction < 0 ? 1000 : -1000, opacity: 0 }),
   };
 
   return (
-    <div className="h-dvh w-full flex flex-col overflow-hidden">
+    <div className="h-dvh w-full flex flex-col overflow-hidden bg-[#f8f9fa]">
       {/* Main content */}
       <div className="flex-1 flex overflow-hidden gap-3">
-
-
         {/* Center content — no scrolling here */}
         <main className="flex-1 p-4 md:p-6 overflow-hidden">
           <div className="flex justify-center mx-auto max-w-full h-[95%]">
-            {/* Left navigation button (matches home.html style) */}
+            {/* Left navigation button */}
             <div className="hidden md:flex h-full">
               <motion.button
                 aria-label="Previous video"
@@ -68,14 +60,24 @@ export const HomeView = () => {
                   setDirection(-1);
                   setVideoIndex((i) => Math.max(0, i - 1));
                 }}
-                className=" w-20 rounded-2xl bg-primary/20 mr-4  shadow-lg backdrop-blur-md flex items-center justify-center
-               transition-all"
+                className="
+                  w-20 rounded-2xl mr-4 flex items-center justify-center transition-all
+                  bg-[rgba(255,248,230,0.7)]
+                  border border-[rgba(255,202,85,0.3)]
+                  text-[#FFA100]
+                  shadow-[0_10px_30px_rgba(255,161,0,0.15)]
+                  hover:bg-[rgba(255,202,85,0.2)]
+                  hover:shadow-[0_12px_35px_rgba(255,161,0,0.2)]
+                  backdrop-blur-md
+                  outline-none focus-visible:ring-4 focus-visible:ring-[rgba(255,202,85,0.35)]
+                "
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
                 <ChevronLeft className="h-10 w-10" />
               </motion.button>
             </div>
+
             <AnimatePresence custom={direction} mode="wait">
               <motion.div
                 key={videoIndex}
@@ -90,15 +92,26 @@ export const HomeView = () => {
                 <VideoSection video={video} />
               </motion.div>
             </AnimatePresence>
-             <div className="hidden md:flex h-full">
+
+            {/* Right navigation button */}
+            <div className="hidden md:flex h-full">
               <motion.button
-                aria-label="Previous video"
+                aria-label="Next video"
                 onClick={() => {
-                  setDirection(-1);
-                  setVideoIndex((i) => Math.max(0, i - 1));
+                  setDirection(1);
+                  setVideoIndex((i) => i + 1);
                 }}
-                className=" w-20 rounded-2xl bg-primary/20 ml-4  shadow-lg backdrop-blur-md flex items-center justify-center
-               transition-all"
+                className="
+                  w-20 rounded-2xl ml-4 flex items-center justify-center transition-all
+                  bg-[rgba(255,248,230,0.7)]
+                  border border-[rgba(255,202,85,0.3)]
+                  text-[#FFA100]
+                  shadow-[0_10px_30px_rgba(255,161,0,0.15)]
+                  hover:bg-[rgba(255,202,85,0.2)]
+                  hover:shadow-[0_12px_35px_rgba(255,161,0,0.2)]
+                  backdrop-blur-md
+                  outline-none focus-visible:ring-4 focus-visible:ring-[rgba(255,202,85,0.35)]
+                "
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -107,7 +120,6 @@ export const HomeView = () => {
             </div>
           </div>
         </main>
-
       </div>
 
       {/* Mobile navigation buttons */}
@@ -117,7 +129,16 @@ export const HomeView = () => {
             setDirection(-1);
             setVideoIndex((i) => Math.max(0, i - 1));
           }}
-          className="pointer-events-auto h-14 w-14 bg-white dark:bg-gray-800 rounded-full shadow-lg border border-amber-200 dark:border-gray-600 flex items-center justify-center text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-gray-700 transition-colors"
+          className="
+            pointer-events-auto h-14 w-14 rounded-full flex items-center justify-center transition-colors
+            bg-[rgba(255,248,230,0.7)]
+            border border-[rgba(255,202,85,0.3)]
+            text-[#FFA100]
+            shadow-[0_10px_30px_rgba(255,161,0,0.15)]
+            hover:bg-[rgba(255,202,85,0.2)]
+            hover:shadow-[0_12px_35px_rgba(255,161,0,0.2)]
+            outline-none focus-visible:ring-4 focus-visible:ring-[rgba(255,202,85,0.35)]
+          "
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
@@ -128,7 +149,16 @@ export const HomeView = () => {
             setDirection(1);
             setVideoIndex((i) => i + 1);
           }}
-          className="pointer-events-auto h-14 w-14 bg-white dark:bg-gray-800 rounded-full shadow-lg border border-amber-200 dark:border-gray-600 flex items-center justify-center text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-gray-700 transition-colors"
+          className="
+            pointer-events-auto h-14 w-14 rounded-full flex items-center justify-center transition-colors
+            bg-[rgba(255,248,230,0.7)]
+            border border-[rgba(255,202,85,0.3)]
+            text-[#FFA100]
+            shadow-[0_10px_30px_rgba(255,161,0,0.15)]
+            hover:bg-[rgba(255,202,85,0.2)]
+            hover:shadow-[0_12px_35px_rgba(255,161,0,0.2)]
+            outline-none focus-visible:ring-4 focus-visible:ring-[rgba(255,202,85,0.35)]
+          "
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >

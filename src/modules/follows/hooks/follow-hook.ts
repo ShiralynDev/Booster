@@ -50,7 +50,7 @@ export const useFollow = ({ userId, isFollowing, fromVideoId,home }: Props) => {
         onError: (_err, _vars, ctx) => {
             if (ctx?.previous && !home) utils.videos.getOne.setData({ id: fromVideoId }, ctx.previous);
             if (ctx?.previous && home) utils.home.getOne.setData({ id: fromVideoId }, ctx.previous);
-            toast.error("something went wrong");
+            clerk.openSignIn();
         },
         onSettled: () => {
             if(!home) utils.videos.getOne.invalidate({ id: fromVideoId });
@@ -96,6 +96,7 @@ export const useFollow = ({ userId, isFollowing, fromVideoId,home }: Props) => {
         onError: (_err, _vars, ctx) => {
             if (ctx?.previous) utils.videos.getOne.setData({ id: fromVideoId }, ctx.previous);
             toast.error("something went wrong");
+            clerk.openSignIn();
         },
         onSettled: () => {
             utils.videos.getOne.invalidate({ id: fromVideoId });

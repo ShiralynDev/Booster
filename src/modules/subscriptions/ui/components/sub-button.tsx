@@ -18,11 +18,12 @@ export const SubButton = ({
     return (
         <Button
             size={size}
-            variant={isSubscribed ? "secondary" : "default"}
-            className={cn("rounded-full ",className)}
+            variant={isSubscribed ? "ghost" : "default"}
+            className={cn(className,`rounded-full ${isSubscribed ? "" : "opacity-50"}`)}
             onClick={onClick}
         >
-            {isSubscribed ? "Leave" : "Follow"}
+
+            {isSubscribed ? "Leave": "Follow"}
         </Button>
     )
 }

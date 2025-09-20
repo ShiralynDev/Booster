@@ -122,11 +122,12 @@ export const CommentsSuspense = ({ videoId, openComments, onOpenChange }: Commen
   return (
     <div className="h-full flex flex-col overflow-hidden "
 
+        onMouseLeave={()=>{setOpen(false); onOpenChange?.(false)}}
+        onMouseEnter={()=>{setOpen(true);onOpenChange?.(true)}}
     >
       {/* HEADER — fixed 70px, matches home.html */}
       <div
         className="h-[60px] p-3 flex items-center justify-between border-b border-white/10 hover:cursor-pointer"
-        onClick={toggle}
       >
         <h2 className="text-[1.1rem] font-semibold flex items-center gap-2  ml-2">
           <MessageCircle className="w-5 h-5 text-black" />
