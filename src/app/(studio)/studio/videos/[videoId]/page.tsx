@@ -9,7 +9,6 @@ interface PageProps {
 
 const Page = async ({ params }: PageProps) => {
     const { videoId } = await params; //To get the video ID in the route. The folder should be called [videoId] the same as the variable name
-    console.log("videoID", videoId)
     void trpc.studio.getOne.prefetch({ id: videoId }); //z object receives an input which is an id of type string uuid
     void trpc.categories.getMany.prefetch();
 

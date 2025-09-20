@@ -68,7 +68,7 @@ export const HomeView = () => {
                   setDirection(-1);
                   setVideoIndex((i) => Math.max(0, i - 1));
                 }}
-                className=" w-20 rounded-2xl bg-primary/20 m-4  shadow-lg backdrop-blur-md flex items-center justify-center
+                className=" w-20 rounded-2xl bg-primary/20 mr-4  shadow-lg backdrop-blur-md flex items-center justify-center
                transition-all"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -97,7 +97,7 @@ export const HomeView = () => {
                   setDirection(-1);
                   setVideoIndex((i) => Math.max(0, i - 1));
                 }}
-                className=" w-20 rounded-2xl bg-primary/20 m-4  shadow-lg backdrop-blur-md flex items-center justify-center
+                className=" w-20 rounded-2xl bg-primary/20 ml-4  shadow-lg backdrop-blur-md flex items-center justify-center
                transition-all"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}

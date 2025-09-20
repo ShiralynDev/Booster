@@ -13,6 +13,8 @@ import { useAuth } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { UserAvatar } from '@/components/user-avatar';
 import { trpc } from '@/trpc/client';
+import { VideoReactions } from '@/modules/videos/ui/components/video-reactions';
+import { toast } from 'sonner';
 
 type Video = VideoGetOneOutput;
 
@@ -29,7 +31,8 @@ export const VideoSection = ({ video }: Props) => {
     const { onClick } = useFollow({
         userId: video.user.id,
         isFollowing: video.user.viewerIsFollowing,
-        fromVideoId: video.id
+        fromVideoId: video.id,
+        home: true,
     });
 
     useEffect(() => {
@@ -51,12 +54,33 @@ export const VideoSection = ({ video }: Props) => {
     // When open, comments panel is 40vh (desktop) / 50vh (mobile). When closed, 70px.
     const collapsedPx = 60;
 
+    const createRating = trpc.videoRatings.create.useMutation({
+        onSuccess: () => {
+            utils.home.getOne.invalidate({ id: video.id })
+        },
+        onError: (error) => {
+            if (error.message === "limit") toast.error("Wait a bit before rating again!")
+        }
+    })
+
+    const onRate = (value: number) => {
+        if (!isSignedIn) return false; //TODO: Change to sign in option
+        if (!value) return false;
+
+        createRating.mutate({
+            videoId: video.id,
+            newRating: value
+        })
+        return true;
+    }
+
+
     return (
         <div className="h-full w-full flex flex-col gap-4 overflow-hidden">
             {/* VIDEO AREA — it shrinks automatically because comments panel changes height */}
 
             <div className="relative group flex-1 rounded-2xl overflow-hidden bg-black shadow-2xl">
-             
+
                 {/* Floating title on pause / first seconds */}
                 <AnimatePresence>
                     {(!isPlaying || showTitle) && (
@@ -64,7 +88,7 @@ export const VideoSection = ({ video }: Props) => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9 }}
-                            className="absolute top-8 left-4 z-20 hidden sm:block pointer-events-none rounded-lg"
+                            className="absolute top-4 left-4 z-20 hidden sm:block pointer-events-none rounded-lg"
                         >
                             <div className="bg-black/60 backdrop-blur-md rounded-xl p-4 max-w-md">
                                 <h2 className="text-white font-bold text-lg line-clamp-1">{video.title}</h2>
@@ -112,53 +136,51 @@ export const VideoSection = ({ video }: Props) => {
             </div>
 
             {/* META + BUTTONS */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 ml-4">
-                <div className="flex flex-wrap items-center gap-2 dark:text-amber-400 text-sm">
-                    <div className="inline-flex items-center gap-2 bg-primary  px-3 py-1.5 rounded-full">
-                        <Eye className="h-4 w-4" /><span className="font-medium">{compactNumber(video.videoViews)}</span>
+            <div className='flex items-start justify-between'>
+                <div className="flex flex-col sm:items-start sm:justify-between gap-3 ml-4">
+                    <div className="flex flex-wrap items-center gap-2 dark:text-amber-400 text-sm">
+                        <p className='text-lg font-semibold'>{video.title}</p>
                     </div>
-                    <div className="inline-flex items-center gap-2 bg-primary  px-3 py-1.5 rounded-full">
-                        <Calendar className="h-4 w-4" /><span className="font-medium">{compactDate(video.createdAt)}</span>
+                    <div className="flex items-center bg-white dark:bg-gray-800 rounded-2xl px-4">
+                        <div className="flex items-center gap-4">
+                            <UserAvatar size="lg" imageUrl={video.user.imageUrl} name={video.user.name} className="ring-2 ring-white dark:ring-gray-800 shadow-lg" />
+                            <div className="flex-1">
+                                <h3 className="font-semibold text-gray-900 dark:text-white">{video.user?.name ?? 'Channel Name'}</h3>
+                                <p className="text-sm text-amber-600 dark:text-amber-400">{compactNumber(video.user.followsCount)} followers</p>
+                            </div>
+                            <div>
+                                {userId === video.user.clerkId ? (
+                                    <Button asChild variant="secondary" size="sm" className="rounded-full gap-2 p-6 shadow-sm hover:shadow-md">
+                                        <a href={`/studio/videos/${video.id}`}>
+                                            <Edit3Icon className="size-4" /><p>Edit</p>
+                                        </a>
+                                    </Button>
+                                ) : (
+                                    <SubButton onClick={onClick} disabled={false} isSubscribed={video.user.viewerIsFollowing} className="rounded-full p-4 shadow-sm hover:shadow-md transition-all" />
+                                )}
+                            </div>
+                        </div>
                     </div>
-                    <div className="inline-flex items-center gap-2 bg-primary  px-3 py-1.5 rounded-full">
-                        <ThumbsUp className="h-4 w-4" /><span className="font-medium">{compactNumber(video.averageRating)} avg rating</span>
-                    </div>
-                </div>
 
-                <div className="flex flex-wrap items-center gap-2">
-                    <button className="px-4 h-10 rounded-full backdrop-blur bg-primary transition inline-flex items-center gap-2 ">
+                </div>
+                <div className="flex flex-wrap items-start gap-2">
+                    <button className="px-4 h-10 rounded-full backdrop-blur  transition inline-flex items-center gap-2 ">
                         <Share className="w-4 h-4" /><span className="text-sm font-medium">Share</span>
                     </button>
-                    <button className="px-4 h-10 rounded-full  bg-primary backdrop-blur transition inline-flex items-center gap-2 ">
-                        <Download className="w-4 h-4" /><span className="text-sm font-medium">Download</span>
-                    </button>
-                    <button className="px-4 h-10 rounded-full  shadow-md transition inline-flex items-center gap-2 bg-primary mr-4 hover:opacity-90">
+                    <div className="inline-flex items-center gap-2  px-3 py-1.5 rounded-full">
+                        <Eye className="h-4 w-4" /><span className="font-medium">{compactNumber(video.videoViews)}</span>
+                    </div>
+                    {/* <div className="inline-flex items-center gap-2 bg-primary  px-3 py-1.5 rounded-full">
+                        <Calendar className="h-4 w-4" /><span className="font-medium">{compactDate(video.createdAt)}</span>
+                    </div> */}
+                    <VideoReactions avgRating={video.averageRating} videoRatings={video.videoRatings} onRate={onRate} />
+                    {/* <button className="px-4 h-10 rounded-full  shadow-md transition inline-flex items-center gap-2 bg-primary mr-4 hover:opacity-90">
                         <Save className="w-4 h-4" /><span className="text-sm font-medium">Save</span>
-                    </button>
+                    </button> */}
                 </div>
             </div>
-
             {/* CHANNEL / FOLLOW */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl px-4">
-                <div className="flex items-center gap-4">
-                    <UserAvatar size="lg" imageUrl={video.user.imageUrl} name={video.user.name} className="ring-2 ring-white dark:ring-gray-800 shadow-lg" />
-                    <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 dark:text-white">{video.user?.name ?? 'Channel Name'}</h3>
-                        <p className="text-sm text-amber-600 dark:text-amber-400">{compactNumber(video.user.followsCount)} followers</p>
-                    </div>
-                    <div>
-                        {userId === video.user.clerkId ? (
-                            <Button asChild variant="secondary" size="sm" className="rounded-full gap-2 p-6 shadow-sm hover:shadow-md">
-                                <a href={`/studio/videos/${video.id}`}>
-                                    <Edit3Icon className="size-4" /><p>Edit</p>
-                                </a>
-                            </Button>
-                        ) : (
-                            <SubButton onClick={onClick} disabled={false} isSubscribed={video.user.viewerIsFollowing} className="rounded-full p-4 shadow-sm hover:shadow-md transition-all" />
-                        )}
-                    </div>
-                </div>
-            </div>
+
 
             {/* COMMENTS PANEL — HEIGHT ANIMATION LIVES HERE */}
             <motion.div
