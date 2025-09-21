@@ -12,11 +12,7 @@ interface Props {
 }
 
 export const VideoReactions = ({ avgRating, onRate, videoRatings, viewerRating }: Props) => {
-    const [userRating, setUserRating] = useState(viewerRating || 0);
-    const [isChoosing, setChoose] = useState(false);
-    const [isRated, setIsRated] = useState(false);
-    const [showThanks, setShowThanks] = useState(false);
-    const [popRating, setPopRating] = useState(false);
+   
 
     const { openSignIn } = useClerk();
     const handleRatingChange = (value: number) => {
@@ -27,8 +23,7 @@ export const VideoReactions = ({ avgRating, onRate, videoRatings, viewerRating }
             openSignIn({});
             return;
         }
-        setUserRating(value);
-        setIsRated(true);
+        viewerRating = numericValue;
 
         // if (value >= 4)
         //     setShowThanks(true);
@@ -50,7 +45,7 @@ export const VideoReactions = ({ avgRating, onRate, videoRatings, viewerRating }
             {/* User Rating Interaction */}
             <div className="flex items-center gap-1 rounded-xl">
                 <Rating
-                    value={userRating}
+                    value={viewerRating}
                     onValueChange={handleRatingChange}
                     className="flex gap-1"
                 >

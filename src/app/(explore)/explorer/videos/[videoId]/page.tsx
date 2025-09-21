@@ -4,11 +4,11 @@ import { VideoView } from "@/modules/videos/ui/views/video-view";
 import { HydrateClient, trpc } from "@/trpc/server"; // <-- server-side proxy + hydrator
 
 type PageProps = {
-  params: { videoId: string };
+  params: Promise<{ videoId: string }>;
 };
 
 export default async function Page({ params }: PageProps) {
-  const { videoId } = params;
+  const { videoId } = await params;
 
   void trpc.videos.getOne.prefetch({ id: videoId });
   void trpc.comments.getTopLevel.prefetchInfinite({videoId, limit: COMMENT_SECTION_SIZE})

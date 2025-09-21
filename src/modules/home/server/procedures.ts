@@ -84,7 +84,7 @@ export const homeRouter = createTRPCRouter({
             }
         }),
 
-    getMany: protectedProcedure
+    getMany: baseProcedure
         .input(
             z.object({
                 cursor: z.object({
@@ -97,6 +97,7 @@ export const homeRouter = createTRPCRouter({
         .query(async ({ ctx, input }) => {
             const { cursor, limit } = input;
             const {clerkUserId}  = ctx;
+            console.log(clerkUserId)
 
             let userId;
 
@@ -108,7 +109,6 @@ export const homeRouter = createTRPCRouter({
             if (user) {
                 userId = user.id;
             }
-
             const viewerFollow = db.$with("viewer_follow").as(
                 db
                     .select()
@@ -146,7 +146,7 @@ export const homeRouter = createTRPCRouter({
                     followsCount: sql<number>` (SELECT COUNT(*) FROM ${userFollows} WHERE ${userFollows.creatorId} = ${users.id}) `.mapWith(Number),
                     viewerIsFollowing: isNotNull(viewerFollow.userId).mapWith(Boolean),
                     videoCount: sql<number>`(SELECT COUNT(*) FROM ${videos} WHERE ${videos.userId} = ${users.id})`.mapWith(Number),
-                    viewerRating : sql<number>`(SELECT ${videoRatings.rating} FROM ${videoRatings} WHERE ${videoRatings.userId} = ${userId} AND ${videoRatings.videoId} = ${videos.id} LIMIT 1)`.mapWith(Number) 
+                    viewerRating : (userId ? sql<number>`(SELECT ${videoRatings.rating} FROM ${videoRatings} WHERE ${videoRatings.userId} = ${userId} AND ${videoRatings.videoId} = ${videos.id} LIMIT 1)`.mapWith(Number) : sql<number>`(NULL)`.mapWith(Number)),
                 },
                 videoRatings: ratingStats.ratingCount,
                 averageRating: ratingStats.averageRating,
