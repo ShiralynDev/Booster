@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WaveStream - Channel Profile (XP Popup Fixed)</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* ========== Original styles (kept) ========== */
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;font-weight:bold}
+    body{background:#212121;color:#fff;min-height:100vh;padding:0;overflow-x:hidden}
+    .container{max-width:1600px;margin:0 auto;padding:20px}
+    .header{display:flex;justify-content:space-between;align-items:center;padding:15px 40px;background:rgba(30,30,30,0.95);border-bottom:2px solid rgba(255,255,255,0.1);backdrop-filter:blur(10px);width:100%;position:relative;margin:0}
+    .logo{font-size:28px;font-weight:800;background:linear-gradient(45deg,#ffca55,#FFA100);-webkit-background-clip:text;background-clip:text;color:transparent;display:flex;align-items:center}
+    .logo i{margin-right:10px;color:#ffca55}
+    .hamburger-menu{display:none;font-size:24px;color:#ffca55;cursor:pointer;margin-right:15px}
+    .search-container{flex:1;display:flex;justify-content:center;max-width:500px;margin:0 20px}
+    .search-bar{display:flex;align-items:center;background:rgba(50,50,50,0.8);border-radius:30px;padding:10px 20px;width:100%;border:1px solid rgba(255,255,255,0.1);transition:all .3s ease}
+    .search-bar:focus-within{border-color:#ffca55;box-shadow:0 0 0 2px rgba(255,202,85,0.3)}
+    .search-bar input{background:transparent;border:none;color:#fff;padding:8px 15px;width:100%;font-size:16px;outline:none}
+    .search-bar i{color:#ccc;cursor:pointer;transition:color .3s ease}
+    .search-bar:focus-within i{color:#ffca55}
+    .user-actions{display:flex;gap:15px;align-items:center}
+    .action-btn{width:45px;height:45px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s ease;background:linear-gradient(45deg,#ffca55,#FFA100);color:#333;font-size:18px;box-shadow:0 5px 15px rgba(255,202,85,0.3);position:relative}
+    .notification-badge{position:absolute;top:-5px;right:-5px;background:#ff4757;color:white;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold}
+    .action-btn:hover{transform:translateY(-5px) rotate(10deg);box-shadow:0 8px 20px rgba(255,202,85,0.5)}
+    .user-profile{width:45px;height:45px;border-radius:50%;object-fit:cover;border:2px solid #ffca55;cursor:pointer;transition:all .3s ease}
+    .user-profile:hover{transform:scale(1.1);box-shadow:0 5px 15px rgba(255,202,85,0.4)}
+    .channel-header{display:flex;margin:30px 0;background:rgba(40,40,40,0.8);border-radius:20px;padding:20px;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);position:relative;overflow:hidden}
+    .channel-header::before{content:'';position:absolute;top:0;left:0;width:100%;height:6px;background:linear-gradient(90deg,#ffca55,#FFA100,#ffca55)}
+    .channel-avatar-container{flex:0 0 35%;position:relative;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:rgba(0,0,0,0.2);border-radius:15px}
+    .channel-avatar{width:160px;height:160px;border-radius:50%;object-fit:cover;border:5px solid rgba(255,255,255,0.1);box-shadow:0 10px 20px rgba(0,0,0,0.3);margin-bottom:20px;transition:all .5s ease}
+    .channel-avatar:hover{transform:scale(1.05);border-color:#ffca55}
+    .channel-info{text-align:center;width:100%}
+    .channel-name{font-size:28px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;justify-content:center;background:linear-gradient(45deg,#ffca55,#FFA100);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .verified-badge{color:#ffca55;margin-left:8px;font-size:18px}
+    .channel-description{margin:15px 0;line-height:1.6;color:#ddd;font-size:14px;text-align:center}
+    .channel-stats{display:flex;gap:12px;margin:15px 0;flex-wrap:wrap;justify-content:center}
+    .stat{display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,0.05);padding:12px;border-radius:12px;min-width:90px;transition:all .3s ease;border:1px solid rgba(255,255,255,0.1)}
+    .stat:hover{transform:translateY(-5px);background:rgba(255,255,255,0.1);box-shadow:0 10px 20px rgba(0,0,0,0.2)}
+    .stat-number{font-size:20px;font-weight:700;color:#ffca55}
+    .stat-label{font-size:11px;color:#ccc;text-transform:uppercase;letter-spacing:1px}
+    .xp-section{flex:1;padding:20px;display:flex;flex-direction:column;justify-content:center}
+    .xp-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .xp-title{font-size:20px;font-weight:700;background:linear-gradient(45deg,#ffca55,#FFA100);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .xp-level{font-size:18px;font-weight:700;color:#00fbff}
+    .xp-bar-container{width:100%;height:25px;background:rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;margin-bottom:12px;border:1px solid rgba(255,255,255,0.1)}
+    .xp-bar{height:100%;background:linear-gradient(90deg,#ffca55,#FFA100);border-radius:12px;width:65%;transition:width .5s ease;position:relative;overflow:hidden}
+    .xp-bar::after{content:'';position:absolute;top:0;left:0;bottom:0;right:0;background-image:linear-gradient(-45deg,rgba(255,255,255,0.2) 25%,transparent 25%,transparent 50%,rgba(255,255,255,0.2) 50%,rgba(255,255,255,0.2) 75%,transparent 75%,transparent);z-index:1;background-size:20px 20px;animation:move 1s linear infinite}
+    @keyframes move{0%{background-position:0 0}100%{background-position:20px 20px}}
+    .xp-info{display:flex;justify-content:space-between;margin-bottom:20px;color:#ccc;font-size:13px}
+    .add-xp-btn{background:linear-gradient(45deg,#ffca55,#FFA100);color:#333;border:none;padding:10px 20px;border-radius:25px;font-weight:600;font-size:14px;cursor:pointer;transition:all .3s ease;box-shadow:0 5px 15px rgba(255,202,85,0.4);display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px}
+    .add-xp-btn:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(255,202,85,0.6)}
+    .xp-rewards{margin-top:25px}
+    .rewards-title{font-size:16px;font-weight:600;margin-bottom:12px;color:#ffca55}
+    .reward-item{display:flex;align-items:center;margin-bottom:10px;font-size:13px}
+    .reward-icon{color:#ffca55;margin-right:8px;font-size:14px}
+    .content-tabs{display:flex;gap:8px;margin:30px 0 20px;background:rgba(50,50,50,0.8);padding:8px;border-radius:50px;width:fit-content;border:1px solid rgba(255,255,255,0.1);box-shadow:0 5px 15px rgba(0,0,0,0.2)}
+    .tab{padding:12px 25px;border-radius:25px;cursor:pointer;transition:all .3s ease;font-weight:500;text-align:center;min-width:100px;font-size:14px}
+    .tab.active{background:linear-gradient(45deg,#ffca55,#FFA100);color:#333;box-shadow:0 5px 15px rgba(255,202,85,0.4)}
+    .tab:hover:not(.active){background:rgba(255,255,255,0.1)}
+    .video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-top:30px}
+    .video-card{background:rgba(50,50,50,0.8);border-radius:15px;overflow:hidden;transition:transform .3s ease;border:1px solid rgba(255,255,255,0.1);cursor:pointer;position:relative}
+    .video-card:hover{transform:translateY(-5px)}
+    .thumbnail{width:100%;height:180px;object-fit:cover;border-bottom:1px solid rgba(255,255,255,0.1)}
+    .video-info{padding:15px}
+    .video-title{font-weight:600;margin-bottom:8px;font-size:16px;line-height:1.4;color:#fff}
+    .video-meta{display:flex;justify-content:space-between;color:#ccc;font-size:13px}
+    @media (max-width:1200px){.channel-header{flex-direction:column}.channel-avatar-container{padding:20px}}
+    @media (max-width:900px){.header{flex-wrap:wrap;gap:12px;padding:12px 20px}.logo{order:1;font-size:24px}.hamburger-menu{display:block;order:2}.search-container{order:4;margin:0;max-width:100%;margin-top:10px}.user-actions{order:3}}
+    @media (max-width:768px){.container{padding:15px}.header{padding:10px 15px}.video-grid{grid-template-columns:1fr}.content-tabs{flex-wrap:wrap;width:100%;border-radius:15px}.tab{flex:1;min-width:auto;padding:10px 15px;font-size:13px}.channel-stats{justify-content:center}.channel-avatar{width:120px;height:120px}.channel-name{font-size:22px}}
+
+    /* ========== Popup styles (updated for slider) ========== */
+    .xp-popup {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      background: rgba(0,0,0,0.6);
+      align-items: center;
+      justify-content: center;
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
+      pointer-events: auto;
+    }
+    .xp-popup.visible { display: flex !important; }
+
+    .xp-popup-dialog {
+      width: 420px;
+      max-width: calc(100% - 40px);
+      background: linear-gradient(180deg, #222, #1b1b1b);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.04);
+      color: #fff;
+      position: relative;
+    }
+
+    .xp-popup-dialog h3 {
+      margin: 0 0 15px;
+      color: #ffca55;
+      font-size: 18px;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .xp-slider-container {
+      margin-bottom: 20px;
+    }
+
+    .xp-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 5px;
+      background: rgba(255,255,255,0.1);
+      outline: none;
+      margin-bottom: 15px;
+    }
+
+    .xp-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ffca55;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255,202,85,0.8);
+    }
+
+    .xp-slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ffca55;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255,202,85,0.8);
+    }
+
+    .xp-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+
+    .xp-option {
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .xp-option:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .xp-option.active {
+      background: linear-gradient(45deg,#ffca55,#FFA100);
+      color: #333;
+      border-color: #ffca55;
+    }
+
+    .selected-xp {
+      text-align: center;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #ffca55;
+    }
+
+    .xp-popup-actions {
+      display:flex;
+      gap:10px;
+      justify-content:center;
+    }
+
+    .xp-popup-actions button {
+      padding:10px 20px;
+      border-radius:25px;
+      border:none;
+      cursor:pointer;
+      font-weight:700;
+      min-width: 100px;
+    }
+
+    #confirmXpBtn { background: linear-gradient(45deg,#4CAF50,#8BC34A); color:#111; }
+    #cancelXpBtn  { background: transparent; color:#fff; border: 1px solid rgba(255,255,255,0.06); }
+
+    @media (max-width:420px){
+      .xp-popup-dialog { width: 95%; padding: 14px; }
+      .xp-options { gap: 5px; }
+      .xp-option { padding: 6px 10px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="hamburger-menu"><i class="fas fa-bars"></i></div>
+    <div class="logo"><i class="fas fa-wave-square"></i> BOOSTER</div>
+
+    <div class="search-container">
+      <div class="search-bar">
+        <input type="text" placeholder="Search channels, videos, and more...">
+        <i class="fas fa-search"></i>
+      </div>
+    </div>
+
+    <div class="user-actions">
+      <div class="action-btn"><i class="fas fa-bell"></i><div class="notification-badge">3</div></div>
+      <img src="BoosterSquareLogo.png" alt="User Profile" class="user-profile">
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Channel Header -->
+    <div class="channel-header">
+      <div class="channel-avatar-container">
+        <img src="BoosterSquareLogo.png" alt="Channel Avatar" class="channel-avatar">
+        <div class="channel-info">
+          <h1 class="channel-name">CreativeCoder <i class="fas fa-check-circle verified-badge"></i></h1>
+          <div class="channel-stats">
+            <div class="stat"><span class="stat-number">100</span><span class="stat-label">Videos</span></div>
+            <div class="stat"><span class="stat-number">25.9K</span><span class="stat-label">Community Users</span></div>
+            <div class="stat"><span class="stat-number">10.7M</span><span class="stat-label">Views</span></div>
+          </div>
+          <p class="channel-description"> Individuo que sube videos</p>
+        </div>
+      </div>
+
+      <!-- XP Bar Section -->
+      <div class="xp-section">
+        <div class="xp-header">
+          <h2 class="xp-title">Channel Booster</h2>
+          <div class="xp-level">Level </div>
+        </div>
+
+        <div class="xp-bar-container">
+          <div class="xp-bar" id="xpBar"></div>
+        </div>
+
+        <div class="xp-info">
+          <span>3,250 XP</span>
+          <span>5,000 XP for next level</span>
+        </div>
+
+        <button class="add-xp-btn" id="addXpBtn" type="button">
+          <i class="fas fa-plus"></i> Add XP
+        </button>
+
+        <div class="xp-rewards">
+          <h3 class="rewards-title">Unlocked Rewards</h3>
+          <div class="reward-item"><i class="fas fa-trophy reward-icon"></i><span>Custom Emotes for Live Streams</span></div>
+          <div class="reward-item"><i class="fas fa-trophy reward-icon"></i><span>Extended Video Upload Length</span></div>
+          <div class="reward-item"><i class="fas fa-trophy reward-icon"></i><span>Priority Channel Verification</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Tabs -->
+    <div class="content-tabs">
+      <div class="tab active">Videos</div>
+      <div class="tab">Shorts</div>
+      <div class="tab">Live Streams</div>
+      <div class="tab">Playlists</div>
+      <div class="tab">Community</div>
+      <div class="tab">About</div>
+    </div>
+
+    <!-- Video Grid -->
+    <div class="video-grid">
+      <div class="video-card">
+        <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=700&q=80" alt="Video Thumbnail" class="thumbnail">
+        <div class="video-info">
+          <h3 class="video-title">Creating Modern UI Designs with CSS Grid and Flexbox</h3>
+          <div class="video-meta"><span>4.2K views</span><span>3 days ago</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== XP Popup with slider ===== -->
+  <div id="xpPopup" class="xp-popup" aria-hidden="true">
+    <div class="xp-popup-dialog" role="dialog" aria-modal="true" aria-labelledby="xpDialogTitle">
+      <h3 id="xpDialogTitle">Add XP</h3>
+      
+      <div class="xp-slider-container">
+        <input type="range" min="0" max="6" value="3" class="xp-slider" id="xpSlider">
+        <div class="selected-xp" id="selectedXp">500 XP</div>
+      </div>
+      
+      <div class="xp-options">
+        <div class="xp-option" data-value="10">10 XP</div>
+        <div class="xp-option" data-value="20">20 XP</div>
+        <div class="xp-option" data-value="50">50 XP</div>
+        <div class="xp-option" data-value="75">75 XP</div>
+        <div class="xp-option" data-value="100">100 XP</div>
+        <div class="xp-option" data-value="500">500 XP</div>
+        <div class="xp-option" data-value="1000">1000 XP</div>
+      </div>
+      
+      <div class="xp-popup-actions">
+        <button id="cancelXpBtn" type="button">Cancel</button>
+        <button id="confirmXpBtn" type="button">Add XP</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Script (updated for slider) ===== -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        const xpBar = document.getElementById('xpBar');
+        const addXpBtn = document.getElementById('addXpBtn');
+        const levelElement = document.querySelector('.xp-level');
+        if (!xpBar || !addXpBtn || !levelElement) {
+          console.error('Missing key elements: xpBar, addXpBtn or xp-level not found');
+          return;
+        }
+
+        // XP values corresponding to slider positions
+        const xpValues = [10, 20, 50, 75, 100, 500, 1000];
+        
+        // initial state
+        let currentXp = 3250;
+        const xpForNextLevel = 5000;
+
+        function updateXpBar() {
+          // clamp 0..100 for width
+          const pct = Math.max(0, Math.min(100, (currentXp / xpForNextLevel) * 100));
+          xpBar.style.width = pct + '%';
+          const xpInfoFirst = document.querySelector('.xp-info span:first-child');
+          if (xpInfoFirst) xpInfoFirst.textContent = `${currentXp.toLocaleString()} XP`;
+          const xpInfoSecond = document.querySelector('.xp-info span:last-child');
+          if (xpInfoSecond) xpInfoSecond.textContent = `${xpForNextLevel.toLocaleString()} XP for next level`;
+        }
+
+        // Popup elements
+        const xpPopup = document.getElementById('xpPopup');
+        const xpSlider = document.getElementById('xpSlider');
+        const selectedXp = document.getElementById('selectedXp');
+        const xpOptions = document.querySelectorAll('.xp-option');
+        const confirmXpBtn = document.getElementById('confirmXpBtn');
+        const cancelXpBtn = document.getElementById('cancelXpBtn');
+
+        if (!xpPopup || !xpSlider || !selectedXp || xpOptions.length === 0 || !confirmXpBtn || !cancelXpBtn) {
+          console.error('Missing popup elements; ensure xpPopup markup is present');
+          return;
+        }
+
+        // Set initial slider value
+        let selectedXpValue = xpValues[3]; // Default to 100 XP (index 4)
+        
+        function updateSelectedXp(value) {
+          selectedXpValue = value;
+          selectedXp.textContent = `${value.toLocaleString()} XP`;
+          
+          // Highlight the corresponding option button
+          xpOptions.forEach(option => {
+            if (parseInt(option.getAttribute('data-value')) === value) {
+              option.classList.add('active');
+            } else {
+              option.classList.remove('active');
+            }
+          });
+        }
+
+        // Initialize slider
+        xpSlider.addEventListener('input', function() {
+          const index = parseInt(this.value);
+          updateSelectedXp(xpValues[index]);
+        });
+
+        // Option buttons click handler
+        xpOptions.forEach(option => {
+          option.addEventListener('click', function() {
+            const value = parseInt(this.getAttribute('data-value'));
+            const index = xpValues.indexOf(value);
+            xpSlider.value = index;
+            updateSelectedXp(value);
+          });
+        });
+
+        function showPopup() {
+          xpPopup.classList.add('visible');
+          xpPopup.setAttribute('aria-hidden', 'false');
+          console.debug('XP popup opened');
+        }
+
+        function hidePopup() {
+          xpPopup.classList.remove('visible');
+          xpPopup.setAttribute('aria-hidden', 'true');
+          console.debug('XP popup closed');
+        }
+
+        // Open popup
+        addXpBtn.addEventListener('click', showPopup);
+
+        // Confirm add XP
+        confirmXpBtn.addEventListener('click', function () {
+          const xpGain = selectedXpValue;
+
+          currentXp += xpGain;
+
+          // Handle multiple level-ups if XP surpasses many levels
+          let levelsGained = 0;
+          while (currentXp >= xpForNextLevel) {
+            currentXp -= xpForNextLevel;
+            levelsGained++;
+          }
+          if (levelsGained > 0) {
+            const currentLevel = parseInt(levelElement.textContent.replace('Level ', ''), 10) || 0;
+            levelElement.textContent = `Level ${currentLevel + levelsGained}`;
+            // single alert summarizing level ups
+            alert(`Level Up! +${levelsGained} level(s) reached.`);
+          }
+
+          updateXpBar();
+
+          // Visual feedback on the add button (temporary)
+          addXpBtn.innerHTML = `<i class="fas fa-plus"></i> +${xpGain} XP`;
+          addXpBtn.style.background = 'linear-gradient(45deg,#4CAF50,#8BC34A)';
+          setTimeout(() => {
+            addXpBtn.innerHTML = '<i class="fas fa-plus"></i> Add XP';
+            addXpBtn.style.background = 'linear-gradient(45deg,#ffca55,#FFA100)';
+          }, 1500);
+
+          hidePopup();
+        });
+
+        // Cancel
+        cancelXpBtn.addEventListener('click', hidePopup);
+
+        // Click outside dialog to close
+        xpPopup.addEventListener('click', hidePopup);
+        xpPopup.querySelector('.xp-popup-dialog').addEventListener('click', function (e) { 
+          e.stopPropagation(); 
+        });
+
+        // Escape closes popup
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && xpPopup.classList.contains('visible')) hidePopup();
+        });
+
+        // Initialize
+        updateXpBar();
+        updateSelectedXp(xpValues[3]); // Default to 100 XP
+
+        // Helpful debug hints printed to the console
+        console.debug('XP popup script loaded successfully.');
+      } catch (err) {
+        console.error('XP script error:', err);
+      }
+    });
+  </script>
+</body>
+</html>
