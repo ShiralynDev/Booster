@@ -7,32 +7,42 @@ import { VideoSection } from "../sections/video-section";
 import { motion, AnimatePresence } from "framer-motion";
 import { DEFAULT_LIMIT } from "@/constants";
 import { VideoGetOneOutput } from "@/modules/videos/types";
+import { useRouter } from "next/router";
+import { InfiniteScroll } from "@/components/infinite-scroll";
 
 export const HomeView = () => {
   // const [video] = trpc.home.getOne.useSuspenseQuery({
   //   id: 'e4a0a1cd-4737-4c5d-9986-4d46f75067dd',
   // });
 
-  const [data] = trpc.home.getMany.useSuspenseInfiniteQuery(
+
+  const [data, query] = trpc.home.getMany.useSuspenseInfiniteQuery(
     { limit: DEFAULT_LIMIT },
     { getNextPageParam: (lastPage) => lastPage.nextCursor }
   );
 
-  console.log(data);
+
   const videos = useMemo(() => {
     if (!data) return [];
 
     return data.pages.flatMap(
-      (page) => Object.values(page.items).filter((item) => item) 
+      (page) => Object.values(page.items).filter((item) => item)
     );
   }, [data]);
-
-  // console.log("VIDEOS", videos);
 
 
 
   const [videoIndex, setVideoIndex] = useState(0);
   const [direction, setDirection] = useState(0);
+
+  const utils = trpc.useUtils();
+
+  //prefetch video data for when required
+  useEffect(() => {
+    const ids = [videos[videoIndex]?.id, videos[videoIndex + 1]?.id].filter(Boolean) as string[];
+    ids.forEach((id) => utils.videos.getOne.prefetch({ id }));
+  }, [videoIndex, videos, utils]);
+
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -42,14 +52,15 @@ export const HomeView = () => {
     };
   }, []);
 
-  console
-  .log("INDEX", videoIndex, videos.length);
   // Keyboard navigation
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") {
         setDirection(1);
-        setVideoIndex((i) => (i + 1)%(videos.length + 1));
+        if (videoIndex + 1 >= videos.length && !query.isFetchingNextPage) {
+          query.fetchNextPage();
+        }
+        setVideoIndex((i) => Math.min(i + 1, videos.length));
       }
       if (e.key === "ArrowLeft") {
         setDirection(-1);
@@ -76,6 +87,7 @@ export const HomeView = () => {
     <div className="h-dvh w-full flex flex-col overflow-hidden bg-[#f8f9fa] dark:bg-[#212121]">
       {/* Main content */}
       <div className="flex-1 flex overflow-hidden gap-3">
+       
         {/* Center content — no scrolling here */}
         <main className="flex-1 p-4 md:p-6 overflow-hidden">
           <div className="flex justify-center mx-auto max-w-full h-[95%]">
@@ -117,7 +129,7 @@ export const HomeView = () => {
                 className="w-full h-full"
               >
                 {videoIndex < videos.length ? (
-                  <VideoSection video={videos[videoIndex]} />
+                  <VideoSection videoId={videos[videoIndex].id} />
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full">
                     <p className="text-gray-600 dark:text-gray-300">
@@ -134,7 +146,10 @@ export const HomeView = () => {
                 aria-label="Next video"
                 onClick={() => {
                   setDirection(1);
-                  setVideoIndex((i) => (i + 1)%(videos.length + 1));
+                  if (videoIndex + 1 >= videos.length && !query.isFetchingNextPage) {
+                    query.fetchNextPage();
+                  }
+                  setVideoIndex((i) => Math.min(i + 1, videos.length));
                 }}
                 className="
                   w-20 rounded-2xl ml-4 flex items-center justify-center transition-all
@@ -162,6 +177,7 @@ export const HomeView = () => {
         <motion.button
           onClick={() => {
             setDirection(-1);
+
             setVideoIndex((i) => Math.max(0, i - 1));
           }}
           className="
@@ -182,7 +198,10 @@ export const HomeView = () => {
         <motion.button
           onClick={() => {
             setDirection(1);
-            setVideoIndex((i) => i + 1);
+            if (videoIndex + 1 >= videos.length && !query.isFetchingNextPage) {
+              query.fetchNextPage();
+            }
+            setVideoIndex((i) => Math.min(i + 1, videos.length));
           }}
           className="
             pointer-events-auto h-14 w-14 rounded-full flex items-center justify-center transition-colors
@@ -199,7 +218,15 @@ export const HomeView = () => {
         >
           <ChevronRight className="h-6 w-6" />
         </motion.button>
+        <InfiniteScroll
+          isManual
+          hasNextPage={query.hasNextPage}
+          isFetchingNextPage={query.isFetchingNextPage}
+          fetchNextPage={query.fetchNextPage}
+        />
       </div>
+
+
     </div>
   );
 };

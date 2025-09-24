@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, uuid, timestamp, uniqueIndex, integer, pgEnum, primaryKey, AnyPgColumn } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid, timestamp, uniqueIndex, integer, pgEnum, primaryKey, AnyPgColumn,boolean } from "drizzle-orm/pg-core";
 
 import {
     createInsertSchema,
@@ -14,7 +14,8 @@ export const users = pgTable("users", {
     imageUrl: text("image_url").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),about: text("about"),
-
+    xp: integer("xp").default(0), // THis is the virtual currency to trade and boost a channel
+    boostPoints: integer("boost_points").default(0), // to measure the amount of boost given to the channel (amount of XP given to the channel). Can only be done with xp
 }, (t) => [uniqueIndex("clerk_id_idx").on(t.clerkId)]);
 
 //create index on clerk_id to query faster. --> speed up WHERE, JOIN, ORDER BY clauses. B-Tree sorted by the column I index
@@ -67,6 +68,8 @@ export const videos = pgTable("videos", {
     categoryId: uuid("category_id").references(() => categories.id, {
         onDelete: 'set null',
     }),
+
+    isFeatured: boolean("is_featured").default(false),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -168,3 +171,11 @@ export const commentReactions = pgTable("comment_reactions", {
         columns: [table.userId, table.commentId]
     })
 ]);
+
+
+export const channelBoost = pgTable("channel_boost", {
+    boostId: uuid().primaryKey().defaultRandom(),
+    creatorId: uuid("creator_id").references(()=>users.id).notNull(),
+    boosterId: uuid("booster_id").references(() => users.id).notNull(),
+    xp: integer("xp").notNull(),
+})

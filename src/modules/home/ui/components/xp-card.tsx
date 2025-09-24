@@ -1,6 +1,8 @@
+import { Tooltip,TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { User } from "@/modules/users/types";
 import { AnimatePresence, motion, progressPercentage } from "framer-motion";
-import { ZapIcon, Plus, X } from "lucide-react";
+import { ZapIcon, Plus, X, CircleQuestionMark, Boxes } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -20,7 +22,7 @@ export const XpCard = ({ user,setShowAddXpModal }: Props) => {
     // Here you would implement the actual XP adding logic
     console.log(`Adding ${selectedXp} XP`);
     setShowAddXpModal(false);
-    toast.success(`Added ${selectedXp} XP to ${user.name}`);
+    toast.success(`Added ${selectedXp} points to ${user.name}`);
   };
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,8 +59,23 @@ export const XpCard = ({ user,setShowAddXpModal }: Props) => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Add XP
+              <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
+              Boost with XP
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-2 px-1 rounded-full cursor-help">
+                      
+                      <CircleQuestionMark className="size-4" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-justify">Adding XP boosts a channel, making it more visible. The higher the boost level, the more it gets recommended.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
               </h3>
               <button
                 onClick={() => setShowAddXpModal(false)}
@@ -70,7 +87,7 @@ export const XpCard = ({ user,setShowAddXpModal }: Props) => {
 
             <div className="mb-6">
               <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                Select how much XP to add to {user.name}
+                Select how much XP to boost this community
               </p>
 
               {/* XP Slider */}

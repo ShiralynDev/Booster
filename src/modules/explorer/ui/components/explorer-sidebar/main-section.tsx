@@ -1,7 +1,7 @@
 'use client';
 
 import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
-import { EarthIcon, FlameIcon, HomeIcon, PlayIcon, PlaySquareIcon, ShoppingCart, Sidebar, Users, Users2 } from "lucide-react";
+import { EarthIcon, FlameIcon, HomeIcon, PlayIcon, PlaySquareIcon, ShieldQuestionIcon, ShoppingCart, Sidebar, Users, Users2 } from "lucide-react";
 
 import { useAuth, useClerk } from "@clerk/nextjs";
 
@@ -34,6 +34,11 @@ const items = [
         title: "Market",
         url: "/market",
         icon: ShoppingCart,
+    },
+    {
+        title: "About",
+        url: "/about",
+        icon: ShieldQuestionIcon,
     }
 
 ]

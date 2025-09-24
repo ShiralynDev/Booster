@@ -5,8 +5,10 @@ import { cn } from "@/lib/utils";
 
 
 import { cva, type VariantProps } from "class-variance-authority";
+import { RocketIcon } from "lucide-react";
+import Link from "next/link";
 
-const avatarVariants = cva("",{
+const avatarVariants = cva("", {
     variants: {
         size: {
             default: 'h-9 w-9',
@@ -16,17 +18,29 @@ const avatarVariants = cva("",{
             lg: 'h-12 w-12',
             xl: 'h-[160px] w-[160px]',
         },
-        defaultVariants:{
-            size: 'default'
-        }
+        
+        iconSize: {
+            default: 'h-4 w-4',
+            xs: 'h-4 w-4',
+            sm: 'h-6 w-6',
+            md: 'h-8 w-8',
+            lg: 'h-12 w-12',
+            xl: 'h-[160px] w-[160px]',
+        },
+
+        defaultVariants: {
+            size: 'default',
+            iconSize:'default'
+        },
     }
 })
 
-interface UserAvatarProps extends VariantProps<typeof avatarVariants>{
-    imageUrl: string | undefined; 
-    name: string | undefined ;
+interface UserAvatarProps extends VariantProps<typeof avatarVariants> {
+    imageUrl: string | undefined;
+    name: string | undefined;
     className?: string;
     onClick?: () => void; //optional event
+    userId: string | undefined;
 }
 
 export const UserAvatar = ({
@@ -35,10 +49,22 @@ export const UserAvatar = ({
     className,
     onClick,
     size, //because it extends VariantProps
+    userId,
+    iconSize,
 }: UserAvatarProps) => {
     return (
-        <Avatar className={cn(avatarVariants({size, className}))} onClick={onClick}>
-            <AvatarImage src={imageUrl} alt={name} />
-        </Avatar>
+        <div className="relative">
+            <Link href={`/users/${userId}`}>
+                <Avatar className={cn(avatarVariants({ size, className }))} onClick={onClick}>
+                    <AvatarImage src={imageUrl} alt={name} />
+                </Avatar>
+            </Link>
+            {/* <div className="absolute  right-2 bottom-5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full p-0.5 shadow-md">
+                <div className="flex  bg-white dark:bg-[#333333] rounded-full p-1">
+                    <RocketIcon className={cn(avatarVariants({iconSize,className}))} />
+            
+                </div>
+            </div> */}
+        </div>
     )
 }

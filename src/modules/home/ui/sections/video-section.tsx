@@ -5,7 +5,7 @@ import { compactDate, compactNumber } from '@/lib/utils';
 import { HomeGetManyOutput, VideoGetOneOutput } from '@/modules/videos/types';
 import { VideoPlayer } from '@/modules/videos/ui/components/video-player';
 import { CommentsSection } from '@/modules/videos/ui/sections/comments-section';
-import { Eye, Calendar, ThumbsUp, Share, Download, Save, Play, Clock, Edit3Icon, ChevronLeft, ZapIcon, Plus, X } from 'lucide-react';
+import { Eye, Calendar, ThumbsUp, Share, Download, Save, Play, Clock, Edit3Icon, ChevronLeft, ZapIcon, Plus, X, RocketIcon, MousePointerClick, ThumbsDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFollow } from '@/modules/follows/hooks/follow-hook';
 import { SubButton } from '@/modules/subscriptions/ui/components/sub-button';
@@ -16,47 +16,18 @@ import { trpc } from '@/trpc/client';
 import { VideoReactions } from '@/modules/videos/ui/components/video-reactions';
 import { toast } from 'sonner';
 import { DEFAULT_LIMIT } from '@/constants';
-import { User } from '@/modules/users/types';
 import { XpCard } from '../components/xp-card';
+import { VideoMenu } from '@/modules/videos/ui/components/video-menu';
+import { VideoOwner } from '@/modules/videos/ui/components/video-owner';
 
-type Video = {
-    user: {
-        followsCount: number;
-        viewerIsFollowing: boolean;
-        videoCount: number;
-        viewerRating: number;
-        id: string;
-        clerkId: string;
-        name: string;
-        imageUrl: string;
-        createdAt: Date;
-        updatedAt: Date;
-    };
-    videoRatings: number;
-    averageRating: number;
-    videoViews: number;
-    id: string;
-    title: string;
-    description: string | null;
-    muxStatus: string | null;
-    muxAssetId: string | null;
-    muxUploadId: string | null;
-    muxPlaybackId: string | null;
-    muxTrackId: string | null;
-    muxTrackStatus: string | null;
-    thumbnailUrl: string | null;
-    thumbnailKey: string | null;
-    updatedAt: Date;
-    createdAt: Date;
-    viewer:User | null;
-}
 
-interface Props { video: Video; }
+interface Props {  videoId: string; }
 
-export const VideoSection = ({ video }: Props) => {
+export const VideoSection = ({ videoId }: Props) => {
+
+    const [video] = trpc.videos.getOne.useSuspenseQuery({id:videoId})
+
     const [commentsOpen, setCommentsOpen] = useState(false);
-    const [showAddXpModal, setShowAddXpModal] = useState(false);
-    const [selectedXp, setSelectedXp] = useState(10);
     const { isSignedIn, userId } = useAuth();
     const [showTitle, setShowTitle] = useState(true);
     const [isPlaying, setIsPlaying] = useState(true);
@@ -76,7 +47,9 @@ export const VideoSection = ({ video }: Props) => {
     }, []);
 
     const createView = trpc.videoViews.create.useMutation({
-        onSuccess: () => { utils.home.getMany.invalidate({ limit:DEFAULT_LIMIT }); },
+        onSuccess: () => { 
+            utils.videos.getOne.invalidate({id:videoId});
+         },
     });
 
     const handlePlay = () => {
@@ -91,7 +64,7 @@ export const VideoSection = ({ video }: Props) => {
 
     const createRating = trpc.videoRatings.create.useMutation({
         onSuccess: () => {
-            utils.home.getMany.invalidate({ limit:DEFAULT_LIMIT })
+            utils.videos.getOne.invalidate({ id:videoId })
         },
         onError: (error) => {
             if (error.message === "limit") toast.error("Wait a bit before rating again!")
@@ -109,44 +82,9 @@ export const VideoSection = ({ video }: Props) => {
         return true;
     }
 
-    const xpOptions = [10, 20, 50, 75, 100, 500, 1000];
-    const currentXp = 350;
-    const xpNeededForNextLevel = 1000;
-    const level = 1;
-    const progressPercentage = (currentXp / xpNeededForNextLevel) * 100;
-
-    const handleAddXp = () => {
-        // Here you would implement the actual XP adding logic
-        console.log(`Adding ${selectedXp} XP`);
-        setShowAddXpModal(false);
-        toast.success(`Added ${selectedXp} XP to ${video.user.name}`);
-    };
-
-    const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = parseInt(e.target.value);
-        setSelectedXp(value);
-        
-        // Snap to the closest predefined value
-        const closest = xpOptions.reduce((prev, curr) => {
-            return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
-        });
-        
-        setSelectedXp(closest);
-    };
-
-    // Create evenly spaced positions for all markers
-    const getMarkerPosition = (value: number, index: number) => {
-        return (index / (xpOptions.length - 1)) * 100;
-    };
-
-    return (
+       return (
         <div className="h-full w-full flex flex-col gap-4 overflow-hidden">
-            {/* Add XP Modal */}
-            <AnimatePresence>
-                {showAddXpModal && (
-                   <XpCard user={video.user} setShowAddXpModal={setShowAddXpModal} />
-                )}
-            </AnimatePresence>
+         
 
             {/* VIDEO AREA */}
             <div className="relative group flex-1 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
@@ -163,6 +101,7 @@ export const VideoSection = ({ video }: Props) => {
                             <div className="bg-white/90 dark:bg-[#333333]/90 backdrop-blur-md rounded-xl p-4 max-w-md border border-gray-200 dark:border-gray-700 shadow-md">
                                 <h2 className="text-gray-900 dark:text-white font-bold text-lg line-clamp-1">{video.title}</h2>
                                 <div className="flex items-center gap-4 mt-2 text-gray-600 dark:text-gray-300 text-sm">
+
                                     <div className="flex items-center gap-1"><Eye className="w-4 h-4" /><span>{compactNumber(video.videoViews)} views</span></div>
                                     <div className="flex items-center gap-1"><Clock className="w-4 h-4" /><span>{new Date(video.createdAt).toLocaleDateString()}</span></div>
                                 </div>
@@ -182,38 +121,44 @@ export const VideoSection = ({ video }: Props) => {
                         thumbnailUrl={video.thumbnailUrl}
                     />
 
-                    {/* Big play overlay when paused */}
+                    {/* Play button overlay */}
                     <AnimatePresence>
                         {!isPlaying && (
-                            <motion.button
-                                type="button"
-                                onClick={() => videoPlayerRef.current?.play()}
-                                initial={{ opacity: 0, scale: 0.85 }}
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.8 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.85 }}
-                                className="absolute inset-0 z-20 flex items-center justify-center"
+                                exit={{ opacity: 0, scale: 0.8 }}
+                                className="absolute inset-0 z-20 flex items-center justify-center -m-20 pointer-events-none group"
                             >
-                                <div className="w-20 h-20 rounded-full bg-white/80 dark:bg-[#333333]/80 backdrop-blur-md flex items-center justify-center border border-gray-200 dark:border-gray-700">
-                                    <div className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
+                                <div
+                                    className="w-20 h-20 rounded-full bg-black/50 backdrop-blur-md flex items-center justify-center hover:scale-110 transition-transform duration-300 pointer-events-auto cursor-pointer hover:bg-black/60 "
+                                    onClick={() => videoPlayerRef.current?.play()}
+                                >
+                                    <div className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
                                         <Play className="h-8 w-8 text-white fill-white ml-1" />
                                     </div>
                                 </div>
-                            </motion.button>
+                            </motion.div>
                         )}
                     </AnimatePresence>
                 </div>
             </div>
 
-            {/* META + BUTTONS */}
+            {/* TOP ROW */}
             <div className='flex items-start justify-between'>
                 <div className="flex flex-col sm:items-start sm:justify-between gap-3 ml-2 flex-1">
                     <div className="flex flex-wrap items-center gap-2 text-gray-700 dark:text-gray-300 text-sm max-w-7xl">
                         <p className='text-2xl font-semibold text-gray-900 dark:text-white line-clamp-1'>{video.title} </p>
                     </div>
-                    
+
+
                     <div className="flex flex-col sm:flex-row gap-4">
                         {/* Channel Info Card */}
-                        <div className="flex items-center bg-white dark:bg-[#333333] rounded-2xl px-4 py-3 border border-gray-200 dark:border-gray-700 shadow-sm flex-1">
+                        <VideoOwner user={video.user} videoId={video.id} />
+                        
+
+                        {/* Antiguo video owner descrption */}
+                        {/* <div className="flex items-center bg-white dark:bg-[#333333] rounded-2xl px-4 py-3 border border-gray-200 dark:border-gray-700 shadow-sm flex-1">
                             <div className="flex items-center gap-3">
                                 <UserAvatar size="lg" imageUrl={video.user.imageUrl} name={video.user.name} className="ring-2 ring-white shadow-sm" />
                                 <div className="flex-1">
@@ -230,67 +175,34 @@ export const VideoSection = ({ video }: Props) => {
                                             </a>
                                         </Button>
                                     ) : (
-                                        <SubButton 
-                                            onClick={onClick} 
-                                            disabled={false} 
-                                            isSubscribed={video.user.viewerIsFollowing} 
-                                            className="rounded-full p-4 shadow-sm hover:shadow-md transition-all bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600" 
+                                        <SubButton
+                                            onClick={onClick}
+                                            disabled={false}
+                                            isSubscribed={video.user.viewerIsFollowing}
+                                            className="rounded-full p-4 shadow-sm hover:shadow-md transition-all bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600"
                                         />
                                     )}
                                 </div>
                             </div>
-                        </div>
-                        
+                        </div> */}
+
                         {/* XP Progress Card */}
-                        <div className="bg-gradient-to-r from-amber-400/10 to-orange-500/10 dark:from-amber-400/5 dark:to-orange-500/5 rounded-2xl p-4 border border-amber-200 dark:border-amber-800/50 shadow-sm flex-1 min-w-[300px]">
-                            <div className="flex justify-between items-center mb-2">
-                                <div className="flex items-center gap-2">
-                                    <div className="bg-gradient-to-r from-amber-400 to-orange-500 p-1 rounded-lg">
-                                        <ZapIcon className="w-4 h-4 text-white" />
-                                    </div>
-                                    <span className="text-sm font-semibold text-gray-900 dark:text-white">Level {level}</span>
-                                </div>
-                                
-                                <button 
-                                    onClick={() => setShowAddXpModal(true)}
-                                    className="flex items-center gap-1 text-xs bg-amber-500 hover:bg-amber-600 text-white py-1 px-2 rounded-lg transition-colors"
-                                >
-                                    <Plus className="w-3 h-3" />
-                                    <span>Add XP</span>
-                                </button>
-                            </div>
-                            
-                            <div className="mb-2">
-                                <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
-                                    <span>{currentXp} XP</span>
-                                    <span>{xpNeededForNextLevel} XP</span>
-                                </div>
-                                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
-                                    <div 
-                                        className="bg-gradient-to-r from-amber-400 to-orange-500 h-2.5 rounded-full relative overflow-hidden"
-                                        style={{ width: `${progressPercentage}%` }}
-                                    >
-                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/20"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div className="flex justify-between items-center">
-                                <span className="text-xs text-gray-600 dark:text-gray-400">{xpNeededForNextLevel - currentXp} XP to next level</span>
-                                <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">{progressPercentage.toFixed(0)}%</span>
-                            </div>
-                        </div>
+                      
                     </div>
                 </div>
-                
+
                 <div className="flex flex-wrap items-start gap-2">
-                    <button className="px-4 h-10 rounded-full bg-white dark:bg-[#333333] border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition inline-flex items-center gap-2 shadow-sm">
-                        <Share className="w-4 h-4" /><span className="text-sm font-medium">Share</span>
-                    </button>
+
+
+                    
                     <div className="inline-flex items-center gap-2 bg-white dark:bg-[#333333] border border-gray-300 dark:border-gray-600 px-3 py-1.5 rounded-full text-gray-700 dark:text-gray-300">
                         <Eye className="h-4 w-4" /><span className="font-medium">{compactNumber(video.videoViews)}</span>
                     </div>
-                    <VideoReactions avgRating={video.averageRating} videoRatings={video.videoRatings} onRate={onRate} viewerRating={video.user.viewerRating}/>
+                    <VideoReactions avgRating={video.averageRating} videoRatings={video.videoRatings} onRate={onRate} viewerRating={video.user.viewerRating} />
+                    <div className='ml-1'>
+
+                        <VideoMenu variant='secondary' videoId={video.id} />
+                    </div>
                 </div>
             </div>
 

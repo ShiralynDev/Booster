@@ -32,6 +32,7 @@ export const CommentReplyInput = ({viewer,addCommentReply,parentCommentId,isPend
                     size="sm"
                     imageUrl={viewer?.imageUrl || "/public-user.png"}
                     name={viewer?.name || "Booster anonymous user"}
+                    userId={viewer?.id}
                 />
                 <div className="flex-shrink bg-gray-100 min-w-0 dark:bg-gray-800 rounded-lg px-2 py-1 flex items-center">
                     <input

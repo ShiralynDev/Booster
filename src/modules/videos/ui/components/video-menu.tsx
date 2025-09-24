@@ -5,23 +5,23 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { ListPlusIcon, MoreVerticalIcon, ShareIcon, TrashIcon } from "lucide-react";
+import { ListPlusIcon, MoreVerticalIcon, MousePointerClick, Share2, ShareIcon, ThumbsDown, TrashIcon } from "lucide-react";
 import { toast } from "sonner";
 
-interface VideoMenuProps{
+interface VideoMenuProps {
     videoId: string;
     variant?: "ghost" | "secondary";
     onRemove?: () => void;
 }
 
-export const VideoMenu= ({
+export const VideoMenu = ({
     videoId,
     variant,
     onRemove,
-}:VideoMenuProps) => {
+}: VideoMenuProps) => {
     const onShare = () => {
         //TODO: Change if deploying outside vercel
-        const fullUrl = `${process.env.VERCEL_URL || "http://localhost:3000"}/videos/${videoId}`
+        const fullUrl = `${process.env.VERCEL_URL || "http://localhost:3000"}/explorer/videos/${videoId}`
 
         navigator.clipboard.writeText(fullUrl);
         toast.success("Link Copied!")
@@ -34,17 +34,32 @@ export const VideoMenu= ({
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-                <DropdownMenuItem onClick={onShare}>
-                    <ShareIcon className="mr-2 size-4"/>
+            <DropdownMenuItem onClick={onShare}>
+                <Button className="flex items-center bg-emerald-200 w-full">
+
+                    <Share2 className="mr-2 size-4" />
                     Share
+                </Button>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={()=>{}}>
-                    <ListPlusIcon className="mr-2 size-4"/>
-                    Add to playlist
+                <DropdownMenuItem>
+                    <Button className='flex items-center justify-between bg-red-300 w-full'
+
+                    >
+                        <MousePointerClick className='size-4' />
+                        <p>Report ClickBait!</p>
+                        <ThumbsDown className='size-4' />
+                    </Button>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                    <Button className='flex items-center bg-red-300 w-full' >
+                        <MousePointerClick className='size-4' />
+                        <p>Report Inappropriate</p>
+                        <ThumbsDown className='size-4' />
+                    </Button>
                 </DropdownMenuItem>
                 {onRemove && (
-                    <DropdownMenuItem onClick={()=>{}}>
-                        <TrashIcon className="mr-2 size-4"/>
+                    <DropdownMenuItem onClick={() => { }}>
+                        <TrashIcon className="mr-2 size-4" />
                         Remove
                     </DropdownMenuItem>
                 )}

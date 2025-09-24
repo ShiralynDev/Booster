@@ -30,8 +30,9 @@ export const CommentInput = ({viewer,createComment}:CommentInputProps) => {
             size="md"
             imageUrl={viewer?.imageUrl || "/public-user.png"}
             name={viewer?.name || "Booster anonymous user"}
+            userId={viewer?.id}
           />
-          <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-lg  p-1 flex items-center">
+          <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-lg  pl-2 p-1 flex items-center">
             <input
               type="text"
               value={newComment}

@@ -1,137 +1,230 @@
 'use client'
 import { motion, AnimatePresence } from "framer-motion";
 import { CategoriesSection } from "../sections/categories-section";
-import { Play, Eye, Clock, Star, TrendingUp, Sparkles, ArrowRight, Zap } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Play, Eye, Clock, Star, TrendingUp, Sparkles, ArrowRight, Zap, Heart, Share2, Calendar } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
+import { trpc } from "@/trpc/client";
+import { DEFAULT_LIMIT } from "@/constants";
+import { User } from "@/modules/users/types";
+import { formatDuration } from "@/lib/utils";
+import type { RouterOutputs } from "@/trpc/client";
+import { VideoThumbnail } from "@/modules/videos/ui/components/video-thumbnail";
+import { UserAvatar } from "@/components/user-avatar";
+import { VideoOwner } from "@/modules/videos/ui/components/video-owner";
+import { InfiniteScroll } from "@/components/infinite-scroll";
 
 interface HomeViewProps {
   categoryId?: string;
 }
 
-interface Video {
-  id: string;
-  title: string;
-  thumbnailUrl: string;
-  duration: string;
-  views: number;
-  rating: number;
-  user: {
-    name: string;
-    imageUrl: string;
-  };
-  category: string;
-  isFeatured?: boolean;
-}
+type Page = RouterOutputs["explorer"]["getMany"];
+type Video = Page["items"][number];
 
 export const ExplorerView = ({ categoryId }: HomeViewProps) => {
   const [selectedCategory, setSelectedCategory] = useState(categoryId || "all");
-  const [videos, setVideos] = useState<Video[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hoveredVideo, setHoveredVideo] = useState<string | null>(null);
+
+  const [data, query] = trpc.explorer.getMany.useSuspenseInfiniteQuery(
+    { limit: DEFAULT_LIMIT * 2 },
+    { getNextPageParam: (lastPage) => lastPage.nextCursor }
+  );
+
+  const videos = useMemo(() => data ? data.pages.flatMap(p => p.items) : [], [data]);
 
   useEffect(() => {
-    // Load videos immediately
-    setVideos(mockVideos);
     setIsLoading(false);
   }, [selectedCategory]);
 
-  const filteredVideos = selectedCategory === "all" 
-    ? videos 
-    : videos.filter(video => video.category.toLowerCase() === selectedCategory.toLowerCase());
+  const featuredVideo = videos.find(v => v.isFeatured);
 
   return (
     <div className="max-w-[2400px] mx-auto mb-10 px-4 pt-2.5 flex flex-col gap-y-8">
       {/* Header Section */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
         className="text-center mb-8"
       >
-        <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 rounded-full mb-4">
-          <Zap className="w-4 h-4" />
-          <span className="text-sm font-medium">TRENDING NOW</span>
-        </div>
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-          Discover Amazing Content
-        </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+        <motion.div
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ delay: 0.2, duration: 0.6, ease: "backOut" }}
+          className="inline-flex items-center gap-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3 rounded-full mb-6 shadow-lg shadow-amber-500/25"
+        >
+          <Zap className="w-5 h-5" />
+          <span className="text-sm font-semibold tracking-wide">TRENDING NOW</span>
+          <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+        </motion.div>
+        
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+          className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4 leading-tight"
+        >
+          Discover Amazing
+          <span className="block bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
+            Content
+          </span>
+        </motion.h1>
+        
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+          className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed"
+        >
           Explore curated videos from talented creators around the world
-        </p>
+          <span className="block text-amber-600 dark:text-amber-400 font-medium mt-2">
+            New content added daily
+          </span>
+        </motion.p>
       </motion.div>
 
       {/* Categories Section */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
+        transition={{ delay: 0.5, duration: 0.6 }}
       >
-        <CategoriesSection 
-          categoryId={selectedCategory} 
-          onCategoryChange={setSelectedCategory}
+        <CategoriesSection
+          categoryId={selectedCategory ?? "all"}
         />
       </motion.div>
 
       {/* Featured Video Section */}
-      {!isLoading && filteredVideos.some(video => video.isFeatured) && (
+      {featuredVideo && (
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="relative"
+          transition={{ delay: 0.6, duration: 0.7 }}
+          className="relative group"
         >
-          <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-[#333333] dark:to-[#333333] rounded-3xl p-8 border border-amber-200 dark:border-amber-800">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-2 h-8 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full" />
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Featured Today</h2>
-              <Sparkles className="w-5 h-5 text-amber-500 ml-2" />
+          {/* Background Glow */}
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-3xl blur-xl transform scale-105 group-hover:scale-110 transition-transform duration-500" />
+          
+          <div className="relative bg-gradient-to-r from-amber-50 to-orange-50 dark:from-[#333333] dark:to-[#333333] rounded-3xl p-8 border border-amber-200 dark:border-amber-800 shadow-2xl">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-10 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full shadow-lg" />
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Featured Today</h2>
+                </div>
+                <div className="flex items-center gap-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 px-4 py-2 rounded-full">
+                  <Sparkles className="w-4 h-4" />
+                  <span className="text-sm font-semibold">Editor's Pick</span>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+                <Calendar className="w-4 h-4" />
+                <span>Just added</span>
+              </div>
             </div>
-            
+
             <div className="grid lg:grid-cols-2 gap-8 items-center">
-              {filteredVideos.filter(v => v.isFeatured).slice(0, 1).map((video) => (
-                <div key={video.id} className="relative group">
-                  <div className="relative rounded-2xl ">
-                    <Image
-                      src={video.thumbnailUrl}
-                      alt={video.title}
-                      width={600}
-                      height={256}
-                      priority
-                      className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <div className="bg-amber-500 text-white px-3 py-1 rounded-lg text-sm font-medium inline-block mb-2">
+              {/* Video Card */}
+              <motion.div 
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                className="relative group/card"
+              >
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                  <VideoThumbnail
+                    duration={featuredVideo.duration || 0}
+                    title={featuredVideo.title}
+                    imageUrl={featuredVideo.thumbnailUrl}
+                    previewUrl={featuredVideo.previewUrl}
+                  />
+                  
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  
+                  {/* Content Overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-6">
+                    <div className="flex items-start justify-between mb-3">
+                      <h3 className="text-2xl font-bold text-white line-clamp-2 pr-4 flex-1">
+                        {featuredVideo.title}
+                      </h3>
+                      <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-lg">
                         Featured
                       </div>
-                      <h3 className="text-xl font-bold text-white line-clamp-2">{video.title}</h3>
                     </div>
-                    <div className="absolute top-4 right-4 bg-black/80 text-white px-2 py-1 rounded-lg text-sm">
-                      {video.duration}
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <UserAvatar
+                          size="lg"
+                          imageUrl={featuredVideo.user?.imageUrl || "/public-user.png"}
+                          name={featuredVideo.user?.name || "Anonymous"}
+                          userId={featuredVideo.user?.id}
+                        />
+                        <div>
+                          <p className="text-white font-medium">{featuredVideo.user?.name}</p>
+                          <p className="text-gray-300 text-sm">Content Creator</p>
+                        </div>
+                      </div>
+                      
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="bg-white text-gray-900 px-6 py-3 rounded-xl font-semibold flex items-center gap-2 shadow-lg hover:shadow-xl transition-all"
+                      >
+                        <Play className="w-5 h-5" />
+                        Watch Now
+                      </motion.button>
                     </div>
                   </div>
                 </div>
-              ))}
-              
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Why you'll love this:</h3>
-                <ul className="space-y-2 text-gray-600 dark:text-gray-400">
-                  <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-amber-500 rounded-full" />
-                    Stunning cinematography and visuals
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-amber-500 rounded-full" />
-                    Expert storytelling techniques
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-amber-500 rounded-full" />
-                    Community rating: 4.8+ stars
-                  </li>
+              </motion.div>
+
+              {/* Features List */}
+              <div className="space-y-6">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Why you'll love this:</h3>
+                <ul className="space-y-4">
+                  {[
+                    "Stunning cinematography and visuals",
+                    "Expert storytelling techniques", 
+                    "Community rating: 4.8+ stars",
+                    "Exclusive behind-the-scenes content"
+                  ].map((feature, index) => (
+                    <motion.li
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.7 + index * 0.1 }}
+                      className="flex items-center gap-4 text-gray-700 dark:text-gray-300 group/feature"
+                    >
+                      <div className="relative">
+                        <div className="w-3 h-3 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full transform group-hover/feature:scale-150 transition-transform" />
+                        <div className="absolute inset-0 bg-amber-500 rounded-full animate-ping opacity-75" />
+                      </div>
+                      <span className="text-lg">{feature}</span>
+                    </motion.li>
+                  ))}
                 </ul>
-                <button className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-amber-500/25 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center gap-2">
-                  Watch Now
-                  <Play className="w-4 h-4" />
-                </button>
+                
+                <div className="flex gap-4 pt-4">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white py-4 rounded-xl font-semibold flex items-center justify-center gap-3 shadow-lg hover:shadow-amber-500/25 transition-all"
+                  >
+                    <Play className="w-5 h-5" />
+                    Watch Featured Video
+                  </motion.button>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-6 py-4 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    <Share2 className="w-5 h-5" />
+                  </motion.button>
+                </div>
               </div>
             </div>
           </div>
@@ -140,21 +233,30 @@ export const ExplorerView = ({ categoryId }: HomeViewProps) => {
 
       {/* Video Grid Section */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
+        transition={{ delay: 0.8, duration: 0.7 }}
       >
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-8 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full" />
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {selectedCategory === "all" ? "Popular Videos" : `${selectedCategory} Videos`}
-            </h2>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <div className="w-2 h-12 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full shadow-lg" />
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+                {selectedCategory === "all" ? "Popular Videos" : `${selectedCategory} Videos`}
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">
+                Curated selection of top content
+              </p>
+            </div>
           </div>
-          <button className="flex items-center gap-2 text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors">
-            <span className="text-sm font-medium">View all</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          
+          <motion.button
+            whileHover={{ x: 5 }}
+            className="flex items-center gap-3 bg-white dark:bg-gray-800 px-6 py-3 rounded-xl font-semibold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-amber-300 dark:hover:border-amber-600 transition-all group"
+          >
+            <span>View all</span>
+            <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+          </motion.button>
         </div>
 
         {isLoading ? (
@@ -174,62 +276,101 @@ export const ExplorerView = ({ categoryId }: HomeViewProps) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.4 }}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
             >
-              {filteredVideos.filter(v => !v.isFeatured).map((video, index) => (
+              {videos.filter(v => !v.isFeatured).map((video, index) => (
                 <motion.div
                   key={video.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="group cursor-pointer"
+                  initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                  whileHover={{ y: -8, scale: 1.02 }}
+                  onHoverStart={() => setHoveredVideo(video.id)}
+                  onHoverEnd={() => setHoveredVideo(null)}
+                  className="group cursor-pointer relative"
                 >
-                  <div className="relative  rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-[#333333] dark:to-[#333333] border-gray-200 dark:border-gray-100 hover:border-amber-300 dark:hover:border-amber-600 transition-all duration-300 hover:shadow-xl">
-                    <div className="relative aspect-video ">
-                      <Image
-                        src={video.thumbnailUrl}
-                        alt={video.title}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  {/* Hover Glow Effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-orange-400/20 rounded-2xl blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-105" />
+                  
+                  <div className="relative bg-gradient-to-br from-gray-100 to-gray-200 dark:from-[#333333] dark:to-[#333333] rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl border border-gray-200 dark:border-gray-700 transition-all duration-300">
+                    {/* Video Thumbnail */}
+                    <div className="relative aspect-video overflow-hidden">
+                      <VideoThumbnail
+                        duration={video.duration || 0}
+                        title={video.title}
+                        imageUrl={video.thumbnailUrl}
+                        previewUrl={video.previewUrl}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      <div className="absolute bottom-3 right-3 bg-black/80 text-white px-2 py-1 rounded-lg text-xs">
-                        {video.duration}
+                      
+                      {/* Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      
+                      {/* Video Info Overlay */}
+                      <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
+                        {video.categoryId && (
+                          <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1 rounded-lg text-xs font-semibold shadow-lg">
+                            {video.categoryId}
+                          </div>
+                        )}
+                        
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          className="bg-white/90 text-gray-900 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        >
+                          <Play className="w-4 h-4" />
+                        </motion.button>
                       </div>
-                      <div className="absolute top-3 left-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-2 py-1 rounded-lg text-xs font-medium">
-                        {video.category}
+                      
+                      {/* Duration */}
+                      <div className="absolute bottom-3 right-3 bg-black/80 text-white px-2 py-1 rounded-lg text-xs font-medium backdrop-blur-sm">
+                        {formatDuration(video.duration)}
                       </div>
                     </div>
 
+                    {/* Content */}
                     <div className="p-4">
-                      <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-2 mb-2 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-                        {video.title}
+                      <h3 className="font-semibold text-gray-900 dark:text-white text-lg mb-3 line-clamp-2 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors leading-tight">
+                        {video.title || "Untitled"}
                       </h3>
-                      
-                      <div className="flex items-center gap-2 mb-3">
-                        <Image
-                          src={video.user.imageUrl}
-                          alt={video.user.name}
-                          width={20}
-                          height={20}
-                          className="w-5 h-5 rounded-full object-cover"
+
+                      {/* Creator Info */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <UserAvatar
+                          size="md"
+                          imageUrl={video.user?.imageUrl || "/public-user.png"}
+                          name={video.user?.name || "Anonymous"}
+                          userId={video.user?.id}
                         />
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
-                          {video.user.name}
-                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-gray-900 dark:text-white text-sm truncate">
+                            {video.user?.name?.replace(/\s*null\s*$/i, "") || "Anonymous"}
+                          </p>
+                          <p className="text-gray-500 dark:text-gray-400 text-xs">Content Creator</p>
+                        </div>
                       </div>
-                      
-                      <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                        <div className="flex items-center gap-1">
-                          <Eye className="w-3 h-3" />
-                          <span>{formatCompactNumber(video.views)}</span>
+
+                      {/* Stats */}
+                      <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1">
+                            <Eye className="w-4 h-4" />
+                            <span>{formatCompactNumber(Number(video.videoViews) ?? 0)}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Star className="w-4 h-4 text-amber-500" />
+                            <span>{Number(video.averageRating).toFixed(1) || "0.0"}</span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Star className="w-3 h-3" />
-                          <span>{video.rating.toFixed(1)}</span>
-                        </div>
+                        
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          className="text-gray-400 hover:text-amber-500 transition-colors"
+                        >
+                          <Heart className="w-4 h-4" />
+                        </motion.button>
                       </div>
                     </div>
                   </div>
@@ -241,141 +382,62 @@ export const ExplorerView = ({ categoryId }: HomeViewProps) => {
       </motion.div>
 
       {/* CTA Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
+      {/* <motion.div
+        initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
+        transition={{ delay: 1, duration: 0.7 }}
         className="text-center py-12"
       >
-        <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-[#333333] dark:to-[#333333] rounded-3xl p-8 border border-amber-200 dark:border-amber-800">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Ready to explore more?
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-2xl mx-auto">
-            Join thousands of viewers discovering amazing content every day
-          </p>
-          <button className="px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-amber-500/25 transition-all duration-300 transform hover:-translate-y-0.5">
-            Explore All Categories
-          </button>
+        <div className="relative group">
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-3xl blur-2xl transform scale-105" />
+          
+          <div className="relative bg-gradient-to-r from-amber-50 to-orange-50 dark:from-[#333333] dark:to-[#333333] rounded-3xl p-12 border border-amber-200 dark:border-amber-800 shadow-2xl">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.1 }}
+              className="text-4xl font-bold text-gray-900 dark:text-white mb-4"
+            >
+              Ready to explore more?
+            </motion.h2>
+            
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2 }}
+              className="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto leading-relaxed"
+            >
+              <span className="text-amber-600 dark:text-amber-400 font-semibold"> Start your journey today.</span>
+            </motion.p>
+            
+            <motion.button
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.3 }}
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-12 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-amber-500/25 transition-all duration-300 inline-flex items-center gap-3"
+            >
+              <Zap className="w-5 h-5" />
+              Explore All Categories
+              <ArrowRight className="w-5 h-5" />
+            </motion.button>
+          </div>
         </div>
-      </motion.div>
+      </motion.div> */}
+       <InfiniteScroll
+              isManual={false}
+              hasNextPage={query.hasNextPage}
+              isFetchingNextPage={query.isFetchingNextPage}
+              fetchNextPage={query.fetchNextPage}
+            />
     </div>
   );
 };
 
-// Helper function
 const formatCompactNumber = (number: number): string => {
   return Intl.NumberFormat("en", {
     notation: "compact",
     maximumFractionDigits: 1
   }).format(number);
 };
-
-// Mock data
-const mockVideos: Video[] = [
-  {
-    id: "1",
-    title: "Amazing Mountain Landscape Timelapse",
-    thumbnailUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
-    duration: "4:32",
-    views: 1250000,
-    rating: 4.8,
-    user: {
-      name: "NatureLover",
-      imageUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"
-    },
-    category: "Nature",
-    isFeatured: true
-  },
-  {
-    id: "2",
-    title: "Urban City Life - Street Photography",
-    thumbnailUrl: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
-    duration: "7:15",
-    views: 890000,
-    rating: 4.6,
-    user: {
-      name: "CityExplorer",
-      imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"
-    },
-    category: "Urban"
-  },
-  {
-    id: "3",
-    title: "Cooking Masterclass: Italian Cuisine",
-    thumbnailUrl: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
-    duration: "12:45",
-    views: 2300000,
-    rating: 4.9,
-    user: {
-      name: "ChefMarco",
-      imageUrl: "https://images.unsplash.com/photo-1566554273541-37a9ca77b91f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"
-    },
-    category: "Cooking"
-  },
-  {
-    id: "4",
-    title: "Sunset Beach Meditation Guide",
-    thumbnailUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
-    duration: "18:20",
-    views: 560000,
-    rating: 4.7,
-    user: {
-      name: "ZenMaster",
-      imageUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"
-    },
-    category: "Wellness"
-  },
-  {
-    id: "5",
-    title: "Wildlife Documentary: African Safari",
-    thumbnailUrl: "https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
-    duration: "22:10",
-    views: 1780000,
-    rating: 4.8,
-    user: {
-      name: "WildlifeDoc",
-      imageUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"
-    },
-    category: "Nature"
-  },
-  {
-    id: "6",
-    title: "Tech Review: Latest Smartphone 2024",
-    thumbnailUrl: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
-    duration: "8:45",
-    views: 920000,
-    rating: 4.5,
-    user: {
-      name: "TechGuru",
-      imageUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"
-    },
-    category: "Technology"
-  },
-  {
-    id: "7",
-    title: "Morning Yoga Routine for Beginners",
-    thumbnailUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
-    duration: "15:30",
-    views: 670000,
-    rating: 4.7,
-    user: {
-      name: "YogaMaster",
-      imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"
-    },
-    category: "Wellness"
-  },
-  {
-    id: "8",
-    title: "DIY Home Decor Ideas on a Budget",
-    thumbnailUrl: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
-    duration: "10:20",
-    views: 430000,
-    rating: 4.4,
-    user: {
-      name: "HomeDesigner",
-      imageUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"
-    },
-    category: "Lifestyle"
-  }
-];

@@ -345,21 +345,21 @@ const FormSectionSuspense = ({ videoId }: PageProps) => {
                                                         <MoreVerticalIcon className="h-5 w-5" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
-                                                <DropdownMenuContent align='start' side='right' className="rounded-xl shadow-lg border border-gray-200 w-44 bg-white">
+                                                <DropdownMenuContent align='start' side='right' className="rounded-xl shadow-lg border border-gray-200 w-44 bg-white dark:bg-[#333333]">
                                                     <DropdownMenuItem 
                                                         onClick={() => setThumbnailModalOpen(true)}
-                                                        className="cursor-pointer px-4 py-3 flex items-center rounded-lg"
+                                                        className="cursor-pointer px-4 py-3 flex items-center rounded-lg dark:hover:bg-blue-900"
                                                     >
-                                                        <ImagePlusIcon className="h-4 w-4 mr-2" />
+                                                        <ImagePlusIcon className="h-4 w-4 mr-2 " />
                                                         Change
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem className="cursor-pointer px-4 py-3 flex items-center rounded-lg">
+                                                    <DropdownMenuItem className="cursor-pointer px-4 py-3 flex items-center rounded-lg dark:hover:bg-blue-900">
                                                         <SparklesIcon className="h-4 w-4 mr-2" />
                                                         AI-generated
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem 
                                                         onClick={() => restoreThumbnail.mutate({id:videoId})}
-                                                        className="cursor-pointer px-4 py-3 flex items-center rounded-lg"
+                                                        className="cursor-pointer px-4 py-3 flex items-center rounded-lg dark:hover:bg-blue-900"
                                                     >
                                                         <RotateCcwIcon className="h-4 w-4 mr-2" />
                                                         Restore
@@ -389,12 +389,12 @@ const FormSectionSuspense = ({ videoId }: PageProps) => {
                                                         <SelectValue placeholder='Select a category' />
                                                     </SelectTrigger>
                                                 </FormControl>
-                                                <SelectContent className="rounded-xl border border-gray-200 shadow-lg bg-white">
+                                                <SelectContent className="rounded-xl border border-gray-200 shadow-lg bg-whitea dark:bg-[#333333]">
                                                     {categories.map((category) => (
                                                         <SelectItem 
                                                             key={category.id} 
                                                             value={category.id}
-                                                            className="rounded-lg px-4 py-3 focus:bg-blue-50 transition-colors duration-200"
+                                                            className="rounded-lg px-4 py-3 focus:bg-blue-50 dark:focus:bg-slate-700 transition-colors duration-200"
                                                         >
                                                             {category.name}
                                                         </SelectItem>
@@ -515,23 +515,23 @@ const FormSectionSuspense = ({ videoId }: PageProps) => {
                                                 defaultValue={field.value !== undefined ? String(field.value) : undefined}
                                             >
                                                 <FormControl>
-                                                    <SelectTrigger className="h-12 rounded-xl border-gray-200 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                                                    <SelectTrigger className="h-12 rounded-xl border-gray-200 focus:ring-blue-500 focus:border-blue-500 dark:focus:bg-slate-700 transition-colors duration-200">
                                                         <SelectValue placeholder='Select visibility' />
                                                     </SelectTrigger>
                                                 </FormControl>
-                                                <SelectContent className="rounded-xl border border-gray-200 shadow-lg bg-white">
-                                                    <SelectItem value="public" className="rounded-lg px-4 py-3 focus:bg-blue-50 transition-colors duration-200">
+                                                <SelectContent className="rounded-xl border border-gray-200 shadow-lg bg-white dark:focus:bg-slate-700 dark:bg-[#333333]">
+                                                    <SelectItem value="public" className="rounded-lg px-4 py-3 focus:bg-blue-50 dark:focus:bg-slate-700 transition-colors duration-200">
                                                         <div className="flex items-center">
                                                             <Globe2Icon className="h-4 w-4 mr-2 text-blue-600" /> 
                                                             <span>Public</span>
-                                                            <span className="ml-5 text-xs text-gray-500">Anyone can view</span>
+                                                            <span className="ml-5 text-sm text-gray-500 dark:text-white">Anyone can view</span>
                                                         </div>
                                                     </SelectItem>
-                                                    <SelectItem value="private" className="rounded-lg px-4 py-3 focus:bg-blue-50 transition-colors duration-200">
+                                                    <SelectItem value="private" className="rounded-lg px-4 py-3 focus:bg-blue-50 dark:focus:bg-slate-700 transition-colors duration-200">
                                                         <div className="flex items-center">
                                                             <LockIcon className="h-4 w-4 mr-2 text-gray-600"/>
                                                             <span>Private</span>
-                                                            <span className="ml-4 text-xs text-gray-500">Only you can view</span>
+                                                            <span className="ml-4 text-sm text-gray-500 dark:text-white">Only you can view</span>
                                                         </div>
                                                     </SelectItem>
                                                 </SelectContent>

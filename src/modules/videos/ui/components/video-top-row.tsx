@@ -44,11 +44,11 @@ export const VideoTopRow = ({ video, onRate,}: Props) => {
             </div>
             
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between z-30 min-w-0 gap-y-2">
-                <div className="min-w-0 flex-1 max-w-lg overflow-hidden order-2 sm:order-1">
+                <div className="min-w-0 overflow-hidden order-2 ">
                     <VideoOwner user={video.user} videoId={video.id} />
                 </div>
                 
-                <div className="flex flex-row items-center justify-between sm:justify-end sm:min-w-[180px] gap-2 order-1 sm:order-2">
+                <div className="flex flex-row items-start justify-between sm:justify-end sm:min-w-[180px] gap-2 order-1 sm:order-2">
                     <VideoReactions 
                         onRate={onRate} 
                         viewerRating={video.user.viewerRating}

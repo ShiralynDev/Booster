@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "image.mux.com" },   // Mux poster/thumbnail
       { protocol: "https", hostname: "assets.mux.com" },  // (optional) storyboards, etc.
+      { protocol: "https", hostname: "" },  // TODO: upload thing
     ],
     formats: ["image/avif", "image/webp"],
   },

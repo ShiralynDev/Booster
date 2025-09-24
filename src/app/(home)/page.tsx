@@ -40,6 +40,7 @@ interface PageProps{
 
 const Page = async ({searchParams}: PageProps) => { //destructure searchParams
   void trpc.categories.getMany.prefetch();
+  void trpc.home.getMany.prefetch({limit:DEFAULT_LIMIT});
   const { categoryId } = await searchParams; //await the promise to get the actual search params
 
   return (

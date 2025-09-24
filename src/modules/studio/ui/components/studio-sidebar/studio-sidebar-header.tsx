@@ -35,6 +35,7 @@ export const StudioSidebarHeader = () => {
               imageUrl={user?.imageUrl}
               name={user?.fullName || "User"}
               size="xs"
+              userId={user.id}
             />
             <span className="text-sm">Your profile</span>
           </Link>
@@ -50,6 +51,7 @@ export const StudioSidebarHeader = () => {
           imageUrl={user?.imageUrl}
           name={user?.fullName || "User"}
           className="size-[112px] hover:opacity-80 transition-opacity"
+          userId={user.id}
         />
       </Link>
       <div className="flex flex-col items-center mt-2 gap-y-1">

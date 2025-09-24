@@ -1,3 +1,4 @@
+import { DEFAULT_LIMIT } from "@/constants";
 import { trpc } from "@/trpc/client";
 import { useClerk } from "@clerk/nextjs";
 import { toast } from "sonner";
@@ -14,12 +15,9 @@ export const useFollow = ({ userId, isFollowing, fromVideoId,home }: Props) => {
     const utils = trpc.useUtils();
     const follow = trpc.follows.create.useMutation({
         onMutate: async ({ userId }) => {
-            if(!home) await utils.videos.getOne.cancel({ id: fromVideoId });
-            else await utils.home.getOne.cancel({id:fromVideoId})
-
-            const previous = (home ? utils.home.getOne.getData({id:fromVideoId}) : utils.videos.getOne.getData({ id: fromVideoId }));
-
-            if(!home){
+            if(!home){ 
+                await utils.videos.getOne.cancel({ id: fromVideoId });
+                const previous = (home ? utils.home.getMany.getData({ limit: DEFAULT_LIMIT }) : utils.videos.getOne.getData({ id: fromVideoId }));
                 utils.videos.getOne.setData({ id: fromVideoId }, (old) => {
                     if (!old) return old;
                     return {
@@ -31,41 +29,31 @@ export const useFollow = ({ userId, isFollowing, fromVideoId,home }: Props) => {
                         },
                     };
                 });
-            }else{
-                 utils.home.getOne.setData({ id: fromVideoId }, (old) => {
-                    if (!old) return old;
-                    return {
-                        ...old,
-                        user: {
-                            ...old.user,
-                            viewerIsFollowing: true,
-                            followsCount: (old.user.followsCount ?? 0) + (old.user.viewerIsFollowing ? 0 : 1),
-                        },
-                    };
-                });
+                return { previous };
             }
 
-            return { previous };
         },
         onError: (_err, _vars, ctx) => {
             if (ctx?.previous && !home) utils.videos.getOne.setData({ id: fromVideoId }, ctx.previous);
-            if (ctx?.previous && home) utils.home.getOne.setData({ id: fromVideoId }, ctx.previous);
+            if (ctx?.previous && home) utils.home.getMany.setData({limit: DEFAULT_LIMIT}, ctx.previous);
             clerk.openSignIn();
         },
         onSettled: () => {
             if(!home) utils.videos.getOne.invalidate({ id: fromVideoId });
-            else utils.videos.getOne.invalidate({ id: fromVideoId });
+            else utils.home.getMany.invalidate({ limit:DEFAULT_LIMIT });
         },
+        onSuccess: () =>{
+            if(home){
+                utils.home.getMany.invalidate({limit:DEFAULT_LIMIT})
+            }
+        }
     });
 
     const unfollow = trpc.follows.delete.useMutation({
         onMutate: async ({ userId }) => {
-            if (!home) await utils.videos.getOne.cancel({ id: fromVideoId });
-            else await utils.home.getOne.cancel({id:fromVideoId})
-
-            const previous = (home ? utils.home.getOne.getData({id:fromVideoId}) : utils.videos.getOne.getData({ id: fromVideoId }));
-
             if (!home) {
+                await utils.videos.getOne.cancel({ id: fromVideoId });
+                const previous = (home ? utils.home.getMany.getData({ limit: DEFAULT_LIMIT }) : utils.videos.getOne.getData({ id: fromVideoId }));
                 utils.videos.getOne.setData({ id: fromVideoId }, (old) => {
                     if (!old) return old;
                     return {
@@ -77,30 +65,24 @@ export const useFollow = ({ userId, isFollowing, fromVideoId,home }: Props) => {
                         },
                     };
                 });
-            } else {
-                utils.home.getOne.setData({ id: fromVideoId }, (old) => {
-                    if (!old) return old;
-                    return {
-                        ...old,
-                        user: {
-                            ...old.user,
-                            viewerIsFollowing: false,
-                            followsCount: (old.user.followsCount ?? 0) - (old.user.viewerIsFollowing ? 1 : 0),
-                        },
-                    };
-                });
-            }
+                return { previous };
+            } 
 
-            return { previous };
         },
         onError: (_err, _vars, ctx) => {
             if (ctx?.previous) utils.videos.getOne.setData({ id: fromVideoId }, ctx.previous);
+            if (ctx?.previous) utils.home.getMany.setData({ limit: DEFAULT_LIMIT}, ctx.previous);
             toast.error("something went wrong");
             clerk.openSignIn();
         },
         onSettled: () => {
             utils.videos.getOne.invalidate({ id: fromVideoId });
         },
+        onSuccess: () =>{
+            if(home){
+                utils.home.getMany.invalidate({limit:DEFAULT_LIMIT})
+            }
+        }
     });
 
     const isPending = follow.isPending || unfollow.isPending

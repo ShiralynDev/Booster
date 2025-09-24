@@ -58,6 +58,7 @@ export const FollowList = () => {
                                         onClick={() => {}}
                                         size='lg'
                                         className="ring-2 ring-amber-400"
+                                        userId={e.user.id}
                                     />
                                     <div>
                                         <h3 className="font-semibold text-amber-900 dark:text-amber-100">{e.user?.name}</h3>

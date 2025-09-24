@@ -338,7 +338,7 @@ export const Comment = ({ parentComment, videoId, viewer, depth, maxDepth }: Com
             className="group relative p-2 ml-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
         >
             <div className="flex gap-3">
-                <UserAvatar size="md" imageUrl={parentComment.user.imageUrl} name={parentComment.user.name} />
+                <UserAvatar size="md" imageUrl={parentComment.user.imageUrl} name={parentComment.user.name} userId={parentComment.userId}/>
                 <div className="flex-1 min-w-0 overflow-hidden">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <UserInfo size="xs" name={parentComment.user.name?.replace(/\s*null\s*$/i, "")} />

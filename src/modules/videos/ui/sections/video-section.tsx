@@ -120,7 +120,7 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
             <div className="absolute -inset-4 bg-gradient-to-r from-amber-500/10  to-amber-500/10 rounded-xl  blur-xl opacity-0 " />
 
             <div className={cn(
-                "relative aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-gray-900 to-gray-950 border border-gray-800/50 backdrop-blur-md",
+                "relative aspect-video rounded-xl overflow-hidden  backdrop-blur-md",
                 video.muxStatus !== "ready" && "rounded-b-none",
             )}
             >
