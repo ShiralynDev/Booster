@@ -142,7 +142,7 @@ export const BoosterRankingsSuspense = ({ userId }: Props) => {
                                 You
                             </span>
                         )}
-                        <Card className="relative bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/20 dark:to-orange-900/20 border-0 p-6 text-center">
+                        <Card className="relative bg-gradient-to-br from-amber-900/20 to-orange-900/20 dark:from-amber-900/20 dark:to-orange-900/20 border-0 p-6 text-center">
                            
                             <div className="relative mb-4">
                                 <div className="w-20 h-20 mx-auto bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center border-4 ">
@@ -159,7 +159,7 @@ export const BoosterRankingsSuspense = ({ userId }: Props) => {
                             <h3 className="font-bold text-lg mb-1 truncate">{rankings.at(2)?.user.name}</h3>
                            
                             <p className="text-muted-foreground text-sm mb-2">Bronze Booster</p>
-                            <div className="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                            <div className="bg-gradient-to-r from-stone-500 to-orange-800 text-white px-3 py-1 rounded-full text-sm font-bold">
                                 {rankings.at(2)?.user.totalXpAdded} XP
                             </div>
                         </Card>
