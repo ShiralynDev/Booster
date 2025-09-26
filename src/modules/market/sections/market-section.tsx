@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Coins, ShoppingCart, Search, Filter, Crown, Palette, Sparkles, BadgeCheck, Zap, Star, Heart, Rocket, Lock, Check, Boxes, Plus, PlusCircle, Box, Wallet, Landmark } from "lucide-react"
+import { Coins, ShoppingCart, Search, Filter, Crown, Palette, Sparkles, BadgeCheck, Zap, Star, Heart, Rocket, Lock, Check, Boxes, Plus, PlusCircle, Box, Wallet, Landmark, X, Video, CreditCard } from "lucide-react"
 import { XpIndicator } from "@/modules/xp/ui/components/xp-indicator"
 import { trpc } from "@/trpc/client"
 import { useAuth, useClerk } from "@clerk/nextjs"
@@ -12,22 +12,20 @@ export const MarketSection = () => {
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [ownedItems, setOwnedItems] = useState([1, 6]) // IDs of owned items
+  const [showXpPopup, setShowXpPopup] = useState(false)
 
-
-  
-
-    const { userId: clerkUserId } = useAuth();
-    const clerk = useClerk();
-    const { data: user } = trpc.users.getByClerkId.useQuery({
-      clerkId: clerkUserId,
-    });
-    const userId = user?.id;
-    const { data: myXp } = trpc.xp.getXpByUserId.useQuery(
+  const { userId: clerkUserId } = useAuth();
+  const clerk = useClerk();
+  const { data: user } = trpc.users.getByClerkId.useQuery({
+    clerkId: clerkUserId,
+  });
+  const userId = user?.id;
+  const { data: myXp } = trpc.xp.getXpByUserId.useQuery(
     { userId: userId! },
     {
-      enabled: !!userId,           // dont fetch until there is a user
-      staleTime: 60_000,           // reduce refetching
-      refetchOnWindowFocus: false, // optional (suggested by companion)
+      enabled: !!userId,
+      staleTime: 60_000,
+      refetchOnWindowFocus: false,
     }
   );
 
@@ -39,8 +37,14 @@ export const MarketSection = () => {
     }
   })
 
-  const userCoins = myXp?.xp || 0;
+  const addXp = trpc.xp.addXp.useMutation({
+    onSuccess: () => {
+      utils.xp.getXpByUserId.invalidate({userId});
+      setShowXpPopup(false);
+    }
+  })
 
+  const userCoins = myXp?.xp || 0;
 
   // Marketplace items data
   const marketplaceItems = [
@@ -69,16 +73,40 @@ export const MarketSection = () => {
   const handlePurchase = (itemId: number, price: number) => {
     if (userCoins >= price) {
       buy.mutate({price});
-
-
-      //TODO: set owned items --> db
       setOwnedItems(prev => [...prev, itemId])
-      // In a real app, you'd make an API call to update the user's inventory
     } else {
-      //TODO: implement buy more xp dialog
-      alert("Not enough coins!")
+      setShowXpPopup(true);
     }
   }
+
+  // Handle rewarded ad
+  const handleWatchAd = () => {
+    // Simulate ad watching process
+    // In a real app, you'd integrate with an ad network like Google AdMob
+    console.log("Starting rewarded ad...");
+    
+    // Simulate ad completion after 3 seconds
+    setTimeout(() => {
+      addXp.mutate({ userId: userId!, amount: 100 }); // Give 100 XP for watching ad
+    }, 3000);
+  }
+
+  // Handle purchase with real money
+  const handlePurchaseXp = (amount: number, price: number) => {
+    // In a real app, you'd integrate with a payment processor like Stripe
+    console.log(`Purchasing ${amount} XP for $${price}`);
+    
+    // Simulate payment processing
+    addXp.mutate({ userId: userId!, amount });
+  }
+
+  // XP purchase options
+  const xpPackages = [
+    { amount: 500, price: 4.99, popular: false },
+    { amount: 1200, price: 9.99, popular: true },
+    { amount: 2500, price: 19.99, popular: false },
+    { amount: 5000, price: 34.99, popular: false },
+  ]
 
   // Categories for filtering
   const categories = [
@@ -107,12 +135,133 @@ export const MarketSection = () => {
           <div className="flex items-center gap-4 mt-4 md:mt-0">
             {/* XP INDICATOR */}
               <XpIndicator xp={userCoins} />
-            <Button className="flex rounded-full bg-gradient-to-r from-[#ffca55] to-[#FFA100] text-gray-900 font-semibold hover:opacity-90">
-              <Landmark className="h-4 w-4 " />
+            <Button 
+              className="flex rounded-full bg-gradient-to-r from-[#ffca55] to-[#FFA100] text-gray-900 font-semibold hover:opacity-90"
+              onClick={() => setShowXpPopup(true)}
+            >
+              <Landmark className="h-4 w-4" />
               Get More XP
             </Button>
           </div>
         </div>
+
+        {/* XP Popup Modal */}
+        {showXpPopup && (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <div className="bg-[#1e1e1e] rounded-2xl border border-gray-700 max-w-md w-full max-h-[90vh] overflow-y-auto">
+              {/* Header */}
+              <div className="flex items-center justify-between p-6 border-b border-gray-700">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-[#ffca55] to-[#FFA100] bg-clip-text text-transparent">
+                  Get More XP
+                </h2>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowXpPopup(false)}
+                  className="text-gray-400 hover:text-white"
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+
+              {/* Current Balance */}
+              <div className="p-6 border-b border-gray-700">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400">Current Balance:</span>
+                  <div className="flex items-center gap-2">
+                    <Coins className="h-5 w-5 text-[#ffca55]" />
+                    <span className="text-xl font-bold">{userCoins} XP</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Free Option - Rewarded Ads */}
+              <div className="p-6 border-b border-gray-700">
+                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <Video className="h-5 w-5 text-blue-400" />
+                  Free XP - Watch Ads
+                </h3>
+                <p className="text-gray-400 text-sm mb-4">
+                  Watch a short video ad to earn 100 XP for free!
+                </p>
+                <Button
+                  onClick={handleWatchAd}
+                  disabled={addXp.isPending}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3"
+                >
+                  {addXp.isPending ? (
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Watching Ad...
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Video className="h-5 w-5" />
+                      Watch Ad & Get 100 XP
+                    </div>
+                  )}
+                </Button>
+              </div>
+
+              {/* Paid Options */}
+              <div className="p-6">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <CreditCard className="h-5 w-5 text-green-400" />
+                  Buy XP Packages
+                </h3>
+                <p className="text-gray-400 text-sm mb-4">
+                  Get instant XP with these premium packages
+                </p>
+
+                <div className="space-y-3">
+                  {xpPackages.map((pkg, index) => (
+                    <div
+                      key={index}
+                      className={`relative p-4 rounded-xl border-2 transition-all hover:scale-105 cursor-pointer ${
+                        pkg.popular
+                          ? "border-[#ffca55] bg-gradient-to-r from-[#ffca55]/10 to-[#FFA100]/10"
+                          : "border-gray-600 bg-[#252525] hover:border-gray-500"
+                      }`}
+                      onClick={() => handlePurchaseXp(pkg.amount, pkg.price)}
+                    >
+                      {pkg.popular && (
+                        <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
+                          <span className="bg-[#ffca55] text-gray-900 text-xs px-2 py-1 rounded-full font-semibold">
+                            MOST POPULAR
+                          </span>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Coins className="h-6 w-6 text-[#ffca55]" />
+                          <div>
+                            <div className="font-semibold text-lg">{pkg.amount.toLocaleString()} XP</div>
+                            <div className="text-gray-400 text-sm">Instant delivery</div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold text-lg">${pkg.price}</div>
+                          <div className="text-gray-400 text-sm">
+                            ${(pkg.price / (pkg.amount / 1000)).toFixed(2)} per 1K XP
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Security Note */}
+                <div className="mt-4 p-3 bg-gray-800/50 rounded-lg">
+                  <div className="flex items-center gap-2 text-xs text-gray-400">
+                    <Lock className="h-3 w-3" />
+                    <span>Secure payment processing. Your transaction is safe and encrypted.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Search and Filter Section */}
         <div className="bg-[#1e1e1e] rounded-xl border border-gray-800 p-4 mb-8">

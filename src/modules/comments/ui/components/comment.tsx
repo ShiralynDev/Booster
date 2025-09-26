@@ -9,7 +9,7 @@ import { CommentOutput } from "@/modules/videos/types";
 import { trpc } from "@/trpc/client";
 import { useClerk, useAuth } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, MessageCircle, Smile, Send, MoreHorizontal, ChevronDown, ChevronUp } from "lucide-react";
+import { Heart, MessageCircle, Smile, Send, MoreHorizontal, ChevronDown, ChevronUp, RocketIcon, Crown, Star, CheckCircle, Zap, Shield, Award, User, Users2, Users2Icon, MessagesSquare, Contact } from "lucide-react";
 import { useMemo, useState, useCallback } from "react";
 import { skipToken } from "@tanstack/react-query";
 import { useClampDetector } from "../../hooks/resize-hook";
@@ -28,6 +28,25 @@ interface CommentProps {
     maxDepth: number;
 }
 
+// Helper function to determine which icon to show based on user role/status
+const getUserIcon = (user: User, isCommentOwner?: boolean) => {
+    // You can customize this logic based on your user roles/status
+    if (user.role === 'admin' || user.role === 'moderator') {
+        return <MessagesSquare className="w-3 h-3 text-green-500 fill-green-500" />;
+    }
+    if (user.isVerified) {
+        return <CheckCircle className="w-3 h-3 text-blue-500 " />;
+    }
+    if (user.isPremium) {
+        return <Crown className="w-3 h-3 text-yellow-500 fill-yellow-500" />;
+    }
+    if (isCommentOwner) {
+        return <Contact className="w-3 h-3 text-[#ffca55]" />;
+    }
+    // Default icon or return null for no icon
+    return <Zap className="w-3 h-3 text-gray-400" />;
+};
+
 export const Comment = ({ parentComment, videoId, viewer, depth, maxDepth }: CommentProps) => {
     const clerk = useClerk();
     const utils = trpc.useUtils();
@@ -37,6 +56,9 @@ export const Comment = ({ parentComment, videoId, viewer, depth, maxDepth }: Com
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
     const { setRefFor, isClamped } = useClampDetector();
     const [replyingTo, setReplyingTo] = useState<{ id: string } | null>(null);
+
+    // Determine if the current viewer is the comment author
+    const isViewerCommentAuthor = viewer?.id === parentComment.userId;
 
     const input = open ?
         { commentId: parentComment.commentId, videoId, limit: COMMENT_REPLIES_SIZE }
@@ -339,12 +361,19 @@ export const Comment = ({ parentComment, videoId, viewer, depth, maxDepth }: Com
         >
             <div className="flex gap-3">
                 <UserAvatar size="md" imageUrl={parentComment.user.imageUrl} name={parentComment.user.name} userId={parentComment.userId}/>
+
                 <div className="flex-1 min-w-0 overflow-hidden">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <UserInfo size="xs" name={parentComment.user.name?.replace(/\s*null\s*$/i, "")} />
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                            {compactDate(parentComment.createdAt) ?? ""}
-                        </span>
+                        
+                        {/* Icon between username and timestamp */}
+                        <div className="flex gap-2 items-center">
+                            {getUserIcon(parentComment.user, isViewerCommentAuthor)}
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                                {compactDate(parentComment.createdAt) ?? ""}
+                            </span>
+                        </div>
+                        
                         <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}

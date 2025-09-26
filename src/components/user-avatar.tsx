@@ -56,18 +56,12 @@ export const UserAvatar = ({
     iconSize,
 }: UserAvatarProps) => {
     return (
-        <div className="relative">
+        <div className="relative ">
             <Link href={`/users/${userId}`}>
                 <Avatar className={cn(avatarVariants({ size, className }))} onClick={onClick}>
-                    <AvatarImage src={imageUrl} alt={name} />
+                    <AvatarImage src={imageUrl} alt={name} />   
                 </Avatar>
             </Link>
-            {/* <div className="absolute  right-2 bottom-5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full p-0.5 shadow-md">
-                <div className="flex  bg-white dark:bg-[#333333] rounded-full p-1">
-                    <RocketIcon className={cn(avatarVariants({iconSize,className}))} />
-            
-                </div>
-            </div> */}
         </div>
     )
 }
