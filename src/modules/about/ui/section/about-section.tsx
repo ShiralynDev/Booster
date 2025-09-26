@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, Boxes, CircleDollarSignIcon, Copyright, CurlyBraces, DollarSign, Headset, Megaphone, Users, UsersRound } from 'lucide-react';
+import Image from 'next/image';
 import { useEffect } from 'react';
 
 export const About = () => {
@@ -111,9 +112,13 @@ export const About = () => {
   return (
     <div className="min-h-screen bg-[#212121] text-gray-100 py-8 px-4">
       <div className="max-w-7xl mx-auto">
-        <header className="text-center mb-12 py-8">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-[#ffca55] to-[#ffa100] bg-clip-text text-transparent mb-4">
-            How Booster Works
+        <header className="flex items-center justify-center mb-12 py-8">
+          <h1 className="flex items-center gap-5 text-5xl font-bold bg-gradient-to-r from-[#ffca55] to-[#ffa100] bg-clip-text text-transparent mb-4">
+            How 
+            <Image src={'/BoosterLongLogo.webp'} alt={'Booster'}  width={256} height={128}          >
+
+            </Image>
+            Works
           </h1>
         </header>
 
