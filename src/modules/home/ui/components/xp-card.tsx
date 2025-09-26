@@ -17,8 +17,6 @@ export const XpCard = ({ user,setShowAddXpModal }: Props) => {
   const xpOptions = [10, 20, 50, 75, 100, 500, 1000];
   const currentXp = 350;
   const xpNeededForNextLevel = 1000;
-  const level = 1;
-  const progressPercentage = (currentXp / xpNeededForNextLevel) * 100;
 
   const { userId: clerkUserId } = useAuth();
   const clerk = useClerk();
@@ -42,8 +40,9 @@ export const XpCard = ({ user,setShowAddXpModal }: Props) => {
 
   const buy = trpc.xp.buyBoostById.useMutation({
     onSuccess: () => {
-      utils.xp.getXpByUserId.invalidate({ userId });
-      utils.xp.getBoostByUserId.invalidate({userId: user.id})
+      utils.xp.getXpByUserId.invalidate({ userId }); //userId => current logged user
+      utils.xp.getBoostByUserId.invalidate({userId: user.id}) //user.id => creator
+      utils.xp.getBoostersByCreatorId.invalidate({creatorId: user.id})
     }
   })
 
@@ -58,18 +57,6 @@ export const XpCard = ({ user,setShowAddXpModal }: Props) => {
       //TODO: implement buy xp dialog
       alert('not enough xp')
     }
-  };
-
-  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value);
-    setSelectedXp(value);
-
-    // Snap to the closest predefined value
-    const closest = xpOptions.reduce((prev, curr) => {
-      return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
-    });
-
-    setSelectedXp(closest);
   };
 
   // Create evenly spaced positions for all markers

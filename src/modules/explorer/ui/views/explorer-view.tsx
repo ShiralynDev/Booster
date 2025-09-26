@@ -1,13 +1,13 @@
 'use client'
 import { motion, AnimatePresence } from "framer-motion";
 import { CategoriesSection } from "../sections/categories-section";
-import { Play, Eye, Clock, Star, TrendingUp, Sparkles, ArrowRight, Zap, Heart, Share2, Calendar } from "lucide-react";
+import { Play, Eye, Clock, Star, TrendingUp, Sparkles, ArrowRight, Zap, Heart, Share2, Calendar, StarIcon, Calendar1 } from "lucide-react";
 import { useState, useEffect, useMemo, Suspense } from "react";
 import Image from "next/image";
 import { trpc } from "@/trpc/client";
 import { DEFAULT_LIMIT } from "@/constants";
 import { User } from "@/modules/users/types";
-import { formatDuration } from "@/lib/utils";
+import { compactDate, formatDuration } from "@/lib/utils";
 import { VideoThumbnail } from "@/modules/videos/ui/components/video-thumbnail";
 import { UserAvatar } from "@/components/user-avatar";
 import { VideoOwner } from "@/modules/videos/ui/components/video-owner";
@@ -430,9 +430,15 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                       {/* Stats */}
                       <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 ml-1">
                         <div className="flex items-center gap-4">
-                          <div className="flex items-center gap-1">
-                            <Eye className="w-4 h-4" />
-                            <span>{formatCompactNumber(Number(video.videoViews) ?? 0)}</span>
+                          <div className="flex items-center gap-9">
+                            <div className="flex items-center gap-1">
+                              <Eye className="w-4 h-4" />
+                              <span>{formatCompactNumber(Number(video.videoViews) ?? 0)}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <StarIcon className="size-4 text-yellow-200" />
+                              {Number(video.averageRating).toFixed(1)}
+                            </div>
                           </div>
 
                         </div>
@@ -443,8 +449,8 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                           className="text-gray-400 hover:text-amber-500 transition-colors"
                         >
                           <div className="flex items-center gap-1">
-                            <Star className="w-4 h-4 text-amber-500 " />
-                            <span>{Number(video.averageRating).toFixed(1) || "0.0"}</span>
+                            <Calendar1 className="size-4" />
+                            {compactDate(video.createdAt)}
                           </div>
                         </motion.button>
                       </div>

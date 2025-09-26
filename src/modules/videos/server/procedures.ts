@@ -131,7 +131,7 @@ export const videosRouter = createTRPCRouter({
 
 
 
-            const newThumbnailUrl = `https://image.mux.com/${existingVideo.muxPlaybackId}/thumbnail.jpg`
+            const newThumbnailUrl = `https://image.mux.com/${existingVideo.muxPlaybackId}/thumbnail.webp`
 
             const [updatedVideo] = await db
                 .update(videos)

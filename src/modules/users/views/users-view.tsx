@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { compactDate } from "@/lib/utils"
-import { Check, EyeIcon, Lock, Rocket, Star, Zap, Sparkles, Badge, Crown, Trophy, RocketIcon } from "lucide-react"
+import { Check, EyeIcon, Lock, Rocket, Star, Zap, Sparkles, Badge, Crown, Trophy, RocketIcon, StarIcon } from "lucide-react"
 import { XpCard } from "@/modules/home/ui/components/xp-card"
 import { VideoThumbnail } from "@/modules/videos/ui/components/video-thumbnail"
 import { useRouter } from "next/navigation"
@@ -39,6 +39,13 @@ export const UsersView = ({ userId }: Props) => {
   const [userVideos] = trpc.users.getVideosByUserId.useSuspenseQuery({ userId })
   const [boostPoints] = trpc.xp.getBoostByUserId.useSuspenseQuery({ userId })
 
+
+  const utils = trpc.useUtils();
+
+  const prefetchRankings = () => {
+    utils.xp.getBoostersByCreatorId.prefetch({creatorId: userId})
+  }
+
   const [currentXp, setCurrentXp] = useState(3250)
   const [showXpPopup, setShowXpPopup] = useState(false)
   const [selectedXpValue, setSelectedXpValue] = useState(100)
@@ -58,7 +65,6 @@ export const UsersView = ({ userId }: Props) => {
 
   const recentUpgrade = diff_time(user?.newLevelUpgrade) <= 72;
 
-  const utils = trpc.useUtils();
   const updateLevelChange = trpc.xp.updateLevelChange.useMutation({
     onSuccess: () => {
       utils.users.getByUserId.invalidate({userId})
@@ -73,6 +79,9 @@ export const UsersView = ({ userId }: Props) => {
       setIsInitialLoad(false)
       return
     }
+    
+    prefetchRankings();
+
 
     if (previousLevelRef.current !== null && channelLevel > previousLevelRef.current) {
       setNewLevel(channelLevel)
@@ -269,7 +278,10 @@ export const UsersView = ({ userId }: Props) => {
                   <h3 className="font-semibold line-clamp-2 truncate">{video.title} </h3>
 
                   <div className="flex justify-between text-muted-foreground text-sm mt-2">
-                    <span className="flex items-center gap-1"><EyeIcon className="size-4" />{video.videoViews} </span>
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center gap-1"><EyeIcon className="size-4" />{video.videoViews} </span>
+                      <span className="flex items-center gap-1"><StarIcon className="size-4 text-yellow-300" /> {video.averageRating} </span>
+                    </div>
                     <span>{compactDate(video.createdAt)}</span>
                   </div>
                 </CardContent>
@@ -279,7 +291,7 @@ export const UsersView = ({ userId }: Props) => {
         )}
 
         {activeTab === "community" && (
-          <BoosterRankings />
+          <BoosterRankings  userId={userId}/>
         )}
       </div>
 

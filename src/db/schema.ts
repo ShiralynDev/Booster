@@ -175,9 +175,11 @@ export const commentReactions = pgTable("comment_reactions", {
 ]);
 
 
-export const channelBoost = pgTable("channel_boost", {
+export const boostTransactions = pgTable("boost_transactions", {
     boostId: uuid().primaryKey().defaultRandom(),
     creatorId: uuid("creator_id").references(()=>users.id).notNull(),
     boosterId: uuid("booster_id").references(() => users.id).notNull(),
     xp: integer("xp").notNull(),
 })
+
+

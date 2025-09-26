@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { userFollows, users, videos, videoViews } from "@/db/schema";
+import { userFollows, users, videoRatings, videos, videoViews } from "@/db/schema";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
 import { and,desc,eq, getTableColumns, inArray, sql } from "drizzle-orm";
@@ -74,11 +74,14 @@ export const usersRouter = createTRPCRouter({
             WHERE ${videoViews.videoId} = ${videos.id}
           ), 0)
         `.mapWith(Number),
+
+        averageRating: sql<number> `(SELECT AVG(${videoRatings.rating}) FROM ${videoRatings} WHERE ${videoRatings.videoId} = ${videos.id})`.mapWith(Number),
+        
       })
       .from(videos)
       .where(eq(videos.userId, userId))
       .orderBy(desc(videos.createdAt));
 
-    return { userVideos };
+    return { userVideos,  };
   }),
 })

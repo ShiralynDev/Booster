@@ -1,8 +1,8 @@
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { boostTransactions, users } from "@/db/schema";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
-import { and, eq, gte, sql } from "drizzle-orm";
+import { and, desc, eq, getTableColumns, gte, sql, sum } from "drizzle-orm";
 import z from "zod";
 
 export const xpRouter = createTRPCRouter({
@@ -95,8 +95,8 @@ export const xpRouter = createTRPCRouter({
      buyBoostById: protectedProcedure
     .input(
       z.object({
-        // price is an integer number of XP points
-        price: z.number().int().nonnegative(),
+                                                        
+        price: z.number().int().nonnegative(), //price is an integer number of xp points
         recipientId: z.string().uuid(), // beneficiario
       })
     )
@@ -140,6 +140,16 @@ export const xpRouter = createTRPCRouter({
         }
 
 
+      const [createdTransaction] = await db
+      .insert(boostTransactions)
+      .values({
+        boosterId: userId,
+        creatorId: recipientId,
+        xp: price,
+      })
+      .returning();
+
+
 
 
       //insert transaction in transactionsTable
@@ -147,5 +157,34 @@ export const xpRouter = createTRPCRouter({
 
       return updatedBoostedChannel; 
     }),
+
+    getBoostersByCreatorId: baseProcedure
+    .input(z.object({
+        creatorId: z.string().uuid(),
+
+    }))
+    .query(async ({input}) => {
+      
+      const {creatorId} = input;
+      
+      const boosters = await db
+      .select({
+        user: {
+          id:users.id,
+          name: users.name,
+          imageUrl: users.imageUrl,
+          totalXpAdded: sum(boostTransactions.xp).as("total_xp"),
+        },
+      })
+      .from(boostTransactions)
+      .where(eq(boostTransactions.creatorId,creatorId))
+      .innerJoin(users,eq(users.id,boostTransactions.boosterId))
+      .groupBy(users.id)
+      .orderBy(desc(sum(boostTransactions.xp)))
+
+      return boosters;
+    })
+
+
 
 })
