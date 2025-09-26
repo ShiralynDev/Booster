@@ -6,7 +6,7 @@ import { HydrateClient } from "@/trpc/server"
 export const dynamic = 'force-dynamic'; //IMPORTANT: WE DON'T AWAIT. BUT RATHER WE PREFETCH
 
 const Page = () => {
-    void trpc.explorer.getMany.prefetch({limit: DEFAULT_LIMIT * 2});
+    void trpc.explorer.getMany.prefetchInfinite({limit: DEFAULT_LIMIT * 2});
     return (
         <HydrateClient>
             <ExplorerView />
