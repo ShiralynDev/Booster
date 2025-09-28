@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { userFollows, users, videoRatings, videos, videoViews } from "@/db/schema";
 import { baseProcedure, createTRPCRouter } from "@/trpc/init";
-import { and, avg, count, desc, eq, getTableColumns, ilike, isNotNull, lt, or, sql, sum } from "drizzle-orm";
+import { and, avg, count, desc, eq, getTableColumns, ilike,  lt, or, sql, sum } from "drizzle-orm";
 import z from "zod";
 
 export const searchRouter = createTRPCRouter({
@@ -15,7 +15,7 @@ export const searchRouter = createTRPCRouter({
             }).nullish(),
             limit: z.number().min(1).max(100)
         }))
-        .query(async ({ ctx, input }) => {
+        .query(async ({  input }) => {
 
             const { cursor, limit, query } = input;
 

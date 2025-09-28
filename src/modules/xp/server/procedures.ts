@@ -3,14 +3,14 @@ import { boostTransactions, users, videos } from "@/db/schema";
 import { stripe } from "@/lib/stripe";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
-import { and, desc, eq, getTableColumns, gte, sql, sum } from "drizzle-orm";
+import { and, desc, eq,  gte, sql, sum } from "drizzle-orm";
 import z from "zod";
 
 export const xpRouter = createTRPCRouter({
 
     getBoostByVideoId: baseProcedure
     .input(z.object({videoId: z.string().uuid()}))
-    .query(async ({ctx,input}) => {
+    .query(async ({input}) => {
       const {videoId} = input;
 
       const [points] = await db
@@ -27,7 +27,7 @@ export const xpRouter = createTRPCRouter({
 
     getXpByUserId: baseProcedure
     .input(z.object({userId: z.string().uuid()}))
-    .query( async ({ctx,input}) => {
+    .query( async ({input}) => {
 
         const {userId} = input;
 
@@ -98,7 +98,7 @@ export const xpRouter = createTRPCRouter({
     
     getBoostByUserId: baseProcedure
     .input(z.object({userId: z.string().uuid()}))
-    .query( async ({ctx,input}) => {
+    .query( async ({input}) => {
 
         const {userId} = input;
 
@@ -159,7 +159,8 @@ export const xpRouter = createTRPCRouter({
         }
 
 
-      const [createdTransaction] = await db
+      //create transaction
+      await db
       .insert(boostTransactions)
       .values({
         boosterId: userId,

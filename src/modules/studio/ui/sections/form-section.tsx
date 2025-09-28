@@ -5,7 +5,7 @@ import { trpc } from "@/trpc/client";
 import { Suspense, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
-import { util, z } from "zod"
+import {  z } from "zod"
 
 import {
     DropdownMenu,
@@ -134,7 +134,7 @@ const FormErrorFallback = () => {
                 </svg>
             </div>
             <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-2">Something went wrong</h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">We couldn't load the video details. Please try again.</p>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">We couldn&apost load the video details. Please try again.</p>
             <Button 
                 onClick={() => window.location.reload()} 
                 className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white px-6 py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg"
@@ -425,7 +425,7 @@ const FormSectionSuspense = ({ videoId }: PageProps) => {
                                         <Eye className="h-4 w-4 text-gray-500 mr-2" />
                                         <div>
                                             <p className="text-xs text-gray-500 dark:text-gray-400">Views</p>
-                                            <p className="text-sm font-medium text-gray-900 dark:text-white">{(video as any).views || 0}</p>
+                                            <p className="text-sm font-medium text-gray-900 dark:text-white">{(video).views || 0}</p>
                                         </div>
                                     </div>
                                     <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg flex items-center">

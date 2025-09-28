@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 
 
 import { cva, type VariantProps } from "class-variance-authority";
-import { RocketIcon } from "lucide-react";
 import Link from "next/link";
 
 const avatarVariants = cva("", {
@@ -53,7 +52,6 @@ export const UserAvatar = ({
     onClick,
     size, //because it extends VariantProps
     userId,
-    iconSize,
 }: UserAvatarProps) => {
     return (
         <div className="relative ">

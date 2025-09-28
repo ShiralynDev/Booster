@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Boxes, CircleDollarSignIcon, Copyright, CurlyBraces, DollarSign, Headset, Megaphone, Users, UsersRound } from 'lucide-react';
+import {  Boxes, CircleDollarSignIcon, Copyright,  Headset, Megaphone,  UsersRound } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect } from 'react';
 
@@ -28,27 +28,7 @@ export const About = () => {
     };
   }, []);
 
-  const CubeIcon = () => (
-    <div className="relative w-20 h-20 transform rotate-x-[-30deg] rotate-y-45deg transform-style-preserve-3d">
-      <div className="absolute top-0 left-0 w-10 h-10 bg-[#212121] border-2 border-[#212121] transform-style-preserve-3d">
-        <div className="absolute inset-0 bg-[#212121] transform translate-z-5" />
-        <div className="absolute inset-0 bg-[#212121] transform rotate-x-90deg translate-z-5" />
-        <div className="absolute inset-0 bg-[#212121] transform rotate-y-90deg translate-z-5" />
-      </div>
-      <div className="absolute top-0 left-10 w-10 h-10 bg-[#212121] border-2 border-[#212121] transform-style-preserve-3d">
-        <div className="absolute inset-0 bg-[#212121] transform translate-z-5" />
-        <div className="absolute inset-0 bg-[#212121] transform rotate-x-90deg translate-z-5" />
-        <div className="absolute inset-0 bg-[#212121] transform rotate-y-90deg translate-z-5" />
-      </div>
-      <div className="absolute top-10 left-0 w-10 h-10 bg-[#212121] border-2 border-[#212121] transform-style-preserve-3d">
-        <div className="absolute inset-0 bg-[#212121] transform translate-z-5" />
-        <div className="absolute inset-0 bg-[#212121] transform rotate-x-90deg translate-z-5" />
-        <div className="absolute inset-0 bg-[#212121] transform rotate-y-90deg translate-z-5" />
-      </div>
-    </div>
-  );
-
-  const XpBar = () => (
+    const XpBar = () => (
     <div className="mt-4">
       <div className="h-5 bg-gray-700 rounded-full overflow-hidden mt-2">
         <div 

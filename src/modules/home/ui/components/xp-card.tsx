@@ -1,10 +1,9 @@
 import { Tooltip,TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { User } from "@/modules/users/types";
 import { trpc } from "@/trpc/client";
-import { useAuth, useClerk } from "@clerk/nextjs";
-import { AnimatePresence, motion, progressPercentage } from "framer-motion";
-import { ZapIcon, Plus, X, CircleQuestionMark, Boxes } from "lucide-react";
-import Link from "next/link";
+import { useAuth, } from "@clerk/nextjs";
+import { motion } from "framer-motion";
+import { CircleQuestionMark, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -16,11 +15,8 @@ interface Props {
 export const XpCard = ({ user,setShowAddXpModal,videoId }: Props) => {
   const [selectedXp, setSelectedXp] = useState(10);
   const xpOptions = [10, 20, 50, 75, 100, 500, 1000];
-  const currentXp = 350;
-  const xpNeededForNextLevel = 1000;
 
   const { userId: clerkUserId } = useAuth();
-  const clerk = useClerk();
   const { data: userLogged } = trpc.users.getByClerkId.useQuery({
     clerkId: clerkUserId,
   });

@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import {  useRef, useState } from "react";
 
 export function useClampDetector() {
   const mapRef = useRef<Record<string, HTMLParagraphElement | null>>({});

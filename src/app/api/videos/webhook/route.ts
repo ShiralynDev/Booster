@@ -11,7 +11,6 @@ import {
 import { mux } from '@/lib/mux';
 import { db } from '@/db';
 import { videos } from '@/db/schema';
-import { BreakdownValuesBasePage } from '@mux/mux-node/resources/data/metrics.mjs';
 
 const SIGNING_SECRET = process.env.MUX_WEBHOOK_SECRET!;
 
@@ -136,7 +135,7 @@ export const POST = async (request: Request) => {
             return new Response("Missing asset id", { status: 400 });
         }
 
-        console.log("Track ready")
+        // console.log("Track ready")
 
         await db.update(videos).set({
             muxTrackId: trackId,

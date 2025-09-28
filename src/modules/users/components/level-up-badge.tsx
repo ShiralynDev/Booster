@@ -6,9 +6,9 @@ interface LevelUpBadgeProps {
   onComplete?: () => void;
 }
 
-export const LevelUpBadge = ({ newLevel, onComplete }: LevelUpBadgeProps) => {
-  const [show, setShow] = useState(true);
-  const [isExiting, setIsExiting] = useState(false);
+export const LevelUpBadge = ({ newLevel, }: LevelUpBadgeProps) => {
+  const [show, ] = useState(true);
+  const [isExiting, ] = useState(false);
 
  
 

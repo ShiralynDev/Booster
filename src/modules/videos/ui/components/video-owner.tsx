@@ -2,15 +2,12 @@
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
 import { SubButton } from "@/modules/subscriptions/ui/components/sub-button";
-import { useAuth, useClerk } from "@clerk/nextjs";
+import { useAuth  } from "@clerk/nextjs";
 import Link from "next/link";
-import { VideoGetOneOutput } from "../../types";
 import { UserInfo } from "@/modules/users/ui/components/user-info";
-import { UsersIcon, Edit3Icon, ZapIcon, HeartIcon, ChevronRightIcon, RocketIcon, Flame } from "lucide-react";
+import { UsersIcon, Edit3Icon, ZapIcon, RocketIcon, } from "lucide-react";
 import { useState } from "react";
-import { trpc } from "@/trpc/client";
 import { useFollow } from "@/modules/follows/hooks/follow-hook";
-import { toast } from "sonner";
 import { XpCard } from "@/modules/home/ui/components/xp-card";
 import { AnimatePresence } from "framer-motion";
 
@@ -43,19 +40,9 @@ const f = (x: number) => {
   return Math.floor((x * x) / 1000);
 };
 
-const diff_time = (date?: Date | string | null): number => {
-  if (!date) return Infinity;
-  const d = date instanceof Date ? date : new Date(date);
-  const t = d.getTime();
-  if (Number.isNaN(t)) return Infinity; // invalid date string
-  return (Date.now() - t) / (1000 * 60 * 60); // hours
-};
 
 export const VideoOwner = ({ user, videoId,boostPoints }: Props) => {
   const { userId } = useAuth();
-  const [isSupported, setIsSupported] = useState(false);
-  const [xpProgress, setXpProgress] = useState(65); // Example progress percentage
-  const [selectedXp, setSelectedXp] = useState(10);
   const [showAddXpModal, setShowAddXpModal] = useState(false);
 
   //WHERE IS THE PREFETCH? -- TODO: getBoostByVideoId -> userId -> boost points
@@ -76,20 +63,7 @@ export const VideoOwner = ({ user, videoId,boostPoints }: Props) => {
   );
 
 
-  const utils = trpc.useUtils();
-
-  const updateLevelChange = trpc.xp.updateLevelChange.useMutation({
-    onSuccess: () => {
-      utils.users.getByUserId.invalidate({ userId: user.id });
-      utils.xp.getBoostByVideoId.invalidate({videoId})
-    },
-  });
-
-
-
-
-
-
+ 
   const { onClick, isPending } = useFollow({
     //ignore xd?
     userId: user.id,
@@ -97,7 +71,6 @@ export const VideoOwner = ({ user, videoId,boostPoints }: Props) => {
     fromVideoId: videoId
   })
 
-  const xpOptions = [10, 20, 50, 75, 100, 500, 1000];
 
   return (
     <div className="flex items-center gap-2">

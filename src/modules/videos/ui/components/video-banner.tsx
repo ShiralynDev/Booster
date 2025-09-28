@@ -7,7 +7,6 @@ interface Props{
 
 export const VideoBanner = ({status}:Props) => {
     if(status === "ready") return null;
-    console.log(status)
     return (
         <div className="bg-yellow-100 -mt-1.5 pt-4 pb-3 px-4 rounded-b-xl flex items-center gap-2">
             <AlertTriangleIcon className="size-4 text-black shrink-0" />

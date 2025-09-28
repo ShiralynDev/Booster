@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { db } from "@/db";
 import { userFollows, users, videoRatings, videos,  videoViews } from "@/db/schema";
-import { baseProcedure, createTRPCRouter, protectedProcedure } from "@/trpc/init";
-import { eq, and, or, lt, desc, sql, getTableColumns, sum, avg, inArray, isNotNull, count } from "drizzle-orm";
+import { baseProcedure, createTRPCRouter, } from "@/trpc/init";
+import { eq, and, or, lt, desc, sql, getTableColumns, sum, avg, inArray, isNotNull, } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 export const homeRouter = createTRPCRouter({

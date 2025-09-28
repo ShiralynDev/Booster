@@ -2,7 +2,7 @@
 
 import { SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { useAuth, useClerk } from "@clerk/nextjs";
-import { FileQuestionMark, FlameIcon, HistoryIcon, HomeIcon, ListVideoIcon, MessageCircleQuestion, PlaySquareIcon, Settings, Sidebar, Star, StarIcon, Stars, ThumbsUpIcon } from "lucide-react";
+import {  MessageCircleQuestion,  Settings, Stars } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
@@ -37,7 +37,7 @@ export const PersonalSection = () => {
 
 
 
-    const { userId, isSignedIn } = useAuth();
+    const {  isSignedIn } = useAuth();
     const clerk = useClerk();
     const [activeItem, setActiveItem] = useState("Next Up");
     const [hoveredItem, setHoveredItem] = useState<string | null>(null);

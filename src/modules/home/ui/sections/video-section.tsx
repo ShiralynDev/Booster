@@ -1,26 +1,22 @@
 'use client';
 
 import { Suspense, useEffect, useRef, useState } from 'react';
-import { compactDate, compactNumber } from '@/lib/utils';
-import { HomeGetManyOutput, VideoGetOneOutput } from '@/modules/videos/types';
+import {  compactNumber } from '@/lib/utils';
+
 import { VideoPlayer } from '@/modules/videos/ui/components/video-player';
 import { CommentsSection } from '@/modules/videos/ui/sections/comments-section';
-import { Eye, Calendar, ThumbsUp, Share, Download, Save, Play, Clock, Edit3Icon, ChevronLeft, ZapIcon, Plus, X, RocketIcon, MousePointerClick, ThumbsDown } from 'lucide-react';
+import { Eye,  Play, Clock,  } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useFollow } from '@/modules/follows/hooks/follow-hook';
-import { SubButton } from '@/modules/subscriptions/ui/components/sub-button';
+;
 import { useAuth } from '@clerk/nextjs';
-import { Button } from '@/components/ui/button';
-import { UserAvatar } from '@/components/user-avatar';
+
 import { trpc } from '@/trpc/client';
 import { VideoReactions } from '@/modules/videos/ui/components/video-reactions';
 import { toast } from 'sonner';
-import { DEFAULT_LIMIT } from '@/constants';
-import { XpCard } from '../components/xp-card';
+
 import { VideoMenu } from '@/modules/videos/ui/components/video-menu';
 import { VideoOwner } from '@/modules/videos/ui/components/video-owner';
 import { ErrorBoundary } from 'react-error-boundary';
-import { HomeViewSuspense } from '../views/home-view';
 
 
 interface Props {  videoId: string; }
@@ -112,17 +108,13 @@ export const VideoSectionSuspense = ({ videoId }: Props) => {
 
 
     const [commentsOpen, setCommentsOpen] = useState(false);
-    const { isSignedIn, userId } = useAuth();
+    const { isSignedIn, } = useAuth();
     const [showTitle, setShowTitle] = useState(true);
     const [isPlaying, setIsPlaying] = useState(true);
     const videoPlayerRef = useRef<{ play: () => void; pause: () => void }>(null);
 
     const utils = trpc.useUtils();
-    const { onClick } = useFollow({
-        userId: video.user.id,
-        isFollowing: video.user.viewerIsFollowing,
-        fromVideoId: video.id,
-    });
+   
 
     useEffect(() => {
         const t = setTimeout(() => setShowTitle(false), 4000);

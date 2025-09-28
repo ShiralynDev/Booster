@@ -7,7 +7,6 @@ import { VideoReactions } from "./video-reactions";
 
 import { format, formatDistanceToNow } from "date-fns"
 import { VideoViews } from "./video-views";
-import { trpc } from "@/trpc/server";
 
 interface Props {
     video: VideoGetOneOutput;

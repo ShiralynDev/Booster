@@ -1,8 +1,8 @@
 import { db } from "@/db";
-import { users, commentReactions, comments } from "@/db/schema";
+import { users, commentReactions, } from "@/db/schema";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
-import { eq, inArray } from "drizzle-orm";
+import {  inArray } from "drizzle-orm";
 import z from "zod";
 
 export const commentReactionsRouter = createTRPCRouter({
@@ -14,7 +14,7 @@ export const commentReactionsRouter = createTRPCRouter({
         const {clerkUserId} = ctx;
         const {commentId} = input;
         
-        console.log(commentId)
+        // console.log(commentId)
         const [user]  = await db
         .select()
         .from(users)
@@ -53,7 +53,6 @@ export const commentReactionsRouter = createTRPCRouter({
             throw new TRPCError({code:"UNAUTHORIZED"})
         }
 
-        const userId = user.id;
 
         const commentReaction = await db
         .delete(commentReactions)

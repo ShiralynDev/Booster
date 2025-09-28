@@ -41,7 +41,7 @@ const items = [
 ];
 
 export const MainSection = () => {
-    const { userId, isSignedIn } = useAuth();
+    const {  isSignedIn } = useAuth();
     const clerk = useClerk();
     const [activeItem, setActiveItem] = useState("Next Up");
     const [hoveredItem, setHoveredItem] = useState<string | null>(null);

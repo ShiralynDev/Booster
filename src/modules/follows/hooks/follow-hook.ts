@@ -1,7 +1,5 @@
-import { DEFAULT_LIMIT } from "@/constants";
 import { trpc } from "@/trpc/client";
 import { useClerk } from "@clerk/nextjs";
-import { OldPlugin } from "postcss";
 import { toast } from "sonner";
 
 interface Props {
@@ -47,6 +45,7 @@ export const useFollow = ({ userId, isFollowing, fromVideoId }: Props) => {
         },
         onError: (_err, _vars, ctx) => {
             if(fromVideoId){
+                // @ts-ignore
                 if (ctx?.previous) utils.videos.getOne.setData({ id: fromVideoId }, ctx.previous);
             }
             clerk.openSignIn();
@@ -77,7 +76,6 @@ export const useFollow = ({ userId, isFollowing, fromVideoId }: Props) => {
                 });
                 return { previous };
             }else{
-                console.log("ACA DEBERIA")
                 await utils.follows.getFollowersByUserId.cancel({userId})
                 const previous = utils.follows.getFollowersByUserId.getData({userId})
                 utils.follows.getFollowersByUserId.setData({userId}, (old) => {
@@ -95,6 +93,7 @@ export const useFollow = ({ userId, isFollowing, fromVideoId }: Props) => {
         },
         onError: (_err, _vars, ctx) => {
             if(fromVideoId){
+                // @ts-ignore
                 if (ctx?.previous) utils.videos.getOne.setData({ id: fromVideoId }, ctx.previous);
             }
             //TODO: add error rollback on follow/unfollow from channel page

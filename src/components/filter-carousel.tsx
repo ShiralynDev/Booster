@@ -8,7 +8,6 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Car } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";

@@ -1,19 +1,15 @@
 'use client'
 import { motion, AnimatePresence } from "framer-motion";
 import { CategoriesSection } from "../sections/categories-section";
-import { Play, Eye, Clock, Star, TrendingUp, Sparkles, ArrowRight, Zap, Heart, Share2, Calendar, StarIcon, Calendar1 } from "lucide-react";
-import { useState, useEffect, useMemo, Suspense } from "react";
-import Image from "next/image";
+import { Play, Eye,  Sparkles, ArrowRight,  Share2, Calendar, StarIcon, Calendar1 } from "lucide-react";
+import { useState,  useMemo, Suspense } from "react";
 import { trpc } from "@/trpc/client";
 import { DEFAULT_LIMIT } from "@/constants";
-import { User } from "@/modules/users/types";
-import { compactDate, formatDuration } from "@/lib/utils";
+import { compactDate } from "@/lib/utils";
 import { VideoThumbnail } from "@/modules/videos/ui/components/video-thumbnail";
 import { UserAvatar } from "@/components/user-avatar";
-import { VideoOwner } from "@/modules/videos/ui/components/video-owner";
 import { InfiniteScroll } from "@/components/infinite-scroll";
 import Link from "next/link";
-import { ClerkLoading } from "@clerk/nextjs";
 import { ErrorBoundary } from "react-error-boundary";
 
 interface HomeViewProps {
@@ -122,8 +118,7 @@ const ExplorerSkeleton = () => {
 };
 
 export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
-  const [selectedCategory, setSelectedCategory] = useState(categoryId || "all");
-  const [hoveredVideo, setHoveredVideo] = useState<string | null>(null);
+  const [selectedCategory ] = useState(categoryId || "all");
 
   const [data, query] = trpc.explorer.getMany.useSuspenseInfiniteQuery(
     { limit: DEFAULT_LIMIT * 2 },
@@ -190,7 +185,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                 </div>
                 <div className="flex items-center gap-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 px-4 py-2 rounded-full">
                   <Sparkles className="w-4 h-4" />
-                  <span className="text-sm font-semibold">Developer's Pick</span>
+                  <span className="text-sm font-semibold">Developer&aposs Pick</span>
                 </div>
               </div>
 
@@ -253,7 +248,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
               </Link>
               {/* Features List */}
               <div className="space-y-6">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Why you'll love this:</h3>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Why you&aposll love this:</h3>
                 <ul className="space-y-4">
                   {[
                     "Funny ending",
@@ -341,15 +336,15 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
             transition={{ duration: 0.4 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6"
           >
-            {videos.filter(v => !v.isFeatured).map((video, index) => (
+            {videos.filter(v => !v.isFeatured).map((video, ) => (
               <motion.div
                 key={video.id}
                 initial={{ opacity: 0, y: 30, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.3 }}
                 whileHover={{ y: -3, scale: 1.01 }}
-                onHoverStart={() => setHoveredVideo(video.id)}
-                onHoverEnd={() => setHoveredVideo(null)}
+                // onHoverStart={() => setHoveredVideo(video.id)}
+                // onHoverEnd={() => setHoveredVideo(null)}
                 className="group cursor-pointer relative"
               >
 

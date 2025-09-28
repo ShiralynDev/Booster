@@ -7,18 +7,11 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SearchInput } from "./search-input";
 import { AuthButton } from "@/modules/auth/ui/components/auth-button";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { ChartNetwork, Gift, Plus, Rocket, Tv, Tv2, Tv2Icon, Upload } from "lucide-react";
+
+import { Tv2Icon, Upload } from "lucide-react";
 import { trpc } from "@/trpc/client";
 import { useAuth, useClerk } from "@clerk/nextjs";
 import { XpIndicator } from "@/modules/xp/ui/components/xp-indicator";
-import { randomUUID } from "crypto";
 
 // XP indicator with loading state and tooltip
 
@@ -96,7 +89,6 @@ export const ExplorerNavBar = () => {
   }
 );
 
-console.log("A")
 
   return (
     <nav

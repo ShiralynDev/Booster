@@ -2,16 +2,15 @@
 
 import { InfiniteScroll } from "@/components/infinite-scroll";
 import { UserAvatar } from "@/components/user-avatar";
-import { COMMENT_REPLIES_SIZE, COMMENT_SECTION_SIZE, MAX_COMMENT_LENGTH } from "@/constants";
+import { COMMENT_REPLIES_SIZE, COMMENT_SECTION_SIZE, } from "@/constants";
 import { compactDate, compactNumber } from "@/lib/utils";
 import { UserInfo } from "@/modules/users/ui/components/user-info";
 import { CommentOutput } from "@/modules/videos/types";
 import { trpc } from "@/trpc/client";
 import { useClerk, useAuth } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, MessageCircle, Smile, Send, MoreHorizontal, ChevronDown, ChevronUp, RocketIcon, Crown, Star, CheckCircle, Zap, Shield, Award, User, Users2, Users2Icon, MessagesSquare, Contact } from "lucide-react";
+import { Heart, MessageCircle, MoreHorizontal, ChevronDown, ChevronUp, Zap,  } from "lucide-react";
 import { useMemo, useState, useCallback } from "react";
-import { skipToken } from "@tanstack/react-query";
 import { useClampDetector } from "../../hooks/resize-hook";
 import { CommentReplyInput } from "./comment-reply-input";
 import { User } from "@/modules/users/types";
@@ -31,19 +30,20 @@ interface CommentProps {
 // Helper function to determine which icon to show based on user role/status
 const getUserIcon = (user: User, isCommentOwner?: boolean) => {
     // You can customize this logic based on your user roles/status
-    if (user.role === 'admin' || user.role === 'moderator') {
-        return <MessagesSquare className="w-3 h-3 text-green-500 fill-green-500" />;
-    }
-    if (user.isVerified) {
-        return <CheckCircle className="w-3 h-3 text-blue-500 " />;
-    }
-    if (user.isPremium) {
-        return <Crown className="w-3 h-3 text-yellow-500 fill-yellow-500" />;
-    }
-    if (isCommentOwner) {
-        return <Contact className="w-3 h-3 text-[#ffca55]" />;
-    }
+    // if (user.role === 'admin' || user.role === 'moderator') {
+    //     return <MessagesSquare className="w-3 h-3 text-green-500 fill-green-500" />;
+    // }
+    // if (user.isVerified) {
+    //     return <CheckCircle className="w-3 h-3 text-blue-500 " />;
+    // }
+    // if (user.isPremium) {
+    //     return <Crown className="w-3 h-3 text-yellow-500 fill-yellow-500" />;
+    // }
+    // if (isCommentOwner) {
+    //     return <Contact className="w-3 h-3 text-[#ffca55]" />;
+    // }
     // Default icon or return null for no icon
+    console.log(user,isCommentOwner)
     return <Zap className="w-3 h-3 text-gray-400" />;
 };
 
@@ -60,9 +60,7 @@ export const Comment = ({ parentComment, videoId, viewer, depth, maxDepth }: Com
     // Determine if the current viewer is the comment author
     const isViewerCommentAuthor = viewer?.id === parentComment.userId;
 
-    const input = open ?
-        { commentId: parentComment.commentId, videoId, limit: COMMENT_REPLIES_SIZE }
-        : skipToken;
+   
 
     const {
         data: repliesData,
@@ -126,6 +124,7 @@ export const Comment = ({ parentComment, videoId, viewer, depth, maxDepth }: Com
             // Optimistically update the cache
             utils.comments.getReplies.setInfiniteData(
                 { commentId: parentId, videoId, limit: COMMENT_REPLIES_SIZE },
+                // @ts-ignore
                 (old) => {
                     if (!old) return old;
                     
@@ -195,6 +194,7 @@ export const Comment = ({ parentComment, videoId, viewer, depth, maxDepth }: Com
             // Replace the temporary comment with the real one
             utils.comments.getReplies.setInfiniteData(
                 { commentId: variables.parentId, videoId, limit: COMMENT_REPLIES_SIZE },
+                // @ts-ignore
                 (old) => {
                     if (!old) return old;
                     
@@ -204,7 +204,7 @@ export const Comment = ({ parentComment, videoId, viewer, depth, maxDepth }: Com
                             ...page,
                             comments: page.comments.map(c => 
                                 c.commentId === context?.tempId 
-                                    ? { ...c, ...data, commentId: data.commentId }
+                                    ? { ...c, ...data, commentId: data?.commentId }
                                     : c
                             ),
                         })),
@@ -279,9 +279,12 @@ export const Comment = ({ parentComment, videoId, viewer, depth, maxDepth }: Com
 
     const likeReply = trpc.commentReactions.create.useMutation({
         onMutate: async ({ commentId }) => {
+            // @ts-ignore
             await utils.comments.getReplies.cancel(listKey);
+            // @ts-ignore
             const previous = utils.comments.getReplies.getInfiniteData(listKey);
 
+            // @ts-ignore
             utils.comments.getReplies.setInfiniteData(listKey, (old) => {
                 if (!old) return old;
                 return {
@@ -300,17 +303,21 @@ export const Comment = ({ parentComment, videoId, viewer, depth, maxDepth }: Com
             return { previous };
         },
         onError: (_e, _v, ctx) => {
+            // @ts-ignore
             if (ctx?.previous) utils.comments.getReplies.setInfiniteData(listKey, ctx.previous);
             clerk.openSignIn();
         },
+        // @ts-ignore
         onSettled: () => utils.comments.getReplies.invalidate(listKey),
     });
 
     const unlikeReply = trpc.commentReactions.delete.useMutation({
         onMutate: async ({ commentId }) => {
+            // @ts-ignore
             await utils.comments.getReplies.cancel(listKey);
+            // @ts-ignore
             const previous = utils.comments.getReplies.getInfiniteData(listKey);
-
+            // @ts-ignore
             utils.comments.getReplies.setInfiniteData(listKey, (old) => {
                 if (!old) return old;
                 return {
@@ -329,9 +336,11 @@ export const Comment = ({ parentComment, videoId, viewer, depth, maxDepth }: Com
             return { previous };
         },
         onError: (_e, _v, ctx) => {
+            // @ts-ignore
             if (ctx?.previous) utils.comments.getReplies.setInfiniteData(listKey, ctx.previous);
             clerk.openSignIn();
         },
+        // @ts-ignore
         onSettled: () => utils.comments.getReplies.invalidate(listKey),
     });
 

@@ -3,17 +3,13 @@
 import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Coins, ShoppingCart, Search, Filter, Crown, Palette, Sparkles, BadgeCheck, Zap, Star, Heart, Rocket, Lock, Check, Boxes, Plus, PlusCircle, Box, Wallet, Landmark, X, Video, CreditCard } from "lucide-react"
+import { Coins, ShoppingCart, Search, Filter, Crown, Palette, Sparkles, BadgeCheck, Zap, Star, Heart, Rocket, Lock, Check, Boxes, Box,  Landmark, X, Video, CreditCard } from "lucide-react"
 import { XpIndicator } from "@/modules/xp/ui/components/xp-indicator"
 import { trpc } from "@/trpc/client"
-import { useAuth, useClerk } from "@clerk/nextjs"
-import { compactNumber } from "@/lib/utils"
+import { useAuth } from "@clerk/nextjs"
 
-const LOOKUP_KEYS = ["xp_500","xp_1200","xp_2500","xp_5500","xp_10000","xp_50000"];
 
-enum lookupKeys{
-  "xp_500","xp_1200","xp_2500","xp_5500","xp_10000","xp_50000"
-}
+
 
 export const MarketSection = () => {
   const [selectedCategory, setSelectedCategory] = useState("all")
@@ -22,7 +18,6 @@ export const MarketSection = () => {
   const [showXpPopup, setShowXpPopup] = useState(false)
 
   const { userId: clerkUserId } = useAuth();
-  const clerk = useClerk();
   const { data: user } = trpc.users.getByClerkId.useQuery({
     clerkId: clerkUserId,
   });
@@ -44,12 +39,7 @@ export const MarketSection = () => {
     }
   })
 
-  const addXp = trpc.xp.buyXp.useMutation({
-    onSuccess: () => {
-      utils.xp.getXpByUserId.invalidate({ userId });
-      setShowXpPopup(false);
-    }
-  })
+
 
   const userCoins = myXp?.xp || 0;
 
@@ -102,7 +92,6 @@ export const MarketSection = () => {
 
   // Handle purchase of Xp with 
   const handlePurchaseXp = async (lookupKey: "xp_500" | "xp_1200"|"xp_2500"|"xp_5500"|"xp_10000"|"xp_50000" ) => {
-    console.log("AA")
     const { url } = await buyXp.mutateAsync({ priceLookupKey: lookupKey });
     window.location.href = url!;
   };

@@ -10,7 +10,6 @@ interface Props{
 }
 export const SubButton = ({
     onClick,
-    disabled,
     isSubscribed,
     className,
     size

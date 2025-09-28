@@ -4,7 +4,7 @@
 
 import { db } from "@/db"
 import { users } from "@/db/schema"
-import { WebhookEvent } from "@clerk/nextjs/server"
+import { UserJSON, WebhookEvent } from "@clerk/nextjs/server"
 import { headers } from "next/headers"
 import { Webhook } from "svix"
 
@@ -50,7 +50,7 @@ export async function POST(req: Request){
 
 
     //Do something with payload
-    const  data:UserJSON   = evt.data
+    const  data   = evt.data as UserJSON
     const type = evt.type
     // console.log("received webhook with ID ", data.id, "and type", type)
     // console.log("webhook payload",body)

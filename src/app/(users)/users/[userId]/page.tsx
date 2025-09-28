@@ -1,4 +1,3 @@
-import { VideoView } from "@/modules/studio/ui/views/video-views";
 import { UsersView } from "@/modules/users/views/users-view";
 import { HydrateClient, trpc } from "@/trpc/server";
 

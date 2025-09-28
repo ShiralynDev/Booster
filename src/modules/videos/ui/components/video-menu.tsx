@@ -5,7 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { ListPlusIcon, MoreVerticalIcon, MousePointerClick, Share2, ShareIcon, ThumbsDown, TrashIcon } from "lucide-react";
+import {  MoreVerticalIcon, MousePointerClick, Share2,  ThumbsDown, TrashIcon } from "lucide-react";
 import { toast } from "sonner";
 
 interface VideoMenuProps {

@@ -1,7 +1,6 @@
  import { db } from "@/db";
 import { videos, videoViews } from "@/db/schema";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "@/trpc/init";
-import { TRPCError } from "@trpc/server";
 import { and, eq, sql } from "drizzle-orm";
 import z from "zod";
 
@@ -57,7 +56,6 @@ export const videoViewsRouter = createTRPCRouter({
                     console.log("rate limited")
                     return existingVideoView;
                 } else {
-                    console.log("updating views")
                     const [updatedVideoViews] = await db
                         .update(videoViews)
                         .set({

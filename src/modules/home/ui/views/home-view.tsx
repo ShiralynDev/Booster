@@ -6,10 +6,7 @@ import { trpc } from "@/trpc/client";
 import { VideoSection } from "../sections/video-section";
 import { motion, AnimatePresence } from "framer-motion";
 import { DEFAULT_LIMIT } from "@/constants";
-import { VideoGetOneOutput } from "@/modules/videos/types";
-import { useRouter } from "next/router";
 import { InfiniteScroll } from "@/components/infinite-scroll";
-import { ExplorerViewSuspense } from "@/modules/explorer/ui/views/explorer-view";
 import { ErrorBoundary } from "react-error-boundary";
 
 export const HomeView = () => {

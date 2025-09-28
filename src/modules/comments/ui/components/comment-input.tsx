@@ -1,7 +1,7 @@
 import { UserAvatar } from "@/components/user-avatar";
 import { MAX_COMMENT_LENGTH } from "@/constants";
 import { User } from "@/modules/users/types";
-import { Smile, Send } from "lucide-react";
+import {  Send } from "lucide-react";
 import { useState } from "react";
 
 

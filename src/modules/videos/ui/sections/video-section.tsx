@@ -10,7 +10,7 @@ import { VideoTopRow } from "../components/video-top-row";
 import { useAuth } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Eye, Clock, Loader2, Sparkles } from "lucide-react";
+import { Play, Eye, Clock, Loader2 } from "lucide-react";
 import { DEFAULT_LIMIT } from "@/constants";
 
 interface VideoSectionProps {
@@ -51,7 +51,7 @@ const VideoErrorFallback = () => {
                     <span className="text-2xl">⚠️</span>
                 </div>
                 <h3 className="text-xl font-semibold text-white">Video Unavailable</h3>
-                <p className="text-gray-300">We're having trouble loading this video. Please try again later.</p>
+                <p className="text-gray-300">We&aposre having trouble loading this video. Please try again later.</p>
                 <button className="px-6 py-2 bg-gradient-to-r from-red-500 to-rose-500 rounded-full text-white font-medium hover:shadow-lg transition-all">
                     Retry
                 </button>
@@ -64,13 +64,13 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
     const [video] = trpc.videos.getOne.useSuspenseQuery({ id: videoId });
     const [boostPoints] = trpc.xp.getBoostByVideoId.useSuspenseQuery({videoId})
 
-    console.log("BOOST AAAA",boostPoints.boostPoints)
+    // console.log("BOOST AAAA",boostPoints.boostPoints)
 
     const [isPlaying, setIsPlaying] = useState(true)
 
     const videoPlayerRef = useRef<{ play: () => void; pause: () => void }>(null);
 
-    const { isSignedIn, userId } = useAuth();
+    const { isSignedIn, } = useAuth();
     const utils = trpc.useUtils();
     const createView = trpc.videoViews.create.useMutation({
         onSuccess: () => {

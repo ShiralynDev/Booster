@@ -78,7 +78,7 @@ export const LevelUpAnimation = ({ newLevel, onComplete }: LevelUpAnimationProps
 
           {/* Message */}
           <p className="text-lg font-semibold text-white/90 mb-4">
-            Congratulations! You've reached level {newLevel}
+            Congratulations! This community has reached level {newLevel}
           </p>
 
           <p className="text-white/80 text-sm">

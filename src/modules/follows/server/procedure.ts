@@ -6,8 +6,7 @@ import {
   baseProcedure,
 } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
-import { sql, eq, and, inArray, getTableColumns, isNotNull } from "drizzle-orm";
-import { get } from "http";
+import { sql, eq, and, inArray, getTableColumns, } from "drizzle-orm";
 import z from "zod";
 
 export const followsRouter = createTRPCRouter({

@@ -83,9 +83,9 @@ export const ourFileRouter = {
             eq(videos.userId,metadata.user.id),
         ))
 
-      console.log("Upload complete for userId:", metadata.user.id);
+      // console.log("Upload complete for userId:", metadata.user.id);
 
-      console.log("file url", file.ufsUrl);
+      // console.log("file url", file.ufsUrl);
 
       // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
       return { uploadedBy: metadata.user.id };

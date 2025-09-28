@@ -1,11 +1,10 @@
 'use client'
 
-import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { UserAvatar } from "@/components/user-avatar"
 import { trpc } from "@/trpc/client"
-import { useAuth, useClerk } from "@clerk/nextjs"
-import { Crown, Award, Rocket, Trophy, Zap, Star, MedalIcon, AwardIcon, Medal } from "lucide-react"
+import { useAuth } from "@clerk/nextjs"
+import { Crown, Award, Rocket, Trophy, Zap,  AwardIcon, Medal } from "lucide-react"
 import { Suspense } from "react"
 import { ErrorBoundary } from "react-error-boundary"
 
@@ -29,7 +28,6 @@ export const BoosterRankingsSuspense = ({ userId }: Props) => {
 
 
     const { userId: clerkUserId } = useAuth();
-    const clerk = useClerk();
     const { data: userLogged } = trpc.users.getByClerkId.useQuery({
         clerkId: clerkUserId,
     });

@@ -4,8 +4,6 @@ import { forwardRef, useImperativeHandle, useRef } from 'react'
 import { THUMBNAIL_FALLBACK } from "../../constants";
 import 'media-chrome/react';
 import 'media-chrome/react/menu';
-import { MediaTheme } from 'media-chrome/react/media-theme';
-import MuxVideo from '@mux/mux-video-react';
 import MuxPlayer from "@mux/mux-player-react"
 
 
@@ -25,7 +23,6 @@ export interface VideoPlayerHandle {
 export const VideoPlayer = forwardRef<VideoPlayerHandle, VideoPlayerProps>(
     ({ playbackId, thumbnailUrl, autoPlay, onPlay, onPause }, ref) => {
         const videoRef = useRef<HTMLVideoElement>(null);
-        console.log(playbackId)
         useImperativeHandle(ref, () => ({
             play: () => {
                 videoRef.current?.play();
@@ -869,6 +866,7 @@ translate: 4% 4%;
 
                 <MuxPlayer 
                 
+                    // @ts-ignore
                     ref={videoRef} //ignore xD
                     theme="media-theme-sutro"
                     className='h-full w-full'

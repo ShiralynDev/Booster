@@ -16,7 +16,6 @@ export const videoRatingsRouter = createTRPCRouter({
         const {newRating} = input;
 
         const {id:userId} = ctx.user;
-        console.log(userId)
 
         const [existingRating] = await db
         .select().from(videoRatings)

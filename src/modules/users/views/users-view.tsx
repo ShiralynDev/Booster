@@ -3,31 +3,20 @@
 import { useState, useEffect, useRef } from "react";
 import { UserAvatar } from "@/components/user-avatar";
 import { trpc } from "@/trpc/client";
-import Image from "next/image";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { compactDate, compactNumber } from "@/lib/utils";
 import {
   Check,
   EyeIcon,
   Lock,
   Rocket,
-  Star,
-  Zap,
   Sparkles,
-  Badge,
-  Crown,
-  Trophy,
-  RocketIcon,
   StarIcon,
-  Edit3Icon,
 } from "lucide-react";
 import { XpCard } from "@/modules/home/ui/components/xp-card";
 import { VideoThumbnail } from "@/modules/videos/ui/components/video-thumbnail";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { diff } from "util";
 import { LevelUpBadge } from "../components/level-up-badge";
 import { LevelUpAnimation } from "../components/level-up-animation";
 import { BoosterRankings } from "../components/boosters-rankings";
@@ -63,9 +52,7 @@ export const UsersView = ({ userId }: Props) => {
     utils.xp.getBoostersByCreatorId.prefetch({ creatorId: userId });
   };
 
-  const [currentXp, setCurrentXp] = useState(3250);
   const [showXpPopup, setShowXpPopup] = useState(false);
-  const [selectedXpValue, setSelectedXpValue] = useState(100);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [newLevel, setNewLevel] = useState(0);
   const previousLevelRef = useRef<number | null>(null);
@@ -76,7 +63,7 @@ export const UsersView = ({ userId }: Props) => {
   const channelLevel = Math.floor(
     Math.floor(Math.sqrt(boostPoints.boostPoints * 1000)) / 1000
   );
-  
+
   const xpOnCurrentLevel = f(1000 * channelLevel);
   const xpForNextLevel = f(1000 * (channelLevel + 1));
 
@@ -123,17 +110,7 @@ export const UsersView = ({ userId }: Props) => {
     )
   );
 
-  // Handle adding XP
-  const handleAddXp = () => {
-    setCurrentXp((prev) => prev + selectedXpValue);
-    setShowXpPopup(false);
 
-    // Check for level up (simplified)
-    if (currentXp + selectedXpValue >= xpForNextLevel) {
-      setNewLevel(channelLevel + 1);
-      setShowLevelUp(true);
-    }
-  };
 
   const handleLevelUpComplete = () => {
     setShowLevelUp(false);
@@ -145,7 +122,6 @@ export const UsersView = ({ userId }: Props) => {
     isFollowing: followers.viewerIsFollowing,
   });
 
-  console.log(followers)
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -322,8 +298,8 @@ export const UsersView = ({ userId }: Props) => {
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeTab === tab
-                  ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted/50"
+                ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground"
+                : "text-muted-foreground hover:bg-muted/50"
                 }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}

@@ -2,10 +2,8 @@
 
 import { DEFAULT_LIMIT } from "@/constants"
 import { trpc } from "@/trpc/client"
-import { Suspense, useMemo, useState } from "react"
-import { format } from "date-fns"
-import { compactDate, compactNumber, formatDuration } from "@/lib/utils"
-import Image from "next/image"
+import { Suspense, useMemo, } from "react"
+import { compactDate, compactNumber, } from "@/lib/utils"
 import { VideoThumbnail } from "@/modules/videos/ui/components/video-thumbnail"
 import { UserAvatar } from "@/components/user-avatar"
 import { Rating, RatingButton } from "@/components/ui/shadcn-io/rating"

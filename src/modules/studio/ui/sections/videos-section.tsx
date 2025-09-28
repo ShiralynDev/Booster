@@ -18,7 +18,7 @@ import Link from "next/link";
 import { VideoThumbnail } from "@/modules/videos/ui/components/video-thumbnail";
 import { formatDuration, snakeCaseToTitle } from "@/lib/utils";
 import { format } from "date-fns";
-import { Globe2Icon, LockIcon, Eye, MessageCircle, Heart, MoreHorizontal, TrendingUp, Calendar, Filter } from "lucide-react";
+import { Globe2Icon, LockIcon, Eye, MessageCircle, Heart, MoreHorizontal,  Calendar, Filter } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 

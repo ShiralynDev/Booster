@@ -1,8 +1,7 @@
-import { useState, useMemo } from "react";
 import { Rating, RatingButton } from "@/components/ui/shadcn-io/rating";
-import { Star, StarIcon, Heart, Users, HeartCrack } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { Star,  Users } from "lucide-react";
 import { useClerk } from "@clerk/nextjs";
+import { useMemo } from "react";
 
 interface Props {
     avgRating: number;

@@ -1,7 +1,5 @@
 'use client'
-import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
-import { UserInfo } from "@/modules/users/ui/components/user-info";
 import { trpc } from "@/trpc/client"
 import { Users, MoreHorizontal, Plus, Search, Globe } from "lucide-react";
 import Link from "next/link";

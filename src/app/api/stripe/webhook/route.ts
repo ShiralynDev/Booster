@@ -17,13 +17,14 @@ export async function POST(req: NextRequest) {
     if (!sig) return new Response("Missing signature", { status: 400 });
 
     let event: Stripe.Event;
-    console.log("Signature" ,sig)
+    // console.log("Signature" ,sig)
     const localWebhooksecret="whsec_47b9d0af0535af4511ebc648c2456712f0a74f805816ab4de18f157b06b3c3c6"
     try {
         //TODO: Change to stripe webhook secret !!
         event = stripe.webhooks.constructEvent(payload, sig,  localWebhooksecret);// process.env.STRIPE_WEBHOOK_SECRET!);
-    } catch (err: any) {
-        return new Response(`Invalid signature: ${err.message}`, { status: 400 });
+    } catch (e) {
+        console.error(e)
+        return new Response('Invalid signature', { status: 400 });
     }
 
     const [seen] = await db.select().from(stripeProcessedEvents).where(eq(stripeProcessedEvents.id, event.id));

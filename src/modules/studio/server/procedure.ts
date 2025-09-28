@@ -2,16 +2,15 @@ import { z } from "zod";
 import { db } from "@/db";
 import { videos, videoViews } from "@/db/schema";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
-import { eq, and, or, lt, desc, sql, getTableColumns, sum } from "drizzle-orm";
+import { eq, and, or, lt, desc, sql, getTableColumns } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 export const studioRouter = createTRPCRouter({
 
     getOne: protectedProcedure
         .input(z.object({ id: z.string().uuid() }))
-        .query(async ({ ctx, input }) => {
-            const { id: userId } = ctx.user;
-            const { id } = input;
+        .query(async ({  input }) => {
+            
 
             const [video] = await db
                 .select({

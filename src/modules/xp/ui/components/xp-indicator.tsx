@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
-import {  Boxes, Gift } from "lucide-react";
+import {  Boxes } from "lucide-react";
 import Link from "next/link";
 
 // XP indicator with loading state and tooltip

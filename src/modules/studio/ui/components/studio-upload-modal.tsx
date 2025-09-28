@@ -4,19 +4,15 @@ import { ResponsiveModal } from '@/components/responsive-modal';
 import { Button } from '@/components/ui/button';
 import { trpc } from '@/trpc/client';
 import { Loader2Icon, PlusIcon } from 'lucide-react';
-import { toast } from 'sonner';
 import { StudioUploader } from './studio-uploader';
-import { useRouter } from 'next/navigation';
 
 export const StudioUploadModal = () => {
-  const router = useRouter();
-  const utils = trpc.useContext();
+
 
   const [open, setOpen] = useState(false);
   const [endpoint, setEndpoint] = useState<string | null>(null);
   const [uploadId, setUploadId] = useState<string | null>(null);
   const [pending,setPending] = useState(false);
-  const [disableUpload,setDisableUpload] = useState(false)
  
 
   const getUrl = trpc.videos.getDirectUpload.useMutation({
@@ -45,15 +41,12 @@ export const StudioUploadModal = () => {
   // });
 
   const handleOpen = () => {
-    setDisableUpload(true)
     setOpen(true);
     setPending(true);
     getUrl.mutate();
   };
 
-  const handleUploadSuccess = () => {
-    setDisableUpload(false)
-  };
+
 
   return (
     <>
@@ -61,7 +54,9 @@ export const StudioUploadModal = () => {
         {!endpoint ? (
           <Loader2Icon className="animate-spin" />
         ) : (
-          <StudioUploader endpoint={endpoint} onSuccess={handleUploadSuccess} uploadId={uploadId} />
+          <StudioUploader endpoint={endpoint} uploadId={uploadId} onSuccess={function (e: CustomEvent): void {
+              throw new Error(`Function not implemented.${e}`);
+            } } />
         )}
       </ResponsiveModal>
 

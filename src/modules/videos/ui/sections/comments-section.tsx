@@ -115,11 +115,7 @@ export const CommentsSuspense = ({ videoId, openComments, onOpenChange,home }: C
   // Controlled open mirror (header always visible at 70px)
   const [open, setOpen] = useState(openComments);
   useEffect(() => setOpen(openComments), [openComments]);
-  const toggle = () => {
-    const next = !open;
-    setOpen(next);
-    onOpenChange?.(next);
-  };
+  
 
   return (
     <div className="h-full flex flex-col overflow-hidden "

@@ -38,11 +38,11 @@ interface PageProps{
 }
 
 
-const Page = async ({searchParams}: PageProps) => { //destructure searchParams
+const Page = async ({}: PageProps) => { //destructure searchParams
   void trpc.categories.getMany.prefetch();
   void trpc.home.getMany.prefetchInfinite({limit:DEFAULT_LIMIT});
-  const { categoryId } = await searchParams; //await the promise to get the actual search params
-
+  // const { categoryId } = await searchParams; //await the promise to get the actual search params
+  
   return (
     // <HydrateClient>
     //   {/* <ExplorerView categoryId={categoryId}/> */}

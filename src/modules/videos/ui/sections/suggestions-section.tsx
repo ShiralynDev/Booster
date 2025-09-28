@@ -1,6 +1,7 @@
 'use client'
 import { motion } from "framer-motion";
-import { Play, Eye, Clock, Star, TrendingUp, Sparkles } from "lucide-react";
+import { Play, Eye,  Star, TrendingUp, Sparkles } from "lucide-react";
+import Image from "next/image";
 
 interface Video {
     id: string;
@@ -19,12 +20,15 @@ interface Video {
 interface SuggestionsSectionProps {
     videos?: Video[];
     title?: string;
+    videoId: string;
 }
 
 export const SuggestionsSection = ({
     videos = mockVideos,
-    title = "Watch next"
+    title = "Watch next",
+    videoId,
 }: SuggestionsSectionProps) => {
+    console.log(videoId)
     return (
         <div className="relative py-8">
             {/* Background gradient */}
@@ -64,7 +68,7 @@ export const SuggestionsSection = ({
                                 {/* Thumbnail container */}
                                 <div className="relative aspect-video ">
                                     {/* Thumbnail */}
-                                    <img
+                                    <Image
                                         src={video.thumbnailUrl}
                                         alt={video.title}
                                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
@@ -102,7 +106,7 @@ export const SuggestionsSection = ({
 
                                     {/* User info */}
                                     <div className="flex items-center gap-2 mb-3">
-                                        <img
+                                        <Image
                                             src={video.user.imageUrl}
                                             alt={video.user.name}
                                             className="w-6 h-6 rounded-full object-cover"

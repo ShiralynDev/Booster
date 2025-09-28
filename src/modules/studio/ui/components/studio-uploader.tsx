@@ -33,12 +33,12 @@ export const StudioUploader = ({ endpoint, onSuccess,uploadId }: StudioUploaderP
         if (!uploaderEl) return;
 
         const handleAdd = (e: Event) => {
-            console.log("File added:", e);
+            console.log(e)
         };
 
         const handleStart = (e: Event) => {
-            console.log("Upload started:");
             createRow.mutate({uploadUrl:endpoint, uploadId});
+            console.log(e)
         };
 
         uploaderEl.addEventListener("uploadstart", handleStart);
@@ -56,7 +56,7 @@ export const StudioUploader = ({ endpoint, onSuccess,uploadId }: StudioUploaderP
                 endpoint={endpoint ?? undefined}
                 id={UPLOADER_ID}
                 className="hidden group/uploader"
-                onSuccess={onSuccess as any}
+                onSuccess={onSuccess}
             />
             <MuxUploaderDrop muxUploader={UPLOADER_ID} className="group/drop" >
                 <div slot="heading" className="flex flex-col items-center gap-6">

@@ -1,13 +1,11 @@
 import { z } from "zod";
 import { db } from "@/db";
-import { commentReactions, comments, userFollows, users, videoRatings, videos, videoUpdateSchema, videoViews } from "@/db/schema";
+import {  userFollows, users, videoRatings, videos, videoUpdateSchema, videoViews } from "@/db/schema";
 import { createTRPCRouter, protectedProcedure, baseProcedure } from "@/trpc/init";
-import { eq, and, getTableColumns, sum, avg, inArray, isNotNull, count, sql } from "drizzle-orm";
+import { eq, and, getTableColumns, sum, avg, inArray, isNotNull,  sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { mux } from "@/lib/mux";
 import { UTApi } from "uploadthing/server";
-import { isHeadersProtocol } from "@mux/mux-node/core.mjs";
-import { duplexPair } from "stream";
 
 export const videosRouter = createTRPCRouter({
     //.query() para queries
