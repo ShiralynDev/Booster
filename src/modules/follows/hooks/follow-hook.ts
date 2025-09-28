@@ -35,7 +35,7 @@ export const useFollow = ({ userId, isFollowing, fromVideoId }: Props) => {
                     if(!old) return old
                     return {
                         ...old,
-                        followsCount: (old.followsCount ?? 0) + (old.viewerIsFollowing ? 0 : 1),
+                        followsCount: (old[0].followsCount ?? 0) + (old[0].viewerIsFollowing ? 0 : 1),
                         viewerIsFollowing: true,
                     }
                 })
@@ -82,7 +82,7 @@ export const useFollow = ({ userId, isFollowing, fromVideoId }: Props) => {
                     if(!old) return old
                     return {
                         ...old,
-                        followsCount: (old.followsCount ?? 0) - (old.viewerIsFollowing ? 1 : 0),
+                        followsCount: (old[0].followsCount ?? 0) - (old[0].viewerIsFollowing ? 1 : 0),
                         viewerIsFollowing:false,
                     }
                 })
