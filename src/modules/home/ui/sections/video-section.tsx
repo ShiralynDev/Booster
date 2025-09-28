@@ -28,13 +28,82 @@ interface Props {  videoId: string; }
 
 export const VideoSection = ({videoId}:Props) => {
   return (
-    <Suspense fallback={<p>Loading</p>}>
-      <ErrorBoundary fallback={<p>Failed to load categories.</p>}>
+    <Suspense fallback={<VideoSectionSkeleton />}>
+      <ErrorBoundary fallback={<p>Failed to load video :(</p>}>
         <VideoSectionSuspense videoId={videoId}  />
       </ErrorBoundary>
     </Suspense>
   )
 }
+
+const VideoSectionSkeleton = () => {
+  return (
+    <div className="h-full w-full flex flex-col gap-4 overflow-hidden animate-pulse">
+      {/* VIDEO AREA SKELETON */}
+      <div className="relative group flex-1 rounded-2xl overflow-hidden bg-gray-300 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm">
+        {/* Play button skeleton */}
+        <div className="absolute inset-0 z-20 flex items-center justify-center -m-20">
+          <div className="w-20 h-20 rounded-full bg-gray-400 dark:bg-gray-600 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-gray-500 dark:bg-gray-500"></div>
+          </div>
+        </div>
+      </div>
+
+      {/* TOP ROW SKELETON */}
+      <div className='flex items-start justify-between'>
+        <div className="flex flex-col sm:items-start sm:justify-between gap-3 ml-2 flex-1">
+          {/* Title skeleton */}
+          <div className="h-8 bg-gray-300 dark:bg-gray-600 rounded-lg w-3/4 max-w-md"></div>
+          
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* Channel Info Card Skeleton */}
+            <div className="flex items-center bg-white dark:bg-[#333333] rounded-2xl px-4 py-3 border border-gray-200 dark:border-gray-700 shadow-sm flex-1">
+              <div className="flex items-center gap-3 w-full">
+                <div className="w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-32"></div>
+                  <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded w-24"></div>
+                </div>
+                <div className="w-20 h-10 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+              </div>
+            </div>
+
+            {/* XP Progress Card Skeleton */}
+            <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-2xl p-4 border border-amber-500/20 flex items-center gap-3 min-w-48">
+              <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center">
+                <div className="w-6 h-6 rounded bg-amber-500/30"></div>
+              </div>
+              <div className="flex-1 space-y-2">
+                <div className="h-3 bg-amber-500/20 rounded w-20"></div>
+                <div className="h-2 bg-amber-500/20 rounded w-full"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats skeleton */}
+        <div className="flex flex-wrap items-start gap-2">
+          <div className="w-20 h-8 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+          <div className="w-24 h-8 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+          <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full ml-1"></div>
+        </div>
+      </div>
+
+      {/* COMMENTS PANEL SKELETON */}
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#333333] overflow-hidden shadow-sm h-[60px]">
+        <div className="p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+              <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-32"></div>
+            </div>
+            <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded w-16"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const VideoSectionSuspense = ({ videoId }: Props) => {
 

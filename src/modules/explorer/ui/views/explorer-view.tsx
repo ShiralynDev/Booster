@@ -190,7 +190,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                 </div>
                 <div className="flex items-center gap-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 px-4 py-2 rounded-full">
                   <Sparkles className="w-4 h-4" />
-                  <span className="text-sm font-semibold">Editor's Pick</span>
+                  <span className="text-sm font-semibold">Developer's Pick</span>
                 </div>
               </div>
 
