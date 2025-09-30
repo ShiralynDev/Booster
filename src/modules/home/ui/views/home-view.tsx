@@ -8,6 +8,7 @@ import { DEFAULT_LIMIT } from "@/constants";
 import { InfiniteScroll } from "@/components/infinite-scroll";
 import { ErrorBoundary } from "react-error-boundary";
 import { useSwipeable } from 'react-swipeable';
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export const HomeView = () => {
   return (
@@ -27,8 +28,6 @@ const VideoSectionSkeleton = () => {
     </div>
   );
 };
-
-
 
 export const HomeViewSuspense = () => {
   const [data, query] = trpc.home.getMany.useSuspenseInfiniteQuery(
@@ -64,7 +63,7 @@ export const HomeViewSuspense = () => {
       document.body.style.overflow = prev;
     };
   }, []);
- 
+
 
   const goToNextVideo = () => {
     console.log("NEXT")
@@ -113,39 +112,34 @@ export const HomeViewSuspense = () => {
     preventScrollOnSwipe: true,
   });
   return (
-    <div {...handlers} className="h-dvh w-full flex flex-col overflow-hidden bg-[#f8f9fa] dark:bg-[#212121]" >
+    <div {...handlers} className="h-dvh w-full flex flex-col overflow-hidden bg-[#f8f9fa] dark:bg-[#212121]">
       {/* Main content */}
       <div className="flex-1 flex overflow-hidden gap-1">
         <main className="flex-1 mb-6 overflow-hidden">
-          <div className="flex justify-center mx-auto max-w-full h-[95%]">
+          <div className="flex justify-center mx-auto max-w-full h-[95%] relative">
 
-            {/* Left navigation button */}
-            {/* <div className="hidden md:flex h-full">
-              <motion.button
-                aria-label="Previous video"
-                onClick={goToPrevVideo}
-                className="
-                  w-20 rounded-2xl mr-4 flex items-center justify-center transition-all
-                  border border-[rgba(255,202,85,0.3)]
-                  text-[#FFA100]
-                  shadow-[0_10px_30px_rgba(255,161,0,0.15)]
-                  hover:bg-[#ffffdf45]
-                  dark:hover:bg-[rgb(53,53,53)]
-                  hover:shadow-[0_12px_35px_rgba(255,161,0,0.2)]
-                  backdrop-blur-md
-                  outline-none focus-visible:ring-4 focus-visible:ring-[rgba(255,202,85,0.35)]
-                "
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <ChevronLeft className="h-10 w-10" />
-              </motion.button>
-            </div> */}
+            {/* Swipe Indicators */}
+            <motion.div
+              className="hidden sm:absolute sm:block sm:left-4 sm:top-[40%] z-40"
+              onClick={() => goToPrevVideo()}
+            >
+
+              <div className="bg-dark/70 dark:bg-white/70 rounded-full p-3 hover:cursor-pointer hover:scale-105 dark:hover:bg-amber-300/90 hover:bg-white/20 transition-all duration-200 ease-in-out">
+                <ChevronLeft className="h-6 w-6 text-white dark:text-white" />
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="hidden sm:block sm:absolute right-4 top-[40%] z-40"
+              onClick={() => goToNextVideo()}
+            >
+              <div className="bg-dark/70 dark:bg-white/70 rounded-full p-3 hover:cursor-pointer hover:scale-105 dark:hover:bg-amber-300/90 hover:bg-white/20 transition-all duration-200 ease-in-out">
+                <ChevronRight className="h-6 w-6 text-white dark:text-white" />
+              </div>
+            </motion.div>
 
             {/* Swipeable area - Only ONE video rendered at a time */}
-            <div
-              className="w-full h-full relative"
-            >
+            <div className="w-full h-full relative">
               <AnimatePresence custom={direction} mode="wait" initial={false}>
                 <motion.div
                   key={videoIndex}
@@ -168,32 +162,7 @@ export const HomeViewSuspense = () => {
                   )}
                 </motion.div>
               </AnimatePresence>
-
-             
             </div>
-
-            {/* Right navigation button */}
-            {/* <div className="hidden md:flex h-full">
-              <motion.button
-                aria-label="Next video"
-                onClick={goToNextVideo}
-                className="
-                  w-20 rounded-2xl ml-4 flex items-center justify-center transition-all
-                  border border-[rgba(255,202,85,0.3)]
-                  text-[#FFA100]
-                  shadow-[0_10px_30px_rgba(255,161,0,0.15)]
-                  hover:bg-[#ffffdf45]
-                  dark:hover:bg-[rgb(53,53,53)]
-                  hover:shadow-[0_12px_35px_rgba(255,161,0,0.2)]
-                  backdrop-blur-md
-                  outline-none focus-visible:ring-4 focus-visible:ring-[rgba(255,202,85,0.35)]
-                "
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <ChevronRight className="h-10 w-10" />
-              </motion.button>
-            </div> */}
           </div>
         </main>
       </div>

@@ -44,6 +44,7 @@ const getUserIcon = (user: User, isCommentOwner?: boolean) => {
     //     return <Contact className="w-3 h-3 text-[#ffca55]" />;
     // }
     // Default icon or return null for no icon
+    console.log(user,isCommentOwner)
     return <Zap className="w-3 h-3 text-gray-400" />;
 };
 
@@ -95,7 +96,7 @@ export const Comment = ({ parentComment, videoId, viewer, depth, maxDepth }: Com
         onError: () => {
             toast.error("something went wrong")
         },
-        onSuccess: (data) => {
+        onSuccess: () => {
             utils.comments.getTopLevel.invalidate({ videoId, limit: COMMENT_SECTION_SIZE });
             utils.comments.getReplies.invalidate({commentId:parentComment.commentId, videoId, limit: COMMENT_REPLIES_SIZE});
 

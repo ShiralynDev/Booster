@@ -106,7 +106,7 @@ export const VideoSectionSuspense = ({ videoId }: Props) => {
     const [video] = trpc.videos.getOne.useSuspenseQuery({ id: videoId })
     const [boostPoints] = trpc.xp.getBoostByVideoId.useSuspenseQuery({ videoId })
 
-    const [commentsOpen, setCommentsOpen] = useState(true);
+    const [commentsOpen, setCommentsOpen] = useState(false);
     const { isSignedIn } = useAuth();
     const [showTitle, setShowTitle] = useState(true);
     const [isPlaying, setIsPlaying] = useState(true);
