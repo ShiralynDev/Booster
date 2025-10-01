@@ -119,7 +119,6 @@ const ExplorerSkeleton = () => {
 
 export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
   const [selectedCategory] = useState(categoryId || "all");
-  const [hoveredVideo, setHoveredVideo] = useState<string | null>(null);
 
   const [data, query] = trpc.explorer.getMany.useSuspenseInfiniteQuery(
     { limit: DEFAULT_LIMIT * 2 },
@@ -129,18 +128,8 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
   const videos = useMemo(() => data ? data.pages.flatMap(p => p.items) : [], [data]);
   const featuredVideo = videos.find(v => v.isFeatured);
 
-  // Stats for the header
-  const totalViews = useMemo(() =>
-    videos.reduce((sum, video) => sum + (Number(video.videoViews) || 0), 0),
-    [videos]
-  );
+ 
 
-  const averageRating = useMemo(() => {
-    const ratedVideos = videos.filter(v => Number(v.averageRating) > 0);
-    return ratedVideos.length > 0
-      ? ratedVideos.reduce((sum, video) => sum + Number(video.averageRating), 0) / ratedVideos.length
-      : 0;
-  }, [videos]);
 
   return (
     <div className="overflow-hidden mb-10 px-4 pt-2.5 flex flex-col gap-y-12">
@@ -456,8 +445,6 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
                 whileHover={{ y: -8, scale: 1.02 }}
-                onHoverStart={() => setHoveredVideo(video.id)}
-                onHoverEnd={() => setHoveredVideo(null)}
                 className="group cursor-pointer relative"
               >
                 <Link href={`/explorer/videos/${video.id}`}>

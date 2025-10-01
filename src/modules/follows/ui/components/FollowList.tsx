@@ -145,7 +145,7 @@ export const FollowList = () => {
                         transition={{ duration: 0.4 }}
                         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
                     >
-                        {filteredUsers.map((user, index) => (
+                        {filteredUsers.map((user ) => (
                             <motion.div
                                 key={user.user?.id}
                                 initial={{ opacity: 0, y: 30, scale: 0.9 }}

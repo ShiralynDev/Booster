@@ -121,10 +121,10 @@ export const NoVideosEmptyState = () => {
           className="space-y-4 mb-8"
         >
           <h2 className="text-3xl font-bold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
-            You've reached the end!
+            You&aposve reached the end!
           </h2>
           <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed">
-            You've watched all the videos in your feed. Time to explore more amazing content from our community.
+            You&aposve watched all the videos in your feed. Time to explore more amazing content from our community.
           </p>
         </motion.div>
 
