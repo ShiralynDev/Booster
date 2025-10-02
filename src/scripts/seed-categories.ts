@@ -21,6 +21,10 @@ const categoryNames = [
     "Travel and Events",
 ]
 
+const assets = [
+    ""
+]
+
 async function main(){
     try{
         const values = categoryNames.map((name) => ({
@@ -33,6 +37,8 @@ async function main(){
         console.error("error seeding categories", err)
         process.exit(1)
     }
+
+   
 }
 
 main()

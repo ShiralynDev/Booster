@@ -163,7 +163,7 @@ export const VideoSectionSuspense = ({ videoId, next,prev }: Props) => {
             <motion.div
                 className={cn("flex-none relative rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm min-h-[50%]")}
                 initial={false}
-                animate={{ height: commentsOpen ? '50%' : '72%' }}
+                animate={{ height: commentsOpen ? '50%' : '77%' }}
                 transition={{ duration: 0.35, ease: 'easeInOut' }}
                 onMouseEnter={() => setShowTitle(true)}
                 onMouseLeave={() => setShowTitle(false)}
