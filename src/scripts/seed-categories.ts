@@ -21,9 +21,9 @@ const categoryNames = [
     "Travel and Events",
 ]
 
-const assets = [
-    ""
-]
+// const assets = [
+//     ""
+// ]
 
 async function main(){
     try{

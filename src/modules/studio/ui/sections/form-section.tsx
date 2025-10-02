@@ -38,7 +38,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { VideoPlayer } from "@/modules/videos/ui/components/video-player";
 import Link from "next/link";
 import { formatDuration, snakeCaseToTitle } from "@/lib/utils";
 import { useRouter } from "next/navigation";

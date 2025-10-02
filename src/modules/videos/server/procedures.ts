@@ -125,13 +125,13 @@ export const videosRouter = createTRPCRouter({
                         ));
             }
 
-            if (!existingVideo.muxPlaybackId) {
+            if (!existingVideo.bunnyLibraryId) {
                 throw new TRPCError({ code: "BAD_REQUEST" })
             }
 
 
 
-            const newThumbnailUrl = `https://image.mux.com/${existingVideo.muxPlaybackId}/thumbnail.webp`
+            const newThumbnailUrl = `https://image.mux.com/${existingVideo.bunnyVideoId}/thumbnail.webp`
 
             const [updatedVideo] = await db
                 .update(videos)
@@ -283,8 +283,8 @@ export const videosRouter = createTRPCRouter({
                 userId,
                 title: "New video title",
                 description: "",
-                muxStatus: 'waiting',
-                muxUploadId: input.uploadId,
+                // muxStatus: 'waiting',
+                // muxUploadId: input.uploadId,
             }).returning();
             return {
                 video:video, 

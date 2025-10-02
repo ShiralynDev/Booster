@@ -3,7 +3,6 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { cn, compactNumber } from '@/lib/utils';
 
-import { VideoPlayer } from '@/modules/videos/ui/components/video-player';
 import { CommentsSection } from '@/modules/videos/ui/sections/comments-section';
 import { ChevronLeft, ChevronRight, Eye, Play, } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -131,12 +130,11 @@ export const VideoSectionSuspense = ({ videoId, next,prev }: Props) => {
         },
     });
 
-    const handlePlay = () => {
-        setIsPlaying(true);
-        if (!isSignedIn) return;
-        createView.mutate({ videoId: video.id });
-    };
-    const handlePause = () => setIsPlaying(false);
+    useEffect(() => {
+        setIsPlaying(true)
+        if(!isSignedIn) return;
+        createView.mutate({videoId: video.id})
+    },[])
 
     const createRating = trpc.videoRatings.create.useMutation({
         onSuccess: () => {

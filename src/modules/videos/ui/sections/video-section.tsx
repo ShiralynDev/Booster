@@ -2,9 +2,8 @@
 
 import { cn } from "@/lib/utils";
 import { trpc } from "@/trpc/client";
-import { Suspense, useState, useRef } from "react";
+import { Suspense, useState, useRef, useEffect } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { VideoPlayer } from "../components/video-player";
 import { VideoBanner } from "../components/video-banner";
 import { VideoTopRow } from "../components/video-top-row";
 import { useAuth } from "@clerk/nextjs";
@@ -92,15 +91,11 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
         }
     })
 
-    const handlePlay = () => {
-        setIsPlaying(true);
-        if (!isSignedIn) return;
-        createView.mutate({ videoId }) //execute the mutate operation created on procedure.ts
-    }
-
-    const handlePause = () => {
-        setIsPlaying(false);
-    }
+    useEffect(() => {
+        setIsPlaying(true)
+        if(!isSignedIn) return;
+        createView.mutate({videoId})
+    },[]);
 
     const handlePlayButtonClick = () => {
         videoPlayerRef.current?.play()

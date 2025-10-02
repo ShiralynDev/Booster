@@ -1,5 +1,4 @@
 import { AlertTriangleIcon } from "lucide-react";
-import { VideoGetOneOutput } from "../../types";
 
 interface Props{
     status: string;

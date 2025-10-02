@@ -1,13 +1,17 @@
 // components/UploadButton.tsx
 "use client";
-import { BunnyEmbed } from "@/modules/videos/ui/views/BunnyEmbed";
 import { useState } from "react";
 
+const Page = () => {
+  return (
+    <UploadButton />
+  )
+}
+export default Page
 
-export default function UploadButton({ onUploaded }: { onUploaded?: (guid: string) => void }) {
+function UploadButton({ onUploaded }: { onUploaded?: (guid: string) => void }) {
   const [busy, setBusy] = useState(false);
 
-  let video_id = "";
   async function onPick(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -21,7 +25,6 @@ export default function UploadButton({ onUploaded }: { onUploaded?: (guid: strin
 
 
     const videoId = meta.guid as string;
-    video_id = videoId;
     
     console.log(videoId)
     // 2 -  upload video by updating the video  object previously obtained
@@ -38,5 +41,3 @@ export default function UploadButton({ onUploaded }: { onUploaded?: (guid: strin
         </>
   )
 }
-
-// https://vz-a1724747-84f.b-cdn.net/fd2d59a4-fd70-4599-8192-bd073460a0f6/thumbnail.jpg

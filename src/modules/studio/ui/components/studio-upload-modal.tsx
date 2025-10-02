@@ -2,27 +2,17 @@
 import { useState } from 'react';
 import { ResponsiveModal } from '@/components/responsive-modal';
 import { Button } from '@/components/ui/button';
-import { trpc } from '@/trpc/client';
 import { Loader2Icon, PlusIcon } from 'lucide-react';
-import { StudioUploader } from './studio-uploader-mux';
 import { StudioBunnyUploader } from './studio-bunny-uploader';
 
 export const StudioUploadModal = () => {
 
 
   const [open, setOpen] = useState(false);
-  const [endpoint, setEndpoint] = useState<string | null>(null);
-  const [uploadId, setUploadId] = useState<string | null>(null);
   const [pending,setPending] = useState(false);
  
 
-  const getUrl = trpc.videos.getDirectUpload.useMutation({
-    onSuccess: (data) => {
-      setEndpoint(data.url)
-      setUploadId(data.uploadId)
-      setPending(false)
-    }
-  })
+ 
 
   //TODO: solve orphaned asset 
   //If webhook arrives first, it only does an UPDATE → 0 rows affected (row doesn’t exist yet).
@@ -44,7 +34,6 @@ export const StudioUploadModal = () => {
   const handleOpen = () => {
     setOpen(true);
     setPending(true);
-    getUrl.mutate();
   };
 
 
