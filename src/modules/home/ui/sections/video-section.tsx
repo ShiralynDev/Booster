@@ -111,6 +111,12 @@ export const VideoSectionSuspense = ({ videoId, next,prev }: Props) => {
     const [video] = trpc.videos.getOne.useSuspenseQuery({ id: videoId })
     const [boostPoints] = trpc.xp.getBoostByVideoId.useSuspenseQuery({ videoId })
 
+    const [shouldPlay,setShouldPlay] = useState(false);
+
+    useEffect(() => {
+        setShouldPlay(true);
+    }, [videoId]);
+
     const [commentsOpen, setCommentsOpen] = useState(false);
     const { isSignedIn } = useAuth();
     const [showTitle, setShowTitle] = useState(true);
@@ -236,17 +242,9 @@ export const VideoSectionSuspense = ({ videoId, next,prev }: Props) => {
                 {/* Player fills container */}
                 <div className="absolute inset-0"
                 >
-                    {/* <VideoPlayer
-                        ref={videoPlayerRef}
-                        autoPlay={isPlaying}
-                        onPlay={handlePlay}
-                        onPause={handlePause}
-                        playbackId={video.muxPlaybackId}
-                        thumbnailUrl={video.thumbnailUrl}
+                   
 
-                    /> */}
-                    {/* <BunnyEmbed libraryId={video.bunnyLibraryId} videoId={video.bunnyVideoId} /> */}
-                    <Player src={video.playbackUrl} autoPlay />
+                    <Player src={video.playbackUrl} autoPlay={shouldPlay}/>
 
                     {/* Play button overlay */}
                     <AnimatePresence>
@@ -283,7 +281,7 @@ export const VideoSectionSuspense = ({ videoId, next,prev }: Props) => {
                             exit={{ opacity: 0, y: 10 }}
                             transition={{ duration: 0.5, ease: 'easeInOut' }}
                         >
-                            <p className='text-2xl font-semibold text-gray-900 dark:text-white line-clamp-1'>{video.title} AAA </p>
+                            <p className='text-2xl font-semibold text-gray-900 dark:text-white line-clamp-1 m-1 mt-2'>{video.title} </p>
                         </motion.div>
                         <VideoOwner user={video.user} videoId={video.id} boostPoints={Number(boostPoints.boostPoints)} />
                     </div>

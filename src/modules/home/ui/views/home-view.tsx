@@ -12,7 +12,7 @@ import { NoVideosEmptyState } from "../components/no-more-videos";
 
 export const HomeView = () => {
   return (
-    <Suspense fallback={<VideoSectionSkeleton />}>
+    <Suspense fallback={<HomeViewSkeleton />}>
       <ErrorBoundary fallback={<p>Failed to load video :(</p>}>
         <HomeViewSuspense />
       </ErrorBoundary>
@@ -20,7 +20,7 @@ export const HomeView = () => {
   )
 }
 
-const VideoSectionSkeleton = () => {
+const HomeViewSkeleton = () => {
   return (
     <div className="h-full w-full flex flex-col gap-4 overflow-hidden animate-pulse">
     </div>
@@ -110,6 +110,7 @@ export const HomeViewSuspense = () => {
     preventScrollOnSwipe: true,
   });
 
+  console.log("VIDEO INDEX", videoIndex, "VIDEOS:", videos)
 
   return (
     <div {...handlers} className="h-dvh w-full flex flex-col overflow-hidden bg-background">
@@ -120,7 +121,7 @@ export const HomeViewSuspense = () => {
 
             {/* Swipeable area - Only ONE video rendered at a time */}
             <div className="w-full h-full relative" >
-              <AnimatePresence custom={direction} mode="wait" initial={false}>
+              <AnimatePresence custom={direction} initial={false} mode="wait">
                 <motion.div
                   key={videoIndex}
                   custom={direction}
@@ -132,7 +133,7 @@ export const HomeViewSuspense = () => {
                   className="w-full h-full absolute inset-0"
                 >
                   {videoIndex < videos.length ? (
-                    <VideoSection videoId={videos[videoIndex].id} next={goToNextVideo} prev={goToPrevVideo}/>
+                    <VideoSection videoId={videos[videoIndex].id} next={goToNextVideo} prev={goToPrevVideo} key={videos[videoIndex].id}/>
                   ) : (
                     <NoVideosEmptyState />
                   )}

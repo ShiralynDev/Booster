@@ -1,842 +1,634 @@
+import DashVideo from 'dash-video-element/react';
 import 'media-chrome/react';
 import 'media-chrome/react/menu';
 import { MediaTheme } from 'media-chrome/react/media-theme';
-import DashVideo from 'dash-video-element/react';
+import { MediaLoadingIndicator } from 'media-chrome/react';
 
-interface Props {
+interface Props{
     src: string | null;
-    autoPlay?: boolean;
-}
-
-export default function Player({ src,autoPlay }: Props) {
-    return (
-        <>
-            <template
-                id="media-theme-sutro"
-                dangerouslySetInnerHTML={{
-                    __html: `
-<!-- Sutro -->
-<style>
-:host {
---_primary-color: var(--media-primary-color, #ffffff);
---_secondary-color: var(--media-secondary-color, transparent);
---_accent-color: var(--media-accent-color, #ffffff);
-}
-
-media-controller {
---base: 18px;
-
-font-size: calc(0.75 * var(--base));
-font-family: Roboto, Arial, sans-serif;
---media-font-family: Roboto, helvetica neue, segoe ui, arial, sans-serif;
--webkit-font-smoothing: antialiased;
-
---media-primary-color: #ffca55;
---media-secondary-color: transparent;
---media-menu-background: rgba(28, 28, 28, 0.6);
---media-text-color: var(--_primary-color);
---media-control-hover-background: var(--media-secondary-color);
-
---media-range-track-height: calc(0.125 * var(--base));
---media-range-thumb-height: var(--base);
---media-range-thumb-width: var(--base);
---media-range-thumb-border-radius: var(--base);
-
---media-control-height: calc(2 * var(--base));
-}
-
-media-controller[breakpointmd] {
---base: 20px;
-}
-
-/* The biggest size controller is tied to going fullscreen
-instead of a player width. */
-media-controller[mediaisfullscreen] {
---base: 24px;
-}
-
-.media-button {
-                        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
---media-control-hover-background: var(--_secondary-color);
---media-tooltip-background: rgb(28 28 28 / .24);
---media-text-content-height: 1.2;
---media-tooltip-padding: .7em 1em;
---media-tooltip-distance: 8px;
---media-tooltip-container-margin: 18px;
-position: relative;
-padding: 0;
-opacity: 0.9;
-}
-
-.media-button svg {
-fill: none;
-stroke: var(--_primary-color);
-stroke-width: 1;
-stroke-linecap: 'round';
-stroke-linejoin: 'round';
-}
-
-svg .svg-shadow {
-stroke: #000;
-stroke-opacity: 0.15;
-stroke-width: 2px;
-fill: none;
-}
-</style>
-
-<media-controller
-breakpoints="md:480"
-defaultsubtitles="{{defaultsubtitles}}"
-defaultduration="{{defaultduration}}"
-gesturesdisabled="{{disabled}}"
-hotkeys="{{hotkeys}}"
-nohotkeys="{{nohotkeys}}"
-defaultstreamtype="on-demand"
->
-<slot name="media" slot="media"></slot>
-<slot name="poster" slot="poster"></slot>
-<slot name="centered-chrome" slot="centered-chrome"></slot>
-<media-error-dialog slot="dialog"></media-error-dialog>
-
-<!-- Controls Gradient -->
-<style>
-.media-gradient-bottom {
-position: absolute;
-bottom: 0;
-width: 100%;
-height: calc(8 * var(--base));
-pointer-events: none;
-}
-
-.media-gradient-bottom::before {
-content: '';
---gradient-steps: hsl(0 0% 0% / 0) 0%, hsl(0 0% 0% / 0.013) 8.1%, hsl(0 0% 0% / 0.049) 15.5%,
-hsl(0 0% 0% / 0.104) 22.5%, hsl(0 0% 0% / 0.175) 29%, hsl(0 0% 0% / 0.259) 35.3%, hsl(0 0% 0% / 0.352) 41.2%,
-hsl(0 0% 0% / 0.45) 47.1%, hsl(0 0% 0% / 0.55) 52.9%, hsl(0 0% 0% / 0.648) 58.8%, hsl(0 0% 0% / 0.741) 64.7%,
-hsl(0 0% 0% / 0.825) 71%, hsl(0 0% 0% / 0.896) 77.5%, hsl(0 0% 0% / 0.951) 84.5%, hsl(0 0% 0% / 0.987) 91.9%,
-hsl(0 0% 0%) 100%;
-
-position: absolute;
-inset: 0;
-opacity: 0.7;
-background: linear-gradient(to bottom, var(--gradient-steps));
-}
-</style>
-<div class="media-gradient-bottom"></div>
-
-<!-- Settings Menu -->
-<style>
-media-settings-menu {
---media-menu-icon-height: 20px;
---media-menu-item-icon-height: 20px;
---media-settings-menu-min-width: calc(10 * var(--base));
---media-menu-transform-in: translateY(0) scale(1);
---media-menu-transform-out: translateY(20px) rotate(3deg) scale(1);
-padding-block: calc(0.15 * var(--base));
-margin-right: 10px;
-margin-bottom: 17px;
-border-radius: 8px;
-z-index: 2;
-user-select: none;
-}
-
-media-settings-menu-item,
-[role='menu']::part(menu-item) {
---media-icon-color: var(--_primary-color);
-margin-inline: calc(0.45 * var(--base));
-height: calc(1.6 * var(--base));
-font-size: calc(0.7 * var(--base));
-font-weight: 400;
-padding: 0;
-padding-left: calc(0.4 * var(--base));
-padding-right: calc(0.1 * var(--base));
-border-radius: 6px;
-text-shadow: none;
-}
- .media-player-container {
-                        position: relative;
-                        border-radius: 16px;
-                        overflow: hidden;
-                        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
-                        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-                    }
-
-[slot='submenu']::part(back button) {
-font-size: calc(0.7 * var(--base));
-}
-
-media-settings-menu-item:hover {
---media-icon-color: #000;
-color: #000;
-background-color: #fff;
-}
-
-media-settings-menu-item:hover [slot='submenu']::part(menu-item),
-[slot='submenu']::part(back indicator) {
---media-icon-color: var(--_primary-color);
-}
-
-media-settings-menu-item:hover [slot='submenu']::part(menu-item):hover {
---media-icon-color: #000;
-color: #000;
-background-color: #fff;
-}
-
-media-settings-menu-item[submenusize='0'] {
-display: none;
-}
-
-/* Also hide if only 'Auto' is added. 
-.quality-settings[submenusize='1'] {
-display: none;
-}
-*/
-</style>
-<media-settings-menu hidden anchor="auto">
-<media-settings-menu-item>
-Playback Speed
-<media-playback-rate-menu slot="submenu" hidden>
-<div slot="title">Playback Speed</div>
-</media-playback-rate-menu>
-</media-settings-menu-item>
-<media-settings-menu-item class="quality-settings">
-Quality
-<media-rendition-menu slot="submenu" hidden>
-<div slot="title">Quality</div>
-</media-rendition-menu>
-</media-settings-menu-item>
-<media-settings-menu-item>
-Subtitles/CC
-<media-captions-menu slot="submenu" hidden>
-<div slot="title">Subtitles/CC</div>
-</media-captions-menu>
-</media-settings-menu-item>
-</media-settings-menu>
-
-<!-- Control Bar -->
-<style>
-media-control-bar {
-position: absolute;
-height: calc(2 * var(--base));
-line-height: calc(2 * var(--base));
-bottom: var(--base);
-left: var(--base);
-right: var(--base);
-}
-</style>
-<media-control-bar>
-<!-- Play/Pause -->
-<style>
-@keyframes bounce-scale-play {
-0% {
-transform: scale(0.75, 0.75);
-}
-50% {
-transform: scale(115%, 115%);
-}
-100% {
-transform: scale(1, 1);
-}
-}
-
-.media-button {
-border-radius: 25%;
-backdrop-filter: blur(10px) invert(15%) brightness(80%) opacity(0);
--webkit-backdrop-filter: blur(10px) invert(15%) brightness(80%) opacity(0);
-transition: backdrop-filter 0.3s, -webkit-backdrop-filter 0.3s, box-shadow 0.3s;
-}
-
-.media-button:hover {
-/* background-color: rgba(0, 0, 0, 0.05); */
-box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 5px;
-/* hue-rotate(120deg) */
-backdrop-filter: blur(10px) invert(15%) brightness(80%) opacity(1);
--webkit-backdrop-filter: blur(10px) invert(15%) brightness(80%) opacity(1);
-transition: backdrop-filter 0.3s, -webkit-backdrop-filter 0.3s;
-}
-
-media-play-button #icon-play {
-opacity: 0;
-transform-box: view-box;
-transform-origin: center center;
-transform: scale(0.5, 0.5);
-transition: all 0.5s;
-}
-
-media-play-button[mediapaused] #icon-play {
-opacity: 1;
-transform: scale(1, 1);
-animation: 0.35s bounce-scale-play ease-in-out;
-}
-
-@keyframes bounce-pause-left {
-0% {
-font-size: 10px;
-}
-50% {
-font-size: 3px;
-}
-100% {
-font-size: 4px;
-}
-}
-
-@keyframes bounce-pause-right {
-0% {
-font-size: 10px;
-transform: translateX(-8px);
-}
-50% {
-font-size: 3px;
-transform: translateX(1px);
-}
-100% {
-font-size: 4px;
-transform: translateX(0);
-}
-}
-
-media-play-button #pause-left,
-media-play-button #pause-right {
-/* Using font-size to animate height because using scale was resulting in unexpected positioning */
-font-size: 4px;
-opacity: 1;
-transform: translateX(0);
-transform-box: view-box;
-}
-
-media-play-button:not([mediapaused]) #pause-left {
-animation: 0.3s bounce-pause-left ease-out;
-}
-
-media-play-button:not([mediapaused]) #pause-right {
-animation: 0.3s bounce-pause-right ease-out;
-}
-
-media-play-button[mediapaused] #pause-left,
-media-play-button[mediapaused] #pause-right {
-opacity: 0;
-font-size: 10px;
-}
-
-media-play-button[mediapaused] #pause-right {
-transform-origin: right center;
-transform: translateX(-8px);
-}
-</style>
-<media-play-button mediapaused class="media-button">
-<svg slot="icon" viewBox="0 0 32 32">
-<!-- <use class="svg-shadow" xlink:href="#icon-play"></use> -->
-<g>
-<path
-id="icon-play"
-d="M20.7131 14.6976C21.7208 15.2735 21.7208 16.7265 20.7131 17.3024L12.7442 21.856C11.7442 22.4274 10.5 21.7054 10.5 20.5536L10.5 11.4464C10.5 10.2946 11.7442 9.57257 12.7442 10.144L20.7131 14.6976Z"
-/>
-</g>
-<!-- <use class="svg-shadow" xlink:href="#icon-pause"></use> -->
-<g id="icon-pause">
-<rect id="pause-left" x="10.5" width="1em" y="10.5" height="11" rx="0.5" />
-<rect id="pause-right" x="17.5" width="1em" y="10.5" height="11" rx="0.5" />
-</g>
-</svg>
-</media-play-button>
-
-<!-- Volume/Mute -->
-<style>
-media-mute-button {
-position: relative;
-}
-
-media-mute-button .muted-path {
-transition: clip-path 0.2s ease-out;
-}
-
-media-mute-button #muted-path-2 {
-transition-delay: 0.2s;
-}
-
-media-mute-button .muted-path {
-clip-path: inset(0);
-}
-
-media-mute-button:not([mediavolumelevel='off']) #muted-path-1 {
-clip-path: inset(0 0 100% 0);
-}
-
-media-mute-button:not([mediavolumelevel='off']) #muted-path-2 {
-clip-path: inset(0 0 100% 0);
-}
-
-media-mute-button .muted-path {
-opacity: 0;
-}
-
-media-mute-button[mediavolumelevel='off'] .muted-path {
-opacity: 1;
-}
-
-media-mute-button .vol-path {
-opacity: 1;
-transition: opacity 0.4s;
-}
-
-media-mute-button[mediavolumelevel='off'] .vol-path {
-opacity: 0;
-}
-
-media-mute-button[mediavolumelevel='low'] #vol-high-path,
-media-mute-button[mediavolumelevel='medium'] #vol-high-path {
-opacity: 0;
-}
-
-media-volume-range {
---media-range-track-background: rgba(255, 255, 255, 0.2);
---media-range-thumb-opacity: 0;
-}
-
-@keyframes volume-in {
-0% {
-visibility: hidden;
-opacity: 0;
-transform: translateY(50%) rotate(1deg);
-}
-50% {
-visibility: visible;
-opacity: 1;
-transform: rotate(-2deg);
-}
-100% {
-visibility: visible;
-opacity: 1;
-transform: translateY(0) rotate(0deg);
-}
-}
-
-@keyframes volume-out {
-0% {
-visibility: visible;
-opacity: 1;
-transform: translateY(0) rotate(0deg);
-}
-50% {
-opacity: 1;
-transform: rotate(0deg);
-}
-100% {
-visibility: hidden;
-opacity: 0;
-transform: translateY(50%) rotate(1deg);
-}
-}
-
-.media-volume-range-wrapper {
-opacity: 0;
-visibility: hidden;
-
-position: absolute;
-top: -100%;
-left: calc(2 * var(--base));
-
-width: calc(10 * var(--base));
-height: calc(2.5 * var(--base));
-transform-origin: center left;
-}
-
-media-volume-range {
-/*
-Hide range and animation until mediavolume attribute is set.
-'visibility' didn't work, hovering over media-volume-range-wrapper
-caused it to show. Should require mute-button:hover.
-*/
-opacity: 0;
-transition: opacity 0s 1s;
-
-width: calc(10 * var(--base));
-height: var(--base);
-padding: 0;
-border-radius: calc(0.25 * var(--base));
-overflow: hidden;
-background: rgba(0, 0, 0, 0.2);
-
---media-range-bar-color: var(--media-accent-color);
-
---media-range-padding-left: 0;
---media-range-padding-right: 0;
-
---media-range-track-width: calc(10 * var(--base));
---media-range-track-height: var(--base);
---media-range-track-border-radius: calc(0.25 * var(--base));
---media-range-track-backdrop-filter: blur(10px) brightness(80%);
-
-/* This makes zero volume still show some of the bar.
-I can't make the bar have curved corners otherwise though. */
---media-range-thumb-width: var(--base);
---media-range-thumb-border-radius: calc(0.25 * var(--base));
-
-/* The Sutro design has a gradient like this, but not sure I like it */
-/* --media-range-thumb-box-shadow: 10px 0px 20px rgba(255, 255, 255, 0.5); */
-}
-
-media-volume-range[mediavolume] {
-opacity: 1;
-}
-
-[keyboardcontrol] media-volume-range:focus {
-/* TODO: This appears to be creating a think outline */
-outline: 1px solid rgba(27, 127, 204, 0.9);
-}
-
-media-mute-button:hover + .media-volume-range-wrapper,
-media-mute-button:focus + .media-volume-range-wrapper,
-media-mute-button:focus-within + .media-volume-range-wrapper,
-.media-volume-range-wrapper:hover,
-.media-volume-range-wrapper:focus,
-.media-volume-range-wrapper:focus-within {
-animation: 0.3s volume-in forwards ease-out;
-}
-
-.media-volume-range-wrapper:not(:hover, :focus-within) {
-animation: 0.3s volume-out ease-out;
-}
-
-/* When keyboard navigating the volume range and wrapper need to always be visible
-otherwise focus state can't land on it. This is ok when keyboard navigating because
-the hovering issues aren't a concern, unless you happen to be keyboard AND mouse navigating.
-*/
-[keyboardcontrol] .media-volume-range-wrapper,
-[keyboardcontrol] .media-volume-range-wrapper:focus-within,
-[keyboardcontrol] .media-volume-range-wrapper:focus-within media-volume-range {
-visibility: visible;
-}
-</style>
-<media-mute-button class="media-button" notooltip>
-<use class="svg-shadow" xlink:href="#vol-paths"></use>
-<svg slot="icon" viewBox="0 0 32 32">
-<g id="vol-paths">
-<path
-id="speaker-path"
-d="M16.5 20.486v-8.972c0-1.537-2.037-2.08-2.802-.745l-1.026 1.79a2.5 2.5 0 0 1-.8.85l-1.194.78A1.5 1.5 0 0 0 10 15.446v1.11c0 .506.255.978.678 1.255l1.194.782a2.5 2.5 0 0 1 .8.849l1.026 1.79c.765 1.334 2.802.792 2.802-.745Z"
-/>
-<path
-id="vol-low-path"
-class="vol-path"
-d="M18.5 18C19.6046 18 20.5 17.1046 20.5 16C20.5 14.8954 19.6046 14 18.5 14"
-/>
-<path
-id="vol-high-path"
-class="vol-path"
-d="M18 21C20.7614 21 23 18.7614 23 16C23 13.2386 20.7614 11 18 11"
-/>
-<path id="muted-path-1" class="muted-path" d="M23 18L19 14" />
-<path id="muted-path-2" class="muted-path" d="M23 14L19 18" />
-</g>
-</svg>
-</media-mute-button>
-<div class="media-volume-range-wrapper">
-<media-volume-range></media-volume-range>
-</div>
-
-<!-- Time Display -->
-<style>
-media-time-display {
-position: relative;
-padding: calc(0.5 * var(--base));
-font-size: calc(0.7 * var(--base));
-border-radius: calc(0.5 * var(--base));
-}
-
-media-controller[breakpointmd] media-time-display:not([showduration]) {
-display: none;
-}
-
-media-controller:not([breakpointmd]) media-time-display[showduration] {
-display: none;
-}
-</style>
-<media-time-display></media-time-display>
-<media-time-display showduration></media-time-display>
-
-<!-- Time Range / Progress Bar -->
-<!-- Cambiar el gradiente de la barra de tiempo en medira-range-bar-color -->
-
-<style>
-media-time-range {
-height: calc(2 * var(--base));
-border-radius: calc(0.25 * var(--base));
-
---media-range-track-backdrop-filter: invert(10%) blur(5px) brightness(110%);
---media-range-track-pointer-background: rgba(255, 255, 255, 0.5);
---media-range-track-border-radius: calc(0.25 * var(--base));
-
---media-time-range-buffered-color: rgba(255, 255, 255, 0.4);
-
---media-range-thumb-background:  #ff6b00;
---media-range-thumb-transition: opacity 0.1s linear;
---media-range-thumb-opacity: 0;
-
---media-preview-thumbnail-border: calc(0.125 * var(--base)) solid #fff;
---media-preview-thumbnail-border-radius: calc(0.5 * var(--base));
---media-preview-thumbnail-min-width: calc(8 * var(--base));
---media-preview-thumbnail-max-width: calc(10 * var(--base));
---media-preview-thumbnail-min-height: calc(5 * var(--base));
---media-preview-thumbnail-max-height: calc(7 * var(--base));
---media-preview-box-margin: 0 0 -10px;
-                        --media-range-track-background: rgba(255, 255, 255, 0.2);
-                        --media-range-bar-color: linear-gradient(90deg, #ffb700, #ff6b00);
-}
-media-time-range:hover {
---media-range-thumb-opacity: 1;
---media-range-track-height: calc(0.25 * var(--base));
-}
-
-media-preview-thumbnail {
-margin-bottom: 5px;
-}
-
-media-preview-chapter-display {
-font-size: calc(0.6 * var(--base));
-padding-block: 0;
-}
-
-media-preview-time-display {
-font-size: calc(0.65 * var(--base));
-padding-top: 0;
-}
-</style>
-<media-time-range>
-<media-preview-thumbnail slot="preview"></media-preview-thumbnail>
-<media-preview-chapter-display slot="preview"></media-preview-chapter-display>
-<media-preview-time-display slot="preview"></media-preview-time-display>
-</media-time-range>
-
-<!-- Subtitles/CC Button -->
-<style>
-media-captions-button {
-position: relative;
-}
-
-media-controller:not([breakpointmd]) media-captions-button {
-display: none;
-}
-
-media-captions-button svg :is(path, rect) {
-stroke: none;
-fill: var(--_primary-color);
-}
-
-/* Disble the captions button when no subtitles are available */
-media-captions-button:not([mediasubtitleslist]) svg {
-opacity: 0.3;
-}
-
-media-captions-button #cc-underline {
-opacity: 1;
-}
-
-media-captions-button[mediasubtitleslist][aria-checked='true'] #cc-underline {
-opacity: 1;
-}
-
-media-captions-button #cc-underline {
-transition: clip-path 0.15s ease-out;
-}
-
-media-captions-button #cc-underline {
-clip-path: inset(0 100% 0 0);
-}
-
-media-captions-button[aria-checked='true'] #cc-underline {
-clip-path: inset(0 0 0 0);
-}
-</style>
-<media-captions-button class="media-button">
-<svg slot="icon" viewBox="0 0 32 32">
-<use class="svg-shadow" xlink:href="#cc-icon"></use>
-<g id="cc-icon">
-<path
-class="cc-c"
-d="M15.6634 14.3574H14.5636C14.4985 14.0523 14.3847 13.7842 14.2221 13.5532C14.0624 13.3222 13.8673 13.1283 13.6367 12.9715C13.409 12.8118 13.1562 12.692 12.8783 12.6122C12.6004 12.5323 12.3107 12.4924 12.0091 12.4924C11.4592 12.4924 10.961 12.6264 10.5146 12.8945C10.0711 13.1625 9.71776 13.5575 9.45463 14.0794C9.19445 14.6012 9.06436 15.2414 9.06436 16C9.06436 16.7586 9.19445 17.3988 9.45463 17.9206C9.71776 18.4425 10.0711 18.8375 10.5146 19.1055C10.961 19.3736 11.4592 19.5076 12.0091 19.5076C12.3107 19.5076 12.6004 19.4677 12.8783 19.3878C13.1562 19.308 13.409 19.1896 13.6367 19.0328C13.8673 18.8731 14.0624 18.6778 14.2221 18.4468C14.3847 18.2129 14.4985 17.9449 14.5636 17.6426H15.6634C15.5806 18.0903 15.4298 18.491 15.2111 18.8446C14.9923 19.1982 14.7203 19.499 14.3951 19.7471C14.0698 19.9924 13.7047 20.1792 13.2996 20.3075C12.8976 20.4358 12.4674 20.5 12.0091 20.5C11.2345 20.5 10.5456 20.3175 9.94246 19.9525C9.33932 19.5875 8.8648 19.0684 8.51888 18.3954C8.17296 17.7224 8 16.924 8 16C8 15.076 8.17296 14.2776 8.51888 13.6046C8.8648 12.9316 9.33932 12.4125 9.94246 12.0475C10.5456 11.6825 11.2345 11.5 12.0091 11.5C12.4674 11.5 12.8976 11.5642 13.2996 11.6925C13.7047 11.8208 14.0698 12.009 14.3951 12.2571C14.7203 12.5024 14.9923 12.8018 15.2111 13.1554C15.4298 13.5062 15.5806 13.9068 15.6634 14.3574Z"
-/>
-<path
-class="cc-c"
-d="M24 14.3574H22.9002C22.8351 14.0523 22.7213 13.7842 22.5587 13.5532C22.399 13.3222 22.2039 13.1283 21.9733 12.9715C21.7456 12.8118 21.4928 12.692 21.2149 12.6122C20.937 12.5323 20.6473 12.4924 20.3457 12.4924C19.7958 12.4924 19.2976 12.6264 18.8511 12.8945C18.4077 13.1625 18.0543 13.5575 17.7912 14.0794C17.531 14.6012 17.4009 15.2414 17.4009 16C17.4009 16.7586 17.531 17.3988 17.7912 17.9206C18.0543 18.4425 18.4077 18.8375 18.8511 19.1055C19.2976 19.3736 19.7958 19.5076 20.3457 19.5076C20.6473 19.5076 20.937 19.4677 21.2149 19.3878C21.4928 19.308 21.7456 19.1896 21.9733 19.0328C22.2039 18.8731 22.399 18.6778 22.5587 18.4468C22.7213 18.2129 22.8351 17.9449 22.9002 17.6426H24C23.9172 18.0903 23.7664 18.491 23.5476 18.8446C23.3289 19.1982 23.0569 19.499 22.7316 19.7471C22.4064 19.9924 22.0413 20.1792 21.6362 20.3075C21.2341 20.4358 20.804 20.5 20.3457 20.5C19.5711 20.5 18.8822 20.3175 18.279 19.9525C17.6759 19.5875 17.2014 19.0684 16.8555 18.3954C16.5095 17.7224 16.3366 16.924 16.3366 16C16.3366 15.076 16.5095 14.2776 16.8555 13.6046C17.2014 12.9316 17.6759 12.4125 18.279 12.0475C18.8822 11.6825 19.5711 11.5 20.3457 11.5C20.804 11.5 21.2341 11.5642 21.6362 11.6925C22.0413 11.8208 22.4064 12.009 22.7316 12.2571C23.0569 12.5024 23.3289 12.8018 23.5476 13.1554C23.7664 13.5062 23.9172 13.9068 24 14.3574Z"
-/>
-<rect id="cc-underline" x="8" y="23" width="16" height="1" rx="0.5" />
-</g>
-</svg>
-</media-captions-button>
-
-<!-- Settings Menu Button -->
-<style>
-media-settings-menu-button svg {
-transition: transform 0.1s cubic-bezier(0.4, 0, 1, 1);
-transform: rotateZ(0deg);
-}
-media-settings-menu-button[aria-expanded='true'] svg {
-transform: rotateZ(30deg);
-}
-</style>
-<media-settings-menu-button class="media-button">
-<svg slot="icon" viewBox="0 0 32 32">
-<use class="svg-shadow" xlink:href="#settings-icon"></use>
-<g id="settings-icon">
-<path
-d="M16 18C17.1046 18 18 17.1046 18 16C18 14.8954 17.1046 14 16 14C14.8954 14 14 14.8954 14 16C14 17.1046 14.8954 18 16 18Z"
-/>
-<path
-d="M21.0176 13.0362L20.9715 12.9531C20.8445 12.7239 20.7797 12.4629 20.784 12.1982L20.8049 10.8997C20.8092 10.6343 20.675 10.3874 20.4545 10.2549L18.5385 9.10362C18.3186 8.97143 18.0472 8.9738 17.8293 9.10981L16.7658 9.77382C16.5485 9.90953 16.2999 9.98121 16.0465 9.98121H15.9543C15.7004 9.98121 15.4513 9.90922 15.2336 9.77295L14.1652 9.10413C13.9467 8.96728 13.674 8.96518 13.4535 9.09864L11.5436 10.2545C11.3242 10.3873 11.1908 10.6336 11.1951 10.8981L11.216 12.1982C11.2203 12.4629 11.1555 12.7239 11.0285 12.9531L10.9831 13.0351C10.856 13.2645 10.6715 13.4535 10.4493 13.5819L9.36075 14.2109C9.13763 14.3398 8.99942 14.5851 9 14.8511L9.00501 17.152C9.00559 17.4163 9.1432 17.6597 9.36476 17.7883L10.4481 18.4167C10.671 18.546 10.8559 18.7364 10.9826 18.9673L11.0313 19.0559C11.1565 19.284 11.2203 19.5431 11.2161 19.8059L11.1951 21.1003C11.1908 21.3657 11.325 21.6126 11.5456 21.7452L13.4615 22.8964C13.6814 23.0286 13.9528 23.0262 14.1707 22.8902L15.2342 22.2262C15.4515 22.0905 15.7001 22.0188 15.9535 22.0188H16.0457C16.2996 22.0188 16.5487 22.0908 16.7664 22.227L17.8348 22.8959C18.0534 23.0327 18.326 23.0348 18.5465 22.9014L20.4564 21.7455C20.6758 21.6127 20.8092 21.3664 20.8049 21.1019L20.784 19.8018C20.7797 19.5371 20.8445 19.2761 20.9715 19.0469L21.0169 18.9649C21.144 18.7355 21.3285 18.5465 21.5507 18.4181L22.6393 17.7891C22.8624 17.6602 23.0006 17.4149 23 17.1489L22.995 14.848C22.9944 14.5837 22.8568 14.3403 22.6352 14.2117L21.5493 13.5818C21.328 13.4534 21.1442 13.2649 21.0176 13.0362Z"
-/>
-</g>
-</svg>
-</media-settings-menu-button>
-
-<!-- PIP/Mini Player Button -->
-<style>
-media-controller:not([breakpointmd]) media-pip-button {
-display: none;
-}
-</style>
-<media-pip-button class="media-button">
-<svg slot="icon" viewBox="0 0 32 32">
-<use class="svg-shadow" xlink:href="#pip-icon"></use>
-<g id="pip-icon">
-<path
-d="M12 22H9.77778C9.34822 22 9 21.6162 9 21.1429V10.8571C9 10.3838 9.34822 10 9.77778 10L22.2222 10C22.6518 10 23 10.3838 23 10.8571V12.5714"
-/>
-<path
-d="M15 21.5714V16.4286C15 16.1919 15.199 16 15.4444 16H22.5556C22.801 16 23 16.1919 23 16.4286V17V21.5714C23 21.8081 22.801 22 22.5556 22H20.3333H17.6667H15.4444C15.199 22 15 21.8081 15 21.5714Z"
-/>
-</g>
-</svg>
-</media-pip-button>
-
-<!-- Airplay Button -->
-<media-airplay-button class="media-button">
-<svg viewBox="0 0 32 32" aria-hidden="true" slot="icon">
-<path stroke-linecap="round" stroke-linejoin="round" d="M20.5 20h1.722c.43 0 .778-.32.778-.714v-8.572c0-.394-.348-.714-.778-.714H9.778c-.43 0-.778.32-.778.714v1.429"/>
-<path stroke-linecap="round" stroke-linejoin="round" d="M11.5 20H9.778c-.43 0-.778-.32-.778-.714v-8.572c0-.394.348-.714.778-.714h12.444c.43 0 .778.32.778.714v1.429"/>
-<path stroke-linejoin="round" d="m16 19 3.464 3.75h-6.928L16 19Z"/>
-</svg>
-</media-airplay-button>
-
-<!-- Cast Button -->
-<media-cast-button class="media-button">
-<svg slot="icon" viewBox="0 0 32 32">
-<use class="svg-shadow" xlink:href="#cast-icon"></use>
-<g id="cast-icon">
-<path
-d="M18.5 21.833h4.167c.46 0 .833-.373.833-.833V11a.833.833 0 0 0-.833-.833H9.333A.833.833 0 0 0 8.5 11v1.111m0 8.056c.92 0 1.667.746 1.667 1.666M8.5 17.667a4.167 4.167 0 0 1 4.167 4.166"
-/>
-<path d="M8.5 15.167a6.667 6.667 0 0 1 6.667 6.666" />
-</g>
-</svg>
-</media-cast-button>
-
-<!-- Fullscreen Button -->
-<style>
-/* Having trouble getting @property to work in the shadow dom
-to clean this up. Like https://codepen.io/luwes/pen/oNRyZyx */
-
-media-fullscreen-button .fs-arrow {
-translate: 0% 0%;
-}
-media-fullscreen-button:hover .fs-arrow {
-animation: 0.35s up-left-bounce cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-media-fullscreen-button:hover #fs-enter-top,
-media-fullscreen-button:hover #fs-exit-bottom {
-animation-name: up-right-bounce;
-}
-
-media-fullscreen-button:hover #fs-enter-bottom,
-media-fullscreen-button:hover #fs-exit-top {
-animation-name: down-left-bounce;
-}
-
-@keyframes up-left-bounce {
-0% {
-translate: 0 0;
-}
-50% {
-translate: -4% -4%;
-}
-}
-@keyframes up-right-bounce {
-0% {
-translate: 0 0;
-}
-50% {
-translate: 4% -4%;
-}
-}
-@keyframes down-left-bounce {
-0% {
-translate: 0 0;
-}
-50% {
-translate: -4% 4%;
-}
-}
-@keyframes down-right-bounce {
-0% {
-translate: 0 0;
-}
-50% {
-translate: 4% 4%;
-}
-}
-</style>
-<media-fullscreen-button class="media-button">
-<svg slot="enter" viewBox="0 0 32 32">
-<use class="svg-shadow" xlink:href="#fs-enter-paths"></use>
-<g id="fs-enter-paths">
-<g id="fs-enter-top" class="fs-arrow">
-<path d="M18 10H22V14" />
-<path d="M22 10L18 14" />
-</g>
-<g id="fs-enter-bottom" class="fs-arrow">
-<path d="M14 22L10 22V18" />
-<path d="M10 22L14 18" />
-</g>
-</g>
-</svg>
-<svg slot="exit" viewBox="0 0 32 32">
-<use class="svg-shadow" xlink:href="#fs-exit-paths"></use>
-<g id="fs-exit-paths">
-<g id="fs-exit-top" class="fs-arrow">
-<path d="M22 14H18V10" />
-<path d="M22 10L18 14" />
-</g>
-<g id="fs-exit-bottom" class="fs-arrow">
-<path d="M10 18L14 18V22" />
-<path d="M14 18L10 22" />
-</g>
-</g>
-</svg>
-</media-fullscreen-button>
-</media-control-bar>
-</media-controller>` }} />
-
-            {src ? (
-            <MediaTheme
-                template="media-theme-sutro"
-                className='w-full h-full'
-                >
-                
-                <DashVideo
-                    slot="media"
-                    className='w-full h-full'
-                    src={src}
-                    playsInline
-                    crossOrigin="anonymous"
-                    autoplay={autoPlay}
-                ></DashVideo>
-            </MediaTheme>
-            ): (
-                <div className='m-3 text-2xl'>
-                    No video to display yet
-                </div>
-            )}
-        </>
-    );
+    autoPlay?: boolean
+}
+
+export default function Player ({src,autoPlay}:Props) {
+  return (
+    <>
+      <template
+        id="media-theme-yt"
+        dangerouslySetInnerHTML={{ __html: `
+          <style>
+            media-controller {
+              font-size: 13px;
+              font-family: Roboto, Arial, sans-serif;
+              --media-font-family: Roboto, helvetica neue, segoe ui, arial, sans-serif;
+              -webkit-font-smoothing: antialiased;
+              --media-secondary-color: transparent;
+              --media-menu-background: rgba(28, 28, 28, 0.9);
+              --media-control-hover-background: var(--media-secondary-color);
+              --media-range-track-height: 3px;
+              --media-range-thumb-height: 13px;
+              --media-range-thumb-width: 13px;
+              --media-range-thumb-border-radius: 13px;
+              --media-preview-thumbnail-border: 2px solid #fff;
+              --media-preview-thumbnail-border-radius: 2px;
+              --media-tooltip-display: none;
+            }
+
+            /* The biggest size controller is tied to going fullscreen
+                instead of a player width */
+            media-controller[mediaisfullscreen] {
+              font-size: 17px;
+              --media-range-thumb-height: 20px;
+              --media-range-thumb-width: 20px;
+              --media-range-thumb-border-radius: 10px;
+              --media-range-track-height: 4px;
+            }
+
+            .yt-button {
+              position: relative;
+              display: inline-block;
+              width: 24px;
+              padding: 0 2px;
+              height: 100%;
+              opacity: 0.9;
+              transition: opacity 0.1s cubic-bezier(0.4, 0, 1, 1);
+              margin-right:10px;
+            }
+            [breakpointmd] .yt-button {
+              width: 24px;
+            }
+            [mediaisfullscreen] .yt-button {
+              width: 30px;
+            }
+
+            .yt-button svg {
+              height: 100%;
+              width: 100%;
+              fill: var(--media-primary-color, #fff);
+              fill-rule: evenodd;
+            }
+
+            .svg-shadow {
+              stroke: #000;
+              stroke-opacity: 0.15;
+              stroke-width: 2px;
+              fill: none;
+            }
+          </style>
+
+          <media-controller
+            breakpoints="md:480"
+            defaultsubtitles="{{defaultsubtitles}}"
+            defaultduration="{{defaultduration}}"
+            gesturesdisabled="{{disabled}}"
+            hotkeys="{{hotkeys}}"
+            nohotkeys="{{nohotkeys}}"
+            defaultstreamtype="on-demand"
+          >
+            <slot name="media" slot="media"></slot>
+            <slot name="poster" slot="poster"></slot>
+            <slot name="centered-chrome" slot="centered-chrome"></slot>
+            <media-error-dialog slot="dialog"></media-error-dialog>
+
+            <!-- Gradient -->
+            <style>
+              .yt-gradient-bottom {
+                padding-top: 37px;
+                position: absolute;
+                width: 100%;
+                height: 170px;
+                bottom: 0;
+                pointer-events: none;
+                background-position: bottom;
+                background-repeat: repeat-x;
+                background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAACqCAYAAABsziWkAAAAAXNSR0IArs4c6QAAAQVJREFUOE9lyNdHBQAAhfHb3nvvuu2997jNe29TJJEkkkgSSSSJJJJEEkkiifRH5jsP56Xz8PM5gcC/xfDEmjhKxEOCSaREEiSbFEqkQppJpzJMJiWyINvkUCIX8kw+JQqg0BRRxaaEEqVQZsopUQGVpooS1VBjglStqaNEPTSYRko0QbNpoUQrtJl2qsN0UqILuk0PJXqhz/RTYgAGzRA1bEYoMQpjZpwSExAyk5SYgmkzQ82aOUqEIWKilJiHBbNIiSVYhhVYhTVYhw3YhC3Yhh3YhT3YhwM4hCM4hhM4hTM4hwu4hCu4hhu4hTu4hwd4hCd4hhd4hTd4hw/4hC/4hh/4/QM2/id28uIEJAAAAABJRU5ErkJggg==');
+              }
+            </style>
+            <div class="yt-gradient-bottom"></div>
+
+            <!-- Settings Menu -->
+            <style>
+              media-settings-menu {
+                position: absolute;
+                right: 12px;
+                bottom: 61px;
+                z-index: 70;
+                will-change: width, height;
+                transition: opacity 0.1s cubic-bezier(0, 0, 0.2, 1);
+                user-select: none;
+                --media-settings-menu-min-width: 220px;
+              }
+              [mediaisfullscreen] media-settings-menu {
+                --media-settings-menu-min-width: 320px;
+                right: 24px;
+                bottom: 70px;
+              }
+              media-settings-menu-item {
+                height: 40px;
+                font-size: 13px;
+                font-weight: 500;
+                padding-top: 0;
+                padding-bottom: 0;
+              }
+
+              [mediaisfullscreen] media-settings-menu-item {
+                font-size: 20px;
+                height: 50px;
+              }
+
+              media-settings-menu-item[submenusize='0'] {
+                display: none;
+              }
+
+              /* Also hide if only 'Auto' is added. */
+              .quality-settings[submenusize='1'] {
+                display: none;
+              }
+            </style>
+            <media-settings-menu hidden anchor="auto">
+              <media-settings-menu-item>
+                Playback Speed
+                <media-playback-rate-menu slot="submenu" hidden>
+                  <div slot="title">Playback Speed</div>
+                </media-playback-rate-menu>
+              </media-settings-menu-item>
+              <media-settings-menu-item class="quality-settings">
+                Quality
+                <media-rendition-menu slot="submenu" hidden>
+                  <div slot="title">Quality</div>
+                </media-rendition-menu>
+              </media-settings-menu-item>
+              <media-settings-menu-item>
+                Subtitles/CC
+                <media-captions-menu slot="submenu" hidden>
+                  <div slot="title">Subtitles/CC</div>
+                </media-captions-menu>
+              </media-settings-menu-item>
+            </media-settings-menu>
+
+            <!-- Time Range / Progress Bar -->
+            <style>
+              media-time-range {
+                position: absolute;
+                bottom: 36px;
+                width: 100%;
+                height: 5px;
+                --media-range-track-background: rgba(255, 255, 255, 0.2);
+                --media-range-track-pointer-background: rgba(255, 255, 255, 0.5);
+                --media-time-range-buffered-color: rgba(255, 255, 255, 0.4);
+                --media-range-bar-color: linear-gradient(90deg, #ffb700, #ff6b00);
+                --media-range-thumb-border-radius: 13px;
+                --media-range-thumb-background: #ff8c00;
+                --media-range-thumb-transition: transform 0.1s linear;
+                --media-range-thumb-transform: scale(0) translate(0%, 0%);
+              }
+              media-time-range:hover {
+                --media-range-track-height: 5px;
+                --media-range-thumb-transform: scale(1) translate(0%, 0%);
+              }
+              [breakpointmd] media-time-range {
+                bottom: 47px;
+              }
+              [mediaisfullscreen] media-time-range {
+                bottom: 52.5px;
+                height: 8px;
+              }
+              [mediaisfullscreen] media-time-range:hover {
+                --media-range-track-height: 8px;
+              }
+
+              media-preview-thumbnail {
+                margin-bottom: 5px;
+              }
+
+              media-preview-chapter-display {
+                padding-block: 0;
+              }
+
+              media-preview-time-display {
+                padding-top: 0;
+              }
+            </style>
+            <media-time-range>
+              <media-preview-thumbnail slot="preview"></media-preview-thumbnail>
+              <media-preview-chapter-display slot="preview"></media-preview-chapter-display>
+              <media-preview-time-display slot="preview"></media-preview-time-display>
+            </media-time-range>
+
+            <!-- Control Bar -->
+            <style>
+              media-control-bar {
+                position: absolute;
+                height: 36px;
+                line-height: 36px;
+                bottom: 0;
+                left: 12px;
+                right: 12px;
+              }
+              [breakpointmd] media-control-bar {
+                height: 48px;
+                line-height: 48px;
+              }
+              [mediaisfullscreen] media-control-bar {
+                height: 54px;
+                line-height: 54px;
+              }
+            </style>
+            <media-control-bar>
+              <!-- Play/Pause -->
+              <style>
+                media-play-button {
+                  --media-button-icon-width: 2px;
+                  padding: 6px 10px;
+                }
+
+                media-play-button #icon-play,
+                media-play-button #icon-pause {
+                  filter: drop-shadow(0 0 2px #00000080);
+                }
+
+                media-play-button :is(#play-p1, #play-p2, #pause-p1, #pause-p2) {
+                  transition: clip-path 0.25s ease-in;
+                }
+
+                /* Slow down the play icon part hiding slightly
+                    to achieve the morphing look a little better */
+                media-play-button:not([mediapaused]) #play-p2,
+                media-play-button:not([mediapaused]) #play-p2 {
+                  transition: clip-path 0.35s ease-in;
+                }
+
+                /* Show icon */
+                media-play-button :is(#pause-p1, #pause-p2),
+                media-play-button[mediapaused] :is(#play-p1, #play-p2) {
+                  clip-path: inset(0);
+                }
+
+                /* Hide icon wth clip path mask */
+                media-play-button #play-p1 {
+                  clip-path: inset(0 100% 0 0);
+                }
+                media-play-button #play-p2 {
+                  clip-path: inset(0 20% 0 100%);
+                }
+                media-play-button[mediapaused] #pause-p1 {
+                  clip-path: inset(50% 0 50% 0);
+                }
+                media-play-button[mediapaused] #pause-p2 {
+                  clip-path: inset(50% 0 50% 0);
+                }
+              </style>
+              <media-play-button mediapaused class="yt-button">
+                <svg slot="icon" viewBox="0 0 24 24">
+                  <g id="icon-play">
+                  <g id="play-icon">
+                    <path id="play-p1" d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/>
+                  </g>
+                  <g id="pause-icon">
+                    <rect id="pause-p1" x="14" y="3" width="5" height="18" rx="1"/><rect x="5" y="3" width="5" height="18" rx="1"/>
+                  </g>
+                  </g>
+                </svg>
+              </media-play-button>
+
+              <!-- Volume/Mute -->
+              <style>
+                media-mute-button :is(#icon-muted, #icon-volume) {
+                  transition: clip-path 0.3s ease-out;
+                }
+                media-mute-button #icon-muted {
+                  clip-path: inset(0 0 100% 0);
+                }
+                media-mute-button[mediavolumelevel='off'] #icon-muted {
+                  clip-path: inset(0);
+                }
+                media-mute-button #icon-volume {
+                  clip-path: inset(0);
+                }
+                media-mute-button[mediavolumelevel='off'] #icon-volume {
+                  clip-path: inset(100% 0 0 0);
+                }
+
+                media-mute-button #volume-high,
+                media-mute-button[mediavolumelevel='off'] #volume-high {
+                  opacity: 1;
+                  transition: opacity 0.3s;
+                }
+                media-mute-button[mediavolumelevel='low'] #volume-high,
+                media-mute-button[mediavolumelevel='medium'] #volume-high {
+                  opacity: 0.2;
+                }
+
+                media-volume-range {
+                  height: 36px;
+                  --media-range-track-background: rgba(255, 255, 255, 0.2);
+                }
+
+                media-mute-button + media-volume-range {
+                  width: 0;
+                  overflow: hidden;
+                  transition: width 0.2s ease-in;
+                }
+
+                /* Expand volume control in all relevant states */
+                media-mute-button:hover + media-volume-range,
+                media-mute-button:focus + media-volume-range,
+                media-mute-button:focus-within + media-volume-range,
+                media-volume-range:hover,
+                media-volume-range:focus,
+                media-volume-range:focus-within {
+                  width: 70px;
+                }
+              </style>
+              <media-mute-button class="yt-button">
+                <svg slot="icon" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.625" stroke-linecap="round" stroke-linejoin="round">
+                  <use class="svg-shadow" xlink:href="#icon-volume"></use>
+                  <g id="icon-volume">
+                    <path id="speaker" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/>
+                    <path
+                      id="volume-low"
+                      d="M16 9a5 5 0 0 1 0 6"
+                    />
+
+                    <g id="volume-high">
+                        <path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/>
+                    </g>
+                  </g>
+                  <g id="icon-muted">
+                 <path d="M16 9a5 5 0 0 1 .95 2.293"/><path d="M19.364 5.636a9 9 0 0 1 1.889 9.96"/><path d="m2 2 20 20"/><path d="m7 7-.587.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298V11"/><path d="M9.828 4.172A.686.686 0 0 1 11 4.657v.686"/> 
+                  </g>
+                </svg>
+              </media-mute-button>
+              <media-volume-range></media-volume-range>
+
+              <!-- Time Display -->
+              <style>
+                media-time-display {
+                  padding-top: 6px;
+                  padding-bottom: 6px;
+                  margin-left:2px;
+                  font-size: 16px;
+                }
+
+                [mediaisfullscreen] media-time-display {
+                  font-size: 20px;
+                }
+              </style>
+              <media-time-display showduration></media-time-display>
+
+              <!-- Control Spacer -->
+              <style>
+                .control-spacer {
+                  flex-grow: 1;
+                }
+              </style>
+              <span class="control-spacer"></span>
+
+              <!-- Subtitles/CC Button -->
+              <style>
+                media-captions-button {
+                  position: relative;
+                }
+
+                /* Disble the captions button when no subtitles are available */
+                media-captions-button:not([mediasubtitleslist]) svg {
+                  opacity: 0.3;
+                }
+
+                media-captions-button[mediasubtitleslist]:after {
+                  content: '';
+                  display: block;
+                  position: absolute;
+                  width: 0;
+                  height: 3px;
+                  border-radius: 3px;
+                  background-color: var(--media-accent-color, #f00);
+                  bottom: 19%;
+                  left: 50%;
+                  transition:
+                    all 0.1s cubic-bezier(0, 0, 0.2, 1),
+                    width 0.1s cubic-bezier(0, 0, 0.2, 1);
+                }
+
+                media-captions-button[mediasubtitleslist][aria-checked='true']:after {
+                  left: 25%;
+                  width: 50%;
+                  transition:
+                    left 0.25s cubic-bezier(0, 0, 0.2, 1),
+                    width 0.25s cubic-bezier(0, 0, 0.2, 1);
+                }
+
+                media-captions-button[mediasubtitleslist][aria-checked='true']:after {
+                  left: 25%;
+                  width: 50%;
+
+                  transition:
+                    left 0.25s cubic-bezier(0, 0, 0.2, 1),
+                    width 0.25s cubic-bezier(0, 0, 0.2, 1);
+                }
+              </style>
+              <media-captions-button class="yt-button">
+                <svg slot="icon" viewBox="0 0 36 36">
+                  <use class="svg-shadow" xlink:href="#cc-icon"></use>
+                  <path
+                    id="cc-icon"
+                    d="M9 13.4124C9 12.0801 10.0801 11 11.4124 11H24.5876C25.9199 11 27 12.0801 27 13.4124V22.5876C27 23.9199 25.9199 25 24.5876 25H11.4124C10.0801 25 9 23.9199 9 22.5876V13.4124ZM12 16.1134C12 15.4985 12.4985 15 13.1134 15H15.8866C16.5015 15 17 15.4985 17 16.1134V19.8866C17 20.5015 16.5015 21 15.8866 21H13.1134C12.4985 21 12 20.5015 12 19.8866V16.1134ZM13.5517 16.4545H15.4483V19.5455H13.5517V16.4545ZM17 17H15.4483V19H17V17ZM20.1134 15C19.4985 15 19 15.4985 19 16.1134V19.8866C19 20.5015 19.4985 21 20.1134 21H22.8866C23.5015 21 24 20.5015 24 19.8866V16.1134C24 15.4985 23.5015 15 22.8866 15H20.1134ZM22.4483 16.4545H20.5517V19.5455H22.4483V16.4545ZM22.4483 17H24V19H22.4483V17Z"
+                  />
+                </svg>
+              </media-captions-button>
+
+              <!-- Settings Menu Button -->
+              <style>
+                media-settings-menu-button svg {
+                  transition: transform 0.1s cubic-bezier(0.4, 0, 1, 1);
+                  transform: rotateZ(0deg);
+                }
+                media-settings-menu-button[aria-expanded='true'] svg {
+                  transform: rotateZ(30deg);
+                }
+              </style>
+              <media-settings-menu-button class="yt-button">
+               <svg slot="icon" id="settings-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings-icon lucide-settings"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="1"/></svg>
+              </media-settings-menu-button>
+
+              <!-- PIP/Mini Player Button -->
+              <media-pip-button class="yt-button">
+                  <svg  slot="icon" id="pip-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-picture-in-picture-icon lucide-picture-in-picture"><path d="M2 10h6V4"/>
+                    <path d="m2 4 6 6"/><path d="M21 10V7a2 2 0 0 0-2-2h-7"/>
+                    <path d="M3 14v2a2 2 0 0 0 2 2h3"/><rect x="12" y="14" width="10" height="7" rx="1"/>
+                  </svg>
+              </media-pip-button>
+
+              <!-- Fullscreen Button -->
+              <style>
+                /* Having trouble getting @property to work in the shadow dom
+                   to clean this up. Like https://codepen.io/luwes/pen/oNRyZyx */
+
+                media-fullscreen-button path {
+                  translate: 0% 0%;
+                }
+                media-fullscreen-button:hover path {
+                  animation: 0.35s up-left-bounce cubic-bezier(0.34, 1.56, 0.64, 1);
+                }
+                media-fullscreen-button:hover .urbounce {
+                  animation-name: up-right-bounce;
+                }
+                media-fullscreen-button:hover .dlbounce {
+                  animation-name: down-left-bounce;
+                }
+                media-fullscreen-button:hover .drbounce {
+                  animation-name: down-right-bounce;
+                }
+
+                @keyframes up-left-bounce {
+                  0% {
+                    translate: 0 0;
+                  }
+                  50% {
+                    translate: -4% -4%;
+                  }
+                }
+                @keyframes up-right-bounce {
+                  0% {
+                    translate: 0 0;
+                  }
+                  50% {
+                    translate: 4% -4%;
+                  }
+                }
+                @keyframes down-left-bounce {
+                  0% {
+                    translate: 0 0;
+                  }
+                  50% {
+                    translate: -4% 4%;
+                  }
+                }
+                @keyframes down-right-bounce {
+                  0% {
+                    translate: 0 0;
+                  }
+                  50% {
+                    translate: 4% 4%;
+                  }
+                }
+              </style>
+              <media-fullscreen-button class="yt-button">
+                <svg slot="enter" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-maximize-icon lucide-maximize"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+                <svg slot="exit" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shrink-icon lucide-shrink"><path d="m15 15 6 6m-6-6v4.8m0-4.8h4.8"/><path d="M9 19.8V15m0 0H4.2M9 15l-6 6"/><path d="M15 4.2V9m0 0h4.8M15 9l6-6"/><path d="M9 4.2V9m0 0H4.2M9 9 3 3"/></svg>
+              </media-fullscreen-button>
+            </media-control-bar>
+
+            <style>
+              media-controller[mediacurrenttime^='0'] .desktop-centered-animation svg {
+                display: none !important;
+                animation-name: none !important;
+                opacity: 0 !important;
+              }
+
+              @media (width <= 768px) {
+                .desktop-centered-animation {
+                  display: none;
+                }
+              }
+
+              .desktop-centered-animation media-play-button {
+                width: 48px;
+                height: 48px;
+                position: relative;
+              }
+
+              .desktop-centered-animation media-play-button > svg {
+                width: 3rem;
+                height: 3rem;
+                opacity: 0;
+                transform: scale(1);
+                pointer-events: none;
+                display: none;
+                animation: none !important;
+              }
+
+              media-controller:not([mediacurrenttime^='0']) .desktop-centered-animation media-play-button > svg[slot='play'],
+              media-controller:not([mediacurrenttime^='0']) .desktop-centered-animation media-play-button > svg[slot='pause'] {
+                display: block;
+                animation: fadeScale 1s ease-out forwards;
+              }
+
+              @keyframes fadeScale {
+                0% {
+                  opacity: 1;
+                  transform: scale(1);
+                }
+                100% {
+                  opacity: 0;
+                  transform: scale(2);
+                }
+              }
+
+              .mobile-centered-controls {
+                display: flex;
+                align-self: stretch;
+                align-items: center;
+                flex-flow: row nowrap;
+                justify-content: center;
+                margin: -5% auto 0;
+                width: 100%;
+                gap: 1rem;
+              }
+
+              .mobile-centered-controls [role='button'] {
+                --media-icon-color: var(--media-primary-color, #fff);
+                background: rgba(0, 0, 0, 0.5);
+                --media-button-icon-width: 36px;
+                --media-button-icon-height: 36px;
+                border-radius: 50%;
+                user-select: none;
+                aspect-ratio: 1;
+              }
+
+              .mobile-centered-controls media-play-button {
+                width: 5rem;
+              }
+
+              .mobile-centered-controls :is(media-seek-backward-button, media-seek-forward-button) {
+                width: 3rem;
+                padding: 0.5rem;
+              }
+
+              @media (width >= 768px) {
+                .mobile-centered-controls {
+                  display: none;
+                }
+              }
+            </style>
+
+            <div class="mobile-centered-controls" slot="centered-chrome">
+              <media-seek-backward-button></media-seek-backward-button>
+              <media-play-button></media-play-button>
+              <media-seek-forward-button></media-seek-forward-button>
+            </div>
+
+            <div class="desktop-centered-animation" slot="centered-chrome">
+           
+            </div>
+          </media-controller>` }}
+      />
+
+      <MediaTheme
+        template="media-theme-yt"
+            className='w-full h-full'
+       >
+        
+        <DashVideo
+          slot="media"
+          className='w-full h-full'
+          src={src || ""}
+          playsInline
+          crossOrigin="anonymous"
+                  autoplay={autoPlay}
+        ></DashVideo>
+
+        <MediaLoadingIndicator noAutohide slot='centered-chrome'></MediaLoadingIndicator>
+      </MediaTheme>
+    </>
+  );
 }
