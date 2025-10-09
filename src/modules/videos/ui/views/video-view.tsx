@@ -10,7 +10,7 @@ export const VideoView = ({ videoId }: VideoViewProps) => {
     return (
         // max w here limits max zoom out
         <div className="flex flex-col mx-auto pt-3.5 px-4 mb-10 w-full">
-            <div className="flex flex-col xl:flex-row xl:items-start gap-6">
+            <div className="flex flex-col xl:flex-row xl:items-start gap-6 ml-16">
                 <div className="min-w-0 min-h-screen ">
                     <VideoSection videoId={videoId} />
                     <SuggestionsSection videoId={videoId} />
@@ -18,7 +18,7 @@ export const VideoView = ({ videoId }: VideoViewProps) => {
                         <CommentsSection videoId={videoId}  openComments home={false}/>
                     </div>
                 </div>
-                <div className="hidden xl:block w-full xl:w-[460px] 2xl:w-[460px] shrink
+                <div className="hidden xl:block w-[45%] shrink
 +                 xl:sticky xl:top-4 xl:self-start xl:h-fit xl:z-20 ">
                     <CommentsSection videoId={videoId} openComments home={false}/>
                 </div>

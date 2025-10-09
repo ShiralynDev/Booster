@@ -28,7 +28,7 @@ interface Props {
 }
 
 
-export const VideoSection = ({ videoId,next,prev }: Props) => {
+export const VideoSection = ({ videoId, next, prev }: Props) => {
     return (
         <Suspense fallback={<VideoSectionSkeleton />}>
             <ErrorBoundary fallback={<p>Failed to load video :(</p>}>
@@ -107,11 +107,11 @@ const VideoSectionSkeleton = () => {
     );
 };
 
-export const VideoSectionSuspense = ({ videoId, next,prev }: Props) => {
+export const VideoSectionSuspense = ({ videoId, next, prev }: Props) => {
     const [video] = trpc.videos.getOne.useSuspenseQuery({ id: videoId })
     const [boostPoints] = trpc.xp.getBoostByVideoId.useSuspenseQuery({ videoId })
 
-    const [shouldPlay,setShouldPlay] = useState(false);
+    const [shouldPlay, setShouldPlay] = useState(false);
 
     useEffect(() => {
         setShouldPlay(true);
@@ -138,9 +138,9 @@ export const VideoSectionSuspense = ({ videoId, next,prev }: Props) => {
 
     useEffect(() => {
         setIsPlaying(true)
-        if(!isSignedIn) return;
-        createView.mutate({videoId: video.id})
-    },[])
+        if (!isSignedIn) return;
+        createView.mutate({ videoId: video.id })
+    }, [])
 
     const createRating = trpc.videoRatings.create.useMutation({
         onSuccess: () => {
@@ -242,9 +242,9 @@ export const VideoSectionSuspense = ({ videoId, next,prev }: Props) => {
                 {/* Player fills container */}
                 <div className="absolute inset-0"
                 >
-                   
 
-                    <Player src={video.playbackUrl} autoPlay={shouldPlay}/>
+
+                    <Player src={video.playbackUrl} autoPlay={shouldPlay} />
 
                     {/* Play button overlay */}
                     <AnimatePresence>
@@ -270,28 +270,31 @@ export const VideoSectionSuspense = ({ videoId, next,prev }: Props) => {
             </motion.div>
 
             {/* SCROLLABLE CONTENT AREA */}
-            <div className="flex-1 overflow-y-auto scrollbar-default">
+            <div className="w-full flex-1 overflow-y-auto scrollbar-default">
                 {/* TOP ROW Large*/}
-                <div className='hidden sm:flex items-start justify-between mb-1'>
-                    <div className="flex flex-col sm:items-start sm:justify-between gap-2 flex-1 mb-2 ">
+                <div className='w-full hidden sm:flex items-start justify-between mb-1'>
+                    <div className="w-full flex flex-col sm:items-start sm:justify-between mb-2 flex-shrink min-w-0">
                         {/* Desktop Title */}
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 10 }}
                             transition={{ duration: 0.5, ease: 'easeInOut' }}
+                            className="min-w-0 max-w-[80%]"
                         >
-                            <p className='text-2xl font-semibold text-gray-900 dark:text-white line-clamp-1 m-1 mt-2'>{video.title} </p>
+                            <p className='text-xl font-semibold text-gray-900 dark:text-white truncate m-1 mt-2'>
+                                {video.title}
+                            </p>
                         </motion.div>
                         <VideoOwner user={video.user} videoId={video.id} boostPoints={Number(boostPoints.boostPoints)} />
                     </div>
 
-                    <div className="flex items-start gap-5 mt-3 mr-5">
-                        <div className="inline-flex items-center gap-2 bg-white dark:bg-[#333333] border border-gray-300 dark:border-gray-600 px-3 py-1.5 rounded-full text-gray-700 dark:text-gray-300">
+                    <div className="flex items-start gap-5 mt-3 mr-5 flex-shrink-0">
+                        <div className="inline-flex items-center gap-2 bg-white dark:bg-[#333333] border border-gray-300 dark:border-gray-600 px-3 py-1.5 rounded-full text-gray-700 dark:text-gray-300 flex-shrink-0">
                             <Eye className="h-4 w-4" /><span className="font-medium">{compactNumber(video.videoViews)}</span>
                         </div>
                         <VideoReactions avgRating={video.averageRating} videoRatings={video.videoRatings} onRate={onRate} viewerRating={video.user.viewerRating} small />
-                        <div className='ml-1'>
+                        <div className='ml-1 flex-shrink-0'>
                             <VideoMenu variant='secondary' videoId={video.id} />
                         </div>
                     </div>
@@ -299,7 +302,7 @@ export const VideoSectionSuspense = ({ videoId, next,prev }: Props) => {
 
                 {/* COMMENTS PANEL */}
                 <motion.div
-                    className={cn(`flex-1 min-h-0 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#212121] backdrop-blur-md shadow-sm `,commentsOpen ? '' : 'h-full')}
+                    className={cn(`flex-1 min-h-0 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#212121] backdrop-blur-md shadow-sm `, commentsOpen ? '' : 'h-full')}
                     initial={false}
                     transition={{ duration: 0.35, ease: 'easeInOut' }}
                     onMouseEnter={() => setCommentsOpen(true)}

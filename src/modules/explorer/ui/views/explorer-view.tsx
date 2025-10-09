@@ -132,7 +132,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
 
 
   return (
-    <div className="overflow-hidden mb-10 px-4 pt-2.5 flex flex-col gap-y-12">
+    <div className="overflow-hidden mb-10 px-4 pt-2.5 flex flex-col gap-y-12 ml-16">
       {/* Enhanced Header Section */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
@@ -272,8 +272,12 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                   transition={{ type: "spring", stiffness: 300 }}
                   className="relative group/card cursor-pointer"
                 >
-                  <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-transparent group-hover/card:border-amber-300 dark:group-hover/card:border-amber-600 transition-all duration-300">
+                  <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-transparent "
+                  
+                    
+                  >
                     <VideoThumbnail
+                    
                       duration={featuredVideo.duration || 0}
                       title={featuredVideo.title}
                       imageUrl={featuredVideo.thumbnailUrl}
@@ -436,7 +440,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 space-y-8 items-end "
           >
             {videos.filter(v => !v.isFeatured).map((video, index) => (
               <motion.div
@@ -444,16 +448,15 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                 initial={{ opacity: 0, y: 30, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
-                whileHover={{ y: -8, scale: 1.02 }}
                 className="group cursor-pointer relative"
               >
                 <Link href={`/explorer/videos/${video.id}`}>
                   {/* Enhanced Hover Glow */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-orange-400/20 rounded-2xl blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-105 -z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-orange-400/20 rounded-2xl blur-md opacity-0 " />
 
-                  <div className="relative bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl border border-gray-200 dark:border-gray-700 group-hover:border-amber-300 dark:group-hover:border-amber-600 transition-all duration-300">
+                  <div className="relative bg-transparent  rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl border">
                     {/* Video Thumbnail */}
-                    <div className="relative aspect-video overflow-hidden">
+                    <div className="relative aspect-video overflow-hidden ">
                       <VideoThumbnail
                         duration={video.duration || 0}
                         title={video.title}
@@ -504,7 +507,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
 
                     {/* Enhanced Content */}
                     <div className="p-4">
-                      <h3 className="font-semibold text-gray-900 dark:text-white text-lg mb-3 line-clamp-2 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors leading-tight">
+                      <h3 className="font-semibold text-gray-900 dark:text-white text-lg mb-3 line-clamp-2 ">
                         {video.title || "Untitled"}
                       </h3>
 
