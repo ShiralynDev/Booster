@@ -1,5 +1,4 @@
 import { trpc } from "@/trpc/client";
-import { useClerk } from "@clerk/nextjs";
 
 interface Props {
     userId: string;
