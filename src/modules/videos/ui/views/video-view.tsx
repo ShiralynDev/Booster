@@ -1,12 +1,15 @@
 import { CommentsSection } from "../sections/comments-section";
 import { SuggestionsSection } from "../sections/suggestions-section";
 import { VideoSection } from "../sections/video-section";
+import { VideoCreator } from "../components/video-creator";
 
 interface VideoViewProps {
     videoId: string;
 }
 
 export const VideoView = ({ videoId }: VideoViewProps) => {
+
+
     return (
         // max w here limits max zoom out
         <div className="flex flex-col mx-auto pt-3.5 px-4 mb-10 w-full">
@@ -18,8 +21,13 @@ export const VideoView = ({ videoId }: VideoViewProps) => {
                         <CommentsSection videoId={videoId}  openComments home={false}/>
                     </div>
                 </div>
-                <div className="hidden xl:block w-[45%] shrink
+               <div className="hidden xl:block w-[45%] shrink
 +                 xl:sticky xl:top-4 xl:self-start xl:h-fit xl:z-20 ">
+
+                    <div className="min-w-0 overflow-hidden order-2 mb-6">
+                        <VideoCreator videoId={videoId} />
+                    </div>
+ 
                     <CommentsSection videoId={videoId} openComments home={false}/>
                 </div>
             </div>

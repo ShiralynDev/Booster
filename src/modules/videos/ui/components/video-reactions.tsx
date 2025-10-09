@@ -40,9 +40,9 @@ export const VideoReactions = ({ avgRating, onRate, videoRatings, viewerRating, 
             {!small ? (
                 <div className="flex flex-col items-center justify-center p-3 bg-white dark:bg-[#333333] border border-amber-200 dark:border-amber-600 rounded-2xl shadow-[0_5px_25px_rgba(255,161,0,0.1)]  max-w-sm mx-auto">
                     {/* Header */}
-                    <div className="text-center">
+                    {/* <div className="text-center">
                         <p className="font-bold text-lg text-amber-900 dark:text-amber-100">Rate this video</p>
-                    </div>
+                    </div> */}
 
                     {/* User Rating Interaction */}
                     <div className="flex items-center rounded-xl">

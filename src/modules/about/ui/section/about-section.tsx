@@ -90,7 +90,7 @@ export const About = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#212121] text-gray-100 py-8 px-4">
+    <div className="min-h-screen bg-background text-gray-100 py-8 px-4">
       <div className="max-w-7xl mx-auto">
         <header className="flex items-center justify-center mb-12 py-8">
           <h1 className="flex items-center gap-5 text-5xl font-bold bg-gradient-to-r from-[#ffca55] to-[#ffa100] bg-clip-text text-transparent mb-4">

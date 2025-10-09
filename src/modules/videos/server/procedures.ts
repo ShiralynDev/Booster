@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { db } from "@/db";
-import {  userFollows, users, videoRatings, videos, videoUpdateSchema, videoViews } from "@/db/schema";
+import { userFollows, users, videoRatings, videos, videoUpdateSchema, videoViews } from "@/db/schema";
 import { createTRPCRouter, protectedProcedure, baseProcedure } from "@/trpc/init";
-import { eq, and, getTableColumns, sum, avg, inArray, isNotNull,  sql } from "drizzle-orm";
+import { eq, and, getTableColumns, sum, avg, inArray, isNotNull, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { mux } from "@/lib/mux";
 import { UTApi } from "uploadthing/server";
@@ -48,7 +48,7 @@ export const videosRouter = createTRPCRouter({
                         followsCount: sql<number>` (SELECT COUNT(*) FROM ${userFollows} WHERE ${userFollows.creatorId} = ${users.id}) `.mapWith(Number),
                         viewerIsFollowing: isNotNull(viewerFollow.userId).mapWith(Boolean),
                         videoCount: sql<number>`(SELECT COUNT(*) FROM ${videos} WHERE ${videos.userId} = ${users.id})`.mapWith(Number),
-                        
+
                         viewerRating: (userId ? sql<number>`(SELECT ${videoRatings.rating} FROM ${videoRatings} WHERE ${videoRatings.userId} = ${userId} AND ${videoRatings.videoId} = ${videos.id} LIMIT 1)`.mapWith(Number) : sql<number>`(NULL)`.mapWith(Number)),
 
 
@@ -211,7 +211,7 @@ export const videosRouter = createTRPCRouter({
                 ]
             },
         });
-       
+
         return { url: directUpload.url, uploadId: directUpload.id };
     }),
 
@@ -267,68 +267,112 @@ export const videosRouter = createTRPCRouter({
     //     }),
 
     create: protectedProcedure
-    .input(z.object(
-        {
-            uploadUrl: z.string().nullish(),
-            uploadId: z.string().nullish(),
-        }
-    ))
-    .mutation(async ({ctx,input}) => {
-        // throw new TRPCError({ code: "NOT_IMPLEMENTED", message: "-What?  - Error. This will be reported" });
+        .input(z.object(
+            {
+                uploadUrl: z.string().nullish(),
+                uploadId: z.string().nullish(),
+            }
+        ))
+        .mutation(async ({ ctx, input }) => {
+            // throw new TRPCError({ code: "NOT_IMPLEMENTED", message: "-What?  - Error. This will be reported" });
 
-        try {
-            
-            const {id: userId} = ctx.user;
-            const [video] = await db.insert(videos).values({
+            try {
+
+                const { id: userId } = ctx.user;
+                const [video] = await db.insert(videos).values({
+                    userId,
+                    title: "New video title",
+                    description: "",
+                    // muxStatus: 'waiting',
+                    // muxUploadId: input.uploadId,
+                }).returning();
+                return {
+                    video: video,
+                    url: input.uploadUrl,
+                };
+            } catch (error) {
+                console.error(error);
+                throw new Error("Failed to create video");
+            }
+        }),
+
+
+
+    createAfterUpload: protectedProcedure
+        .input(z.object({
+            title: z.string().min(1),
+        }))
+        .mutation(async ({ ctx, input }) => {
+            const { id: userId } = ctx.user;
+            const { title } = input;
+            const [row] = await db.insert(videos).values({
+                title,
                 userId,
-                title: "New video title",
-                description: "",
-                // muxStatus: 'waiting',
-                // muxUploadId: input.uploadId,
             }).returning();
-            return {
-                video:video, 
-                url: input.uploadUrl,
-            };
-        } catch (error) {
-            console.error(error);
-            throw new Error("Failed to create video");
-        }
-    }),
-
-    
-
-      createAfterUpload: protectedProcedure
-    .input(z.object({
-      title: z.string().min(1),
-    }))
-    .mutation(async ({ ctx, input }) => {
-      const { id: userId } = ctx.user;
-      const {title} = input;
-      const [row] = await db.insert(videos).values({
-        title,
-        userId,
-      }).returning();
-      console.log(row)
-      return row;
-    }),
+            console.log(row)
+            return row;
+        }),
 
     updateVideoUrl: protectedProcedure
-    .input(z.object({
-        videoId: z.string().uuid(),
-        fileUrl: z.string(),
-        thumbnailUrl: z.string(),
-    }))
-    .mutation(async ({input}) => {
-        const {videoId,fileUrl,thumbnailUrl} = input;
-        
-        await db
-        .update(videos)
-        .set({
-            playbackUrl: fileUrl,
-            thumbnailUrl
-        })
-        .where(eq(videos.id,videoId))
+        .input(z.object({
+            videoId: z.string().uuid(),
+            fileUrl: z.string(),
+            thumbnailUrl: z.string(),
+        }))
+        .mutation(async ({ input }) => {
+            const { videoId, fileUrl, thumbnailUrl } = input;
 
-    })
+            await db
+                .update(videos)
+                .set({
+                    playbackUrl: fileUrl,
+                    thumbnailUrl
+                })
+                .where(eq(videos.id, videoId))
+
+        }),
+
+    getUserByVideoId: baseProcedure
+        .input(z.object({
+            videoId: z.string().uuid(),
+        }))
+        .query(async ({ ctx, input }) => {
+            const { videoId } = input;
+            console.log("KJADLSKD")
+            const { clerkUserId } = ctx;
+            let userId;
+
+            const [user] = await db
+                .select()
+                .from(users)
+                .where(inArray(users.clerkId, clerkUserId ? [clerkUserId] : [])) //trick
+
+            if (user) {
+                userId = user.id;
+            }
+
+            const viewerFollow = db.$with("viewer_follow").as(
+                db
+                    .select()
+                    .from(userFollows)
+                    .where(inArray(userFollows.userId, userId ? [userId] : []))
+            )
+
+            console.log("user", userId,)
+            const [creator] = await db
+                .with(viewerFollow)
+                .select({
+                    ...getTableColumns(users),
+                    followsCount: sql<number>` (SELECT COUNT(*) FROM ${userFollows} WHERE ${userFollows.creatorId} = ${users.id}) `.mapWith(Number),
+                    viewerIsFollowing: isNotNull(viewerFollow.userId).mapWith(Boolean),
+                })
+                .from(videos)
+                .innerJoin(users, eq(videos.userId, users.id))
+                .leftJoin(viewerFollow, eq(viewerFollow.creatorId, users.id))
+                .where(eq(videos.id, videoId))
+                .limit(1)
+
+            return creator;
+
+        })
 });

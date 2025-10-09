@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
 import { SubButton } from "@/modules/subscriptions/ui/components/sub-button";
-import { useAuth  } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import { UserInfo } from "@/modules/users/ui/components/user-info";
 import { UsersIcon, Edit3Icon, ZapIcon, RocketIcon, } from "lucide-react";
@@ -10,12 +10,11 @@ import { useState } from "react";
 import { useFollow } from "@/modules/follows/hooks/follow-hook";
 import { XpCard } from "@/modules/home/ui/components/xp-card";
 import { AnimatePresence } from "framer-motion";
+import { Spinner } from "@/components/ui/shadcn-io/spinner";
 
 type User = {
   followsCount: number;
   viewerIsFollowing: boolean;
-  videoCount: number;
-  viewerRating: number;
   id: string;
   clerkId: string;
   name: string;
@@ -41,14 +40,13 @@ const f = (x: number) => {
 };
 
 
-export const VideoOwner = ({ user, videoId,boostPoints }: Props) => {
+export const VideoOwner = ({ user, videoId, boostPoints }: Props) => {
   const { userId } = useAuth();
   const [showAddXpModal, setShowAddXpModal] = useState(false);
 
   //WHERE IS THE PREFETCH? -- TODO: getBoostByVideoId -> userId -> boost points
   // const [boostPoints] = trpc.xp.getBoostByUserId.useSuspenseQuery({userId:user.id})
 
-  console.log(boostPoints)
 
   const channelLevel = Math.floor(
     Math.floor(Math.sqrt(boostPoints * 1000)) / 1000
@@ -57,13 +55,13 @@ export const VideoOwner = ({ user, videoId,boostPoints }: Props) => {
   const xpOnCurrentLevel = f(1000 * channelLevel);
   const xpForNextLevel = f(1000 * (channelLevel + 1));
 
-  console.log(xpOnCurrentLevel,xpForNextLevel)
 
-  const progressPercentage =  Math.max( 0, Math.min( 100, ((boostPoints - xpOnCurrentLevel) / (xpForNextLevel - xpOnCurrentLevel)) * 100)
+  const progressPercentage = Math.max(0, Math.min(100, ((boostPoints - xpOnCurrentLevel) / (xpForNextLevel - xpOnCurrentLevel)) * 100)
   );
 
+  console.log(videoId)
 
- 
+
   const { onClick, isPending } = useFollow({
     //ignore xd?
     userId: user.id,
@@ -136,12 +134,21 @@ export const VideoOwner = ({ user, videoId,boostPoints }: Props) => {
                 </Link>
               </Button>
             ) : (
-              <SubButton
-                onClick={onClick}
-                disabled={isPending}
-                isSubscribed={user.viewerIsFollowing}
-                className="rounded-full p-4 shadow-sm hover:shadow-md transition-all bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600"
-              />
+              <>
+                {isPending ? (
+                  <Button
+                    className="rounded-full flex justify-center text-center p-4 shadow-sm hover:shadow-md transition-all bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600"
+                  >
+                    <Spinner variant="circle" />
+                  </Button>
+                ) :
+                  <SubButton
+                    onClick={onClick}
+                    disabled={isPending}
+                    isSubscribed={user.viewerIsFollowing}
+                    className="rounded-full p-4 shadow-sm hover:shadow-md transition-all bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600"
+                  />}
+              </>
             )}
           </div>
 
@@ -186,6 +193,6 @@ export const VideoOwner = ({ user, videoId,boostPoints }: Props) => {
           </p>
         </div>
       </div>
-    </div>
+    </div >
   );
 };

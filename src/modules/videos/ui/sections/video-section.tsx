@@ -62,7 +62,6 @@ const VideoErrorFallback = () => {
 
 const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
     const [video] = trpc.videos.getOne.useSuspenseQuery({ id: videoId });
-    const [boostPoints] = trpc.xp.getBoostByVideoId.useSuspenseQuery({videoId})
 
     // console.log("BOOST AAAA",boostPoints.boostPoints)
 
@@ -200,7 +199,7 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
             </div>
 
             <VideoBanner status={video.status || "processing"} />
-            <VideoTopRow video={video} onRate={onRate} boostPoints={Number(boostPoints.boostPoints)} />
+            <VideoTopRow video={video} onRate={onRate}  />
         </div>
     )
 }

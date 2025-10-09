@@ -13,6 +13,7 @@ export default async function Page({ params }: PageProps) {
   void trpc.videos.getOne.prefetch({ id: videoId });
   void trpc.comments.getTopLevel.prefetchInfinite({videoId, limit: COMMENT_SECTION_SIZE})
   void trpc.xp.getBoostByVideoId.prefetch({videoId})
+  // void trpc.videos.getUserByVideoId.prefetch({ videoId });
 
 
   return (
