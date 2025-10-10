@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const formatDuration = (duration: number) => {
-  const second = duration;
+  const second = (duration % 60);
   const minutes = Math.floor((duration / 60));
   return `${minutes.toString().padStart(2, "0")}:${second.toString().padStart(2, "0")}`
 }

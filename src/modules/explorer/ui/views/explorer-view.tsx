@@ -308,6 +308,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                             imageUrl={featuredVideo.user?.imageUrl || "/public-user.png"}
                             name={featuredVideo.user?.name || "Anonymous"}
                             userId={featuredVideo.user?.id}
+                            badgeSize={5}
                           />
                           <div>
                             <p className="text-white font-medium text-lg">{featuredVideo.user?.name}</p>
@@ -518,6 +519,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                           imageUrl={video.user?.imageUrl || "/public-user.png"}
                           name={video.user?.name || "Anonymous"}
                           userId={video.user?.id}
+                          badgeSize={5}
                         />
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-gray-900 dark:text-white text-sm truncate">

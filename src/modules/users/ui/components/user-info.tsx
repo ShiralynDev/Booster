@@ -1,5 +1,6 @@
 import {cva, type VariantProps } from "class-variance-authority"
 
+
 import { cn } from "@/lib/utils"
 
 import {
@@ -38,9 +39,13 @@ export const UserInfo = ({
         <div className={cn(userInfoVariants({size,className}))}>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <p className="text-gray-500 dark:text-gray-100 hover:text-gray-800 dark:hover:text-gray-200 line-clamp-1">
-                        {name}
-                    </p>
+
+                    <div className="flex items-center gap-1">
+
+                        <p className="text-gray-500 dark:text-gray-100 hover:text-gray-800 dark:hover:text-gray-200 line-clamp-1">
+                            {name}
+                        </p>
+                    </div>
                 </TooltipTrigger>
                 <TooltipContent className="bg-black/70 dark:bg-white" align="center">
                     <p>{name}</p>

@@ -358,7 +358,6 @@ export const videosRouter = createTRPCRouter({
                     .where(inArray(userFollows.userId, userId ? [userId] : []))
             )
 
-            console.log("user", userId,)
             const [creator] = await db
                 .with(viewerFollow)
                 .select({

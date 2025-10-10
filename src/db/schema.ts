@@ -211,22 +211,24 @@ export const xpPurchases = pgTable("xp_purchases", {
     createdAt: timestamp("created_at").defaultNow(),
 });
 
-// export const assets = pgTable("assets", {
-//     assetId: uuid("asset_id").primaryKey().defaultRandom(),
-//     price: integer("price").notNull().default(0),
-//     name: text("asset_name").notNull(),
-//     description: text("asset_description").notNull(),
-//     createdAt: timestamp("created_at").defaultNow(),
-//     updatedAt: timestamp("updated_at").defaultNow().notNull(),
-// })
+export const assets = pgTable("assets", {
+    assetId: uuid("asset_id").primaryKey().defaultRandom(),
+    price: integer("price").notNull().default(0),
+    name: text("asset_name").notNull(),
+    category: text(),
+    description: text("asset_description").notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    iconNumber: integer().notNull().default(0),
+})
 
-// export const userAssets = pgTable("user_assets", {
-//     assetId: uuid("asset_id").references(() => assets.assetId, { onDelete: "cascade", onUpdate: "cascade" }),
-//     userId: uuid("user_id").references(() => users.id, { onDelete: "cascade", onUpdate: "cascade" }),
-// }, (t) => [
-//     primaryKey({
-//         name: "user_assets_pk",
-//         columns: [t.assetId, t.userId],
-//     })
-// ])
+export const userAssets = pgTable("user_assets", {
+    assetId: uuid("asset_id").references(() => assets.assetId, { onDelete: "cascade", onUpdate: "cascade" }),
+    userId: uuid("user_id").references(() => users.id, { onDelete: "cascade", onUpdate: "cascade" }),
+}, (t) => [
+    primaryKey({
+        name: "user_assets_pk",
+        columns: [t.assetId, t.userId],
+    })
+])
 

@@ -23,6 +23,7 @@ import { BoosterRankings } from "../components/boosters-rankings";
 import { useFollow } from "@/modules/follows/hooks/follow-hook";
 import { SubButton } from "@/modules/subscriptions/ui/components/sub-button";
 import { Spinner } from "@/components/ui/shadcn-io/spinner";
+import { getUserIcons } from "@/modules/market/components/assetIcons/functions/get-user-icons";
 
 interface Props {
   userId: string;
@@ -141,7 +142,7 @@ export const UsersView = ({ userId }: Props) => {
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#ffca55] via-[#FFA100] to-[#ffca55]"></div>
 
           <div className="flex flex-col md:flex-row p-6">
-            <div className="flex flex-col items-center md:items-center md:w-1/3 mb-6 md:mb-0">
+            <div className="flex flex-col items-center md:items-center md:w-1/3 mb-6 md:mb-0 min-w-0">
               <UserAvatar
                 size="xl"
                 imageUrl={user?.imageUrl || undefined}
@@ -149,14 +150,23 @@ export const UsersView = ({ userId }: Props) => {
                 className={`w-40 h-40 border-4 border-border hover:border-primary transition-all duration-300 mb-4 ${showLevelUp ? "animate-pulse ring-4 ring-yellow-400" : ""
                   }`}
                 userId={user.id}
-                iconSize="md"
+                badgeSize={14}
               />
 
-              <div className="text-center md:text-center">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent flex items-center justify-center md:justify-center">
-                  {user?.name || "Unknown User"}
-                  <span className="ml-2 text-primary">✓</span>
-                </h1>
+              <div className="flex flex-col items-center">
+                <div className="flex items-center justify-center text-center max-w-full">
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent  line-clamp-2 max-w-[200px] md:max-w-[400px]">
+                    {/* Code With Antonio and Angelie for a good software development j */}
+                    {user?.name || "Unknown User"}
+                  </h1>
+                </div>
+                  {/* <PlanetIcon className="text-yellow-600 ml-2 shadow-red-100/50 bg-transparent size-8 flex-shrink-0" /> */}
+                  <div className="mt-1">
+
+                  {getUserIcons(user.id,10)}
+                  </div>
+
+
 
                 <div className="flex flex-wrap gap-3 my-4 justify-center md:justify-start">
                   <div className="bg-muted/50 p-3 rounded-lg border border-border text-center min-w-[90px]  transition-transform">
@@ -243,19 +253,19 @@ export const UsersView = ({ userId }: Props) => {
               <div className="flex items-center justify-between">
 
                 {isPending ? (
-                  <Button 
+                  <Button
                     className="rounded-full flex justify-center text-center p-4 shadow-sm hover:shadow-md transition-all bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600"
                   >
-                    <Spinner variant="circle"/>
+                    <Spinner variant="circle" />
                   </Button>
-                ) : 
-                <SubButton
-                  onClick={onClick}
-                  disabled={isPending}
-                  isSubscribed={followers[0]?.viewerIsFollowing}
-                  className="rounded-full p-4 shadow-sm hover:shadow-md transition-all bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600"
-                />
-              }
+                ) :
+                  <SubButton
+                    onClick={onClick}
+                    disabled={isPending}
+                    isSubscribed={followers[0]?.viewerIsFollowing}
+                    className="rounded-full p-4 shadow-sm hover:shadow-md transition-all bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600"
+                  />
+                }
                 <Button
                   onClick={() => setShowXpPopup(true)}
                   className="bg-gradient-to-r from-primary to-secondary text-primary-foreground font-bold py-2 px-6 rounded-full hover:opacity-90 transition-all hover:scale-105 active:scale-95"

@@ -43,6 +43,7 @@ interface UserAvatarProps extends VariantProps<typeof avatarVariants> {
     className?: string;
     onClick?: () => void; //optional event
     userId: string | undefined;
+    badgeSize?: number
 }
 
 export const UserAvatar = ({
@@ -53,10 +54,11 @@ export const UserAvatar = ({
     size, //because it extends VariantProps
     userId,
 }: UserAvatarProps) => {
+
     return (
         <div className="relative ">
             <Link href={`/users/${userId}`}>
-                <Avatar className={cn(avatarVariants({ size, className }))} onClick={onClick}>
+                <Avatar className={cn(avatarVariants({ size, className }), '')} onClick={onClick}>
                     <AvatarImage src={imageUrl} alt={name} />   
                 </Avatar>
             </Link>

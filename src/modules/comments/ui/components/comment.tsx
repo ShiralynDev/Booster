@@ -9,13 +9,14 @@ import { CommentOutput } from "@/modules/videos/types";
 import { trpc } from "@/trpc/client";
 import { useClerk, useAuth } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, MessageCircle, MoreHorizontal, ChevronDown, ChevronUp, Zap,  } from "lucide-react";
+import { Heart, MessageCircle, MoreHorizontal, ChevronDown, ChevronUp,  } from "lucide-react";
 import { useMemo, useState, useCallback } from "react";
 import { useClampDetector } from "../../hooks/resize-hook";
 import { CommentReplyInput } from "./comment-reply-input";
 import { User } from "@/modules/users/types";
 import { Spinner } from "@/components/ui/shadcn-io/spinner";
 import { toast } from "sonner";
+import { getUserIcons } from "@/modules/market/components/assetIcons/functions/get-user-icons";
 
 type Comment = CommentOutput[0];
 
@@ -28,25 +29,7 @@ interface CommentProps {
     maxDepth: number;
 }
 
-// Helper function to determine which icon to show based on user role/status
-const getUserIcon = (user: User, isCommentOwner?: boolean) => {
-    // You can customize this logic based on your user roles/status
-    // if (user.role === 'admin' || user.role === 'moderator') {
-    //     return <MessagesSquare className="w-3 h-3 text-green-500 fill-green-500" />;
-    // }
-    // if (user.isVerified) {
-    //     return <CheckCircle className="w-3 h-3 text-blue-500 " />;
-    // }
-    // if (user.isPremium) {
-    //     return <Crown className="w-3 h-3 text-yellow-500 fill-yellow-500" />;
-    // }
-    // if (isCommentOwner) {
-    //     return <Contact className="w-3 h-3 text-[#ffca55]" />;
-    // }
-    // Default icon or return null for no icon
-    console.log(user,isCommentOwner)
-    return <Zap className="w-3 h-3 text-gray-400" />;
-};
+
 
 export const Comment = ({ parentComment, videoId, viewer, depth, maxDepth }: CommentProps) => {
     const clerk = useClerk();
@@ -59,11 +42,7 @@ export const Comment = ({ parentComment, videoId, viewer, depth, maxDepth }: Com
     const [replyingTo, setReplyingTo] = useState("");
 
     // Determine if the current viewer is the comment author
-    const isViewerCommentAuthor = viewer?.id === parentComment.userId;
-
-    // console.log("PADREEEEEEEEEEEEEE", parentComment)
-
-   
+    // const isViewerCommentAuthor = viewer?.id === parentComment.userId;
 
     const {
         data: repliesData,
@@ -98,10 +77,10 @@ export const Comment = ({ parentComment, videoId, viewer, depth, maxDepth }: Com
         },
         onSuccess: () => {
             utils.comments.getTopLevel.invalidate({ videoId, limit: COMMENT_SECTION_SIZE });
-            utils.comments.getReplies.invalidate({commentId:parentComment.commentId, videoId, limit: COMMENT_REPLIES_SIZE});
+            utils.comments.getReplies.invalidate({ commentId: parentComment.commentId, videoId, limit: COMMENT_REPLIES_SIZE });
 
             //@ts-ignore --> here comment is guaranteed to have a parentId. In the worst case, the procedure will reject it
-            utils.comments.getReplies.invalidate({commentId:parentComment.parentId, videoId, limit: COMMENT_REPLIES_SIZE});
+            utils.comments.getReplies.invalidate({ commentId: parentComment.parentId, videoId, limit: COMMENT_REPLIES_SIZE });
         },
     });
 
@@ -252,20 +231,21 @@ export const Comment = ({ parentComment, videoId, viewer, depth, maxDepth }: Com
             className="group relative p-2 ml-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
         >
             <div className="flex gap-3">
-                <UserAvatar size="md" imageUrl={parentComment.user.imageUrl} name={parentComment.user.name} userId={parentComment.userId}/>
+                <UserAvatar size="md" imageUrl={parentComment.user.imageUrl} name={parentComment.user.name} userId={parentComment.userId} badgeSize={5} />
 
                 <div className="flex-1 min-w-0 overflow-hidden">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <UserInfo size="xs" name={parentComment.user.name?.replace(/\s*null\s*$/i, "")} />
-                        
+
+
                         {/* Icon between username and timestamp */}
                         <div className="flex gap-2 items-center">
-                            {getUserIcon(parentComment.user, isViewerCommentAuthor)}
+                            {getUserIcons(parentComment.user.id,4)}
                             <span className="text-xs text-gray-500 dark:text-gray-400">
                                 {compactDate(parentComment.createdAt) ?? ""}
                             </span>
                         </div>
-                        
+
                         <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
@@ -310,7 +290,7 @@ export const Comment = ({ parentComment, videoId, viewer, depth, maxDepth }: Com
                         {depth < maxDepth && (
                             <motion.button
                                 whileTap={{ scale: 0.95 }}
-                                onClick={() => {setReplyingTo(""); setReplyingTo(parentComment.commentId)}}
+                                onClick={() => { setReplyingTo(""); setReplyingTo(parentComment.commentId) }}
                                 className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
                                 disabled={isReplying}
                             >

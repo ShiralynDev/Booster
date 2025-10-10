@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { boostTransactions, users, videos } from "@/db/schema";
+import { boostTransactions, userAssets, users, videos } from "@/db/schema";
 import { stripe } from "@/lib/stripe";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
@@ -45,12 +45,13 @@ export const xpRouter = createTRPCRouter({
     .input(
       z.object({
         // price is an integer number of XP points
+        assetId: z.string().uuid(),
         price: z.number().int().nonnegative(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.user.id;
-      const { price } = input;
+      const { price,assetId } = input;
 
       // Atomic decrement with balance check in WHERE
       const [updated] = await db
@@ -74,6 +75,13 @@ export const xpRouter = createTRPCRouter({
 
       //insert transaction in transactionsTable
       //insert item in owns of user
+
+      await db
+      .insert(userAssets)
+      .values({
+        assetId,
+        userId,
+      })
 
       return updated; 
     }),

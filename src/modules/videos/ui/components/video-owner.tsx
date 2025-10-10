@@ -11,6 +11,7 @@ import { useFollow } from "@/modules/follows/hooks/follow-hook";
 import { XpCard } from "@/modules/home/ui/components/xp-card";
 import { AnimatePresence } from "framer-motion";
 import { Spinner } from "@/components/ui/shadcn-io/spinner";
+import { getUserIcons } from "@/modules/market/components/assetIcons/functions/get-user-icons";
 
 type User = {
   followsCount: number;
@@ -59,8 +60,6 @@ export const VideoOwner = ({ user, videoId, boostPoints }: Props) => {
   const progressPercentage = Math.max(0, Math.min(100, ((boostPoints - xpOnCurrentLevel) / (xpForNextLevel - xpOnCurrentLevel)) * 100)
   );
 
-  console.log(videoId)
-
 
   const { onClick, isPending } = useFollow({
     //ignore xd?
@@ -90,8 +89,8 @@ export const VideoOwner = ({ user, videoId, boostPoints }: Props) => {
                   name={user.name}
                   className="ring-2 ring-white dark:ring-[#333333] shadow-lg"
                   userId={user.id}
+                  badgeSize={7}
                 />
-
               </div>
             </Link>
 
@@ -106,6 +105,7 @@ export const VideoOwner = ({ user, videoId, boostPoints }: Props) => {
                   name={user.name?.replace(/\s*null\s*$/i, "")}
                   className="font-semibold text-gray-900 dark:text-white text-base sm:text-lg"
                 />
+                {getUserIcons(user.id,5)}
               </div>
             </div>
 

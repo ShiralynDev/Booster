@@ -84,4 +84,7 @@ export const usersRouter = createTRPCRouter({
 
     return { userVideos,  };
   }),
+
+  // getAssetsByUser
+
 })
