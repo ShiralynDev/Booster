@@ -195,7 +195,7 @@ const FormSectionSuspense = ({ videoId }: PageProps) => {
         update.mutateAsync(data);
     }
 
-    const fullUrl = `${process.env.VERCEL_URL || "http://localhost:3000"}/explorer/videos/${videoId}`
+    const fullUrl = `${process.env.NEXT_PUBLIC_VERCEL_URL || "http://localhost:3000"}/explorer/videos/${videoId}`
     const [isCopied, setIsCopied] = useState(false);
 
     const onCopy = async () => {

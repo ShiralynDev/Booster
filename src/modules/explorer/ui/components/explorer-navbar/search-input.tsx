@@ -1,3 +1,5 @@
+// 'use client';
+
 import { Button } from "@/components/ui/button";
 import { SearchIcon, XIcon } from "lucide-react"
 import { useRouter } from "next/navigation";
@@ -12,7 +14,8 @@ export const SearchInput = () => {
     const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const url = new URL("/search",  process.env.VERCEL_URL! ?? "http://localhost:3000")
+        console.log("VERCEL",process.env.NEXT_PUBLIC_VERCEL_URL)
+        const url = new URL("/search",  process.env.NEXT_PUBLIC_VERCEL_URL || "http://localhost:3000")
         const newQuery = value.trim();
 
 
