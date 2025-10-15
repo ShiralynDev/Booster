@@ -12,7 +12,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
-    metadataBase: new URL("https://www.booster.example"), // <-- your canonical origin
+    metadataBase: new URL("https://www.boostervideos.net"), 
     title: {
         default: "Booster",
         template: "%s | Booster",
@@ -23,11 +23,11 @@ export const metadata: Metadata = {
     },
     openGraph: {
         type: "website",
-        url: "https://www.booster.example/",
+        url: "https://www.boostervideos.net/",
         siteName: "Booster",
         title: "Booster",
         description: "Video platform oriented for creators and users",
-        images: [{ url: "/og-default.jpg", width: 1200, height: 630 }],
+        images: [{ url: "/BoosterLongLogo.tmp.png", width: 1200, height: 630 }],
     },
     twitter: {
         card: "summary_large_image",
