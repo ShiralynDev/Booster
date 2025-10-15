@@ -12,6 +12,7 @@ import { eq } from "drizzle-orm"
 
 
 export async function POST(req: Request){
+    console.log("AAAA")
     const SIGNING_SECRET = process.env.CLERK_SIGNING_SECRET
 
     if(!SIGNING_SECRET){

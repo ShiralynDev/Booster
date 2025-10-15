@@ -48,10 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ClerkProvider>
             <html lang="en" suppressHydrationWarning>
                 <head>
-                    {/* Preconnect to critical origins (keep this short and justified) */}
                     <link rel="preconnect" href="https://vitals.vercel-analytics.com" crossOrigin="" />
-                    {/* If you serve images/video from a dedicated domain/CDN, preconnect it too */}
-                    {/* <link rel="preconnect" href="https://cdn.booster.example" crossOrigin="" /> */}
                 </head>
                 <body className={inter.className}>
                     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
