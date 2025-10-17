@@ -4,7 +4,7 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       { userAgent: "*", allow: "/" },
-      { userAgent: "*", disallow: "/api" },
+      // { userAgent: "*", disallow: "/api" },
     ],
     sitemap: "https://www.boostervideos.net/sitemap.xml",
   };
