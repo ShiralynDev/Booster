@@ -10,7 +10,6 @@ export const explorerRouter = createTRPCRouter({
             z.object({
                 cursor: z.object({
                     id: z.string().uuid(),
-                    updatedAt: z.date(),
                     score: z.number().nullish(),
                 }).nullish(),
                 limit: z.number().min(1).max(100),
@@ -92,7 +91,7 @@ export const explorerRouter = createTRPCRouter({
             }
 
 
-            const data = await db
+            const rows = await db
                 .with(viewerFollow, ratingStats, videoViewsStats)
                 .select({
                     ...getTableColumns(videos),
@@ -102,19 +101,20 @@ export const explorerRouter = createTRPCRouter({
                         viewerIsFollowing: isNotNull(viewerFollow.userId).mapWith(Boolean),
                         videoCount: sql<number>`(SELECT COUNT(*) FROM ${videos} WHERE ${videos.userId} = ${users.id})`.mapWith(Number),
                         viewerRating: (userId ? sql<number>`(SELECT ${videoRatings.rating} FROM ${videoRatings} WHERE ${videoRatings.userId} = ${userId} AND ${videoRatings.videoId} = ${videos.id} LIMIT 1)`.mapWith(Number) : sql<number>`(NULL)`.mapWith(Number)),
-                        score: sql<number>`
-                            LN(
-                                POWER(COALESCE(SQRT(${users.boostPoints} * 1000) / 1000, 0) + 1, 2)  
-                                + COALESCE(${videoViewsStats.viewCount}, 0) 
-                                + TANH(COALESCE(${ratingStats.averageRating}, 0) - 3.5)
-                                * LN(GREATEST(COALESCE(${ratingStats.ratingCount}, 0), 1))
-                                + LN(GREATEST(COALESCE(${ratingStats.ratingCount}, 0), 1))
-                                + LN(GREATEST(COALESCE(${commentsAgg.commentCount}, 0), 1))
-                            )   * COALESCE(SQRT(${users.boostPoints} * 1000) / 1000, 0)
-                                `.as('score'),
-
-
                     },
+                    score: sql<number>`
+                        LN(
+                            POWER(COALESCE(SQRT(${users.boostPoints} * 1000) / 1000, 0) + 1, 2)  
+                            + COALESCE(${videoViewsStats.viewCount}, 0) 
+                            + TANH(COALESCE(${ratingStats.averageRating}, 0) - 3.5)
+                            * LN(GREATEST(COALESCE(${ratingStats.ratingCount}, 0), 1))
+                            + LN(GREATEST(COALESCE(${ratingStats.ratingCount}, 0), 1))
+                            + LN(GREATEST(COALESCE(${commentsAgg.commentCount}, 0), 1))
+                        )   * COALESCE(SQRT(${users.boostPoints} * 1000) / 1000, 0)
+                            `.as('score'),
+
+
+                    
                     videoRatings: ratingStats.ratingCount,
                     averageRating: ratingStats.averageRating,
                     videoViews: videoViewsStats.viewCount,
@@ -125,26 +125,18 @@ export const explorerRouter = createTRPCRouter({
                 .leftJoin(videoViewsStats, eq(videoViewsStats.videoId, videos.id))
                 .leftJoin(commentsAgg, eq(commentsAgg.videoId, videos.id))
                 .where(and(...whereParts))
-                .orderBy(desc(sql`score`), desc(videos.updatedAt))
-                .limit(limit + 1); const hasMore = data.length > limit;
+                .orderBy(desc(sql`score`))
+                .limit(limit + 1); 
 
-            //remove last item if hasMore
-            const rows = hasMore ? data.slice(0, -1) : data;
-
-            const lastItem = rows[rows.length - 1];
-            const nextCursor = hasMore ?
-                {
-                    id: lastItem.id,
-                    updatedAt: lastItem.updatedAt,
-                } : null;
-
-
-            const items = rows
+            const hasMore = rows.length > limit;
+            const items = hasMore ? rows.slice(0, -1) : rows;
+            const last = items[items.length - 1];
+            const nextCursor = hasMore && last ? { id: last.id, score: Number(last.score) } : null;
 
 
             return {
                 items,
                 nextCursor,
-            }
+            }      
         })
 })
