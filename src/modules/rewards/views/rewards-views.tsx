@@ -27,10 +27,8 @@ export const RewardsView = ({ categoryId }: HomeViewProps) => {
 }
 
 const RewardsSkeleton = () => {
-    // ... (keep the existing skeleton code)
     return (
         <div className="overflow-hidden mb-10 px-4 pt-2.5 flex flex-col gap-y-8 animate-pulse">
-            {/* ... existing skeleton code ... */}
         </div>
     );
 };
@@ -61,10 +59,18 @@ const VideoPlayerPopup = ({ videoId, isOpen, onClose, videos }: VideoPlayerPopup
         }
       })
     
+    const createView = trpc.videoViews.create.useMutation({
+        onSuccess: () => {
+            utils.videos.getOne.invalidate({ id: videoId });
+        },
+    });
+
+
 
     const videoEnd = () => {
         console.log("SE TERMINO JIJIJIJI")
         buy({amount: 35, videoId})
+        createView.mutate({videoId})
     }
 
     if (!video) return null;
@@ -235,7 +241,7 @@ export const RewardsViewSuspense = ({ categoryId }: HomeViewProps) => {
                                 />
 
                                 <div className="relative bg-transparent rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl border"
-                                    onClick={() => {setWatching(video.id);console.log("AASDA")}}
+                                    onClick={() => {setWatching(video.id)}}
                                 >
                                     {/* Video Thumbnail */}
                                     <div className="relative aspect-video overflow-hidden">
