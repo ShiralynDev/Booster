@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { boostTransactions, userAssets, users, videos } from "@/db/schema";
+import { boostTransactions, userAssets, users, videos, videoViews } from "@/db/schema";
 import { stripe } from "@/lib/stripe";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
@@ -211,6 +211,43 @@ export const xpRouter = createTRPCRouter({
                 .orderBy(desc(sum(boostTransactions.xp)))
 
             return boosters;
+        }),
+
+    rewardXp: protectedProcedure
+        .input(z.object({
+            amount: z.number(),
+            videoId: z.string().uuid(),
+        }))
+        .mutation(async ({ ctx, input }) => {
+            const { id: userId } = ctx.user;
+            const { amount, videoId } = input;
+
+            const lastViewRow = await db
+                .select({
+                    lastSeen: videoViews.updatedAt,
+                })
+                .from(videoViews)
+                .where(and(eq(videoViews.userId, userId), eq(videoViews.videoId, videoId)))
+                .limit(1);
+
+            const now = new Date();
+            const lastView = lastViewRow[0]?.lastSeen; // podría ser undefined
+
+            if (lastView) {
+                const diffMs = now.getTime() - new Date(lastView).getTime();
+                const diffHours = diffMs / (1000 * 60 * 60);
+
+                if (diffHours < 12) {
+                    return; 
+                }
+            }
+
+            const newxp = await db.update(users)
+                .set({
+                    xp: sql<number>`${users.xp} + ${amount}`,
+                })
+                .where(eq(users.id, userId));
+            return newxp;
         }),
 
     buyXp: protectedProcedure

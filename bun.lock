@@ -75,6 +75,7 @@
         "media-icons": "^1.1.5",
         "next": "15.1.6",
         "next-themes": "^0.4.6",
+        "player.js": "^0.1.0",
         "player.style": "^0.2.0",
         "react": "^19.0.0",
         "react-day-picker": "^9.9.0",
@@ -1565,6 +1566,8 @@
     "pify": ["pify@2.3.0", "", {}, "sha512-udgsAY+fTnvv7kI7aaxbqwWNb0AHiB0qBO89PZKPkoTmGOgdbrHDKD+0B2X4uTfJ/FT1R09r9gTsjUjNJotuog=="],
 
     "pirates": ["pirates@4.0.7", "", {}, "sha512-TfySrs/5nm8fQJDcBDuUng3VOUKsd7S+zqvbOTiGXHfxX4wK31ard+hoNuvkicM/2YFzlpDgABOevKSsB4G/FA=="],
+
+    "player.js": ["player.js@0.1.0", "", {}, "sha512-pzWPiqw5b4kQCYhXyoLOZWidWcSySVJTqciDOtoH/MzY97piKnUme494dfczCAC7FLkMSPMH2HfhNJU9D/lVFw=="],
 
     "player.style": ["player.style@0.2.0", "", { "dependencies": { "media-chrome": "~4.13.0" } }, "sha512-Ngoaz49TClptMr8HDA2IFmjT3Iq6R27QEUH/C+On33L59RSF3dCLefBYB1Au2RDZQJ6oVFpc1sXaPVpp7fEzzA=="],
 

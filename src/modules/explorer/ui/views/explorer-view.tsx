@@ -170,18 +170,6 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                 </div>
 
                 <div className="relative z-10">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.2, duration: 0.6 }}
-                        className="inline-flex items-center gap-3 bg-gradient-to-r from-amber-500/10 to-orange-500/10 px-6 py-3 rounded-2xl border border-amber-200/50 dark:border-amber-800/50 mb-6"
-                    >
-                        <Sparkles className="w-5 h-5 text-amber-500" />
-                        <span className="text-amber-600 dark:text-amber-400 font-semibold">
-                            Discover New Content
-                        </span>
-                    </motion.div>
-
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -204,7 +192,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
             >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/5 to-transparent blur-xl transform scale-110" />
                 <div className="relative z-10">
-                    <CategoriesSection categoryId={selectedCategory ?? "all"} />
+                    <CategoriesSection categoryId={selectedCategory || "all"} />
                 </div>
             </motion.div>
 
@@ -349,7 +337,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                             {/* Enhanced Features List */}
                             <div className="space-y-6">
                                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white bg-gradient-to-r from-amber-600 to-orange-600 dark:from-amber-400 dark:to-orange-400 bg-clip-text text-transparent">
-                                    Why You&apos;ll Love This
+                                    Why You will ll Love This
                                 </h3>
                                 <ul className="space-y-4">
                                     {[
@@ -418,12 +406,12 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                         />
                         <div>
                             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                                {selectedCategory === "all" ? "Trending Videos" : `${selectedCategory} Videos`}
+                                {selectedCategory === "all" ? "Trending Videos" : `${selectedCategory ?? "All"} Videos`}
                             </h2>
-                            <p className="text-gray-600 dark:text-gray-400 mt-1 flex items-center gap-2">
+                            {/* <p className="text-gray-600 dark:text-gray-400 mt-1 flex items-center gap-2">
                                 <TrendingUp className="w-4 h-4" />
                                 Curated selection of top-performing content
-                            </p>
+                            </p> */}
                         </div>
                     </div>
 
