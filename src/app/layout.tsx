@@ -1,6 +1,6 @@
 // app/layout.tsx
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Montserrat } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/next";
@@ -9,7 +9,13 @@ import "./globals.css";
 import { TRPCProvider } from "@/trpc/client";
 import { ThemeProvider } from "@/components/theme-provider";
 
-const inter = Inter({ subsets: ["latin"], display: "swap" });
+const montserrat = Montserrat({ 
+    subsets: ["latin"], 
+    display: "swap",
+    weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+    style: ['normal', 'italic'],
+    variable: '--font-montserrat'
+});
 
 export const metadata: Metadata = {
     metadataBase: new URL("https://www.boostervideos.net"),
@@ -46,11 +52,11 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <ClerkProvider>
-            <html lang="en" suppressHydrationWarning>
+            <html lang="en" suppressHydrationWarning className={montserrat.variable}>
                 <head>
                     <link rel="preconnect" href="https://vitals.vercel-analytics.com" crossOrigin="" />
                 </head>
-                <body className={inter.className}>
+                <body className={`${montserrat.className} antialiased`}>
                     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
                         <TRPCProvider>
                             {children}

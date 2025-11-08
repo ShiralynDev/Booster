@@ -30,35 +30,38 @@ export const SearchInput = () => {
     }
 
     return (
-        <form className='flex w-full max-w-[600px]' onSubmit={handleSearch}>
+        <form className='relative flex w-full max-w-[600px]' onSubmit={handleSearch}>
             <div className="relative w-full">
                 <input
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
                     type='text'
                     placeholder="Search"
-                    className="w-full pl-4 py-2 pr-12 rounded-l-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-[#333333] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+                    className="w-full pl-4 pr-20 py-1.5 border rounded-full focus:outline-none focus:border-blue-500"
                 />
-                {/* TODO: add remove search button */}
+                {/* Clear search button */}
                 {value && (
                     <Button
                         type="button"
                         variant='ghost'
                         size='icon'
                         onClick={() => setValue("")}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full"
+                        className="absolute right-16 top-1/2 -translate-y-1/2 rounded-full size-6"
                     >
-                        <XIcon className="text-gray-500" />
+                        <XIcon className="text-gray-500 size-4" />
                     </Button>
                 )}
             </div>
+            {/* Search button overlapping on the right */}
             <button
                 disabled={!value.trim()}
                 type="submit"
-                className="px-5 py-2.5 bg-gray-100 dark:bg-[#333333] border border-l-0 border-gray-300 dark:border-gray-600 rounded-r-full hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-gray-300"
+                className="absolute top-[48.5%] right-0 -translate-y-1/2 h-10 px-7 rounded-full bg-gradient-to-r from-[#FFCA55] to-[#FFA100] text-black disabled:cursor-not-allowed flex items-center justify-center "
             >
-                <SearchIcon className='size-5' />
+                <SearchIcon className='size-6' />
             </button>
         </form>
     )
 }
+
+

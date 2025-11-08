@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { SearchInput } from "./search-input";
 import { AuthButton } from "@/modules/auth/ui/components/auth-button";
 
@@ -147,9 +146,6 @@ export const ExplorerNavBar = () => {
           </NavItem>
 
           <XpIndicator xp={myXp?.xp || 0} isLoading={isLoading} />
-          <div className="m-1">
-          <ThemeToggle  />
-          </div>
           <AuthButton />
         </div>
       </div>

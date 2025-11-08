@@ -363,7 +363,7 @@ export const VideoSectionSuspense = ({ videoId, next, prev }: Props) => {
                         {video.isFeatured && (
                             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-gray-900 px-3 py-1.5 rounded-full text-sm font-semibold shadow-lg backdrop-blur-sm animate-pulse flex-shrink-0">
                                 <Coins className="h-4 w-4" />
-                                <span>Watch for 35 XP</span>
+                                <span>Sponsored, Watch for 20 XP</span>
                             </div>
                         )}
                         <VideoReactions avgRating={video.averageRating} videoRatings={video.videoRatings} onRate={onRate} viewerRating={video.user.viewerRating} small />

@@ -13,7 +13,10 @@ export default withUt({
   ],
   theme: {
   	extend: {
-		fontFamily: { montserrat: ["var(--font-montserrat)", "sans-serif"], inter: ["var(--font-inter)", "sans-serif"], },
+		fontFamily: { 
+			sans: ['var(--font-montserrat)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        	montserrat: ['var(--font-montserrat)', 'sans-serif'], 
+		},
   		colors: {
   			background: '#121212',
   			foreground: 'hsl(var(--foreground))',
