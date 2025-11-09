@@ -97,7 +97,7 @@ export const UsersView = ({ userId }: Props) => {
       updateLevelChange.mutate({ userId });
     }
     previousLevelRef.current = channelLevel;
-  }, [channelLevel, isInitialLoad, userId]); // Removed functions that cause re-renders
+  }, [channelLevel, isInitialLoad, userId, prefetchRankings, updateLevelChange]);
 
   //TODO: implement community rankings
 

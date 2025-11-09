@@ -1,3 +1,5 @@
+import { VideoView } from "@/modules/videos/ui/views/video-view";
+
 interface PageProps {
     params: Promise<{ videoId: string }>; //returns a promise with type videoId which is a string
 }
@@ -9,9 +11,7 @@ const Page = async ({params}: PageProps) => {
     const {videoId} = await params;
 
     return ( 
-        <div>
-            Video Id Page {videoId}
-        </div>
+        <VideoView videoId={videoId} />
      );
 }
  

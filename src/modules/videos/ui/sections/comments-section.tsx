@@ -80,8 +80,7 @@ export const CommentsSuspense = ({ videoId, openComments, onOpenChange, home }: 
 
 
   return (
-    <div className="h-full flex-1 flex-col overflow-hidden border-red-300 "
-
+    <div className="h-full flex flex-col overflow-hidden border border-gray-900 dark:border-gray-800 rounded-lg bg-gray-50 dark:bg-black"
       onMouseLeave={() => { if (!home) return; setOpen(false); }}
       onMouseEnter={() => { if (!home) return; setOpen(true); }}
     >
@@ -116,7 +115,7 @@ export const CommentsSuspense = ({ videoId, openComments, onOpenChange, home }: 
                 <CommentInput viewer={viewer} createComment={createComment} isPending={isPending} />
               </div>
 
-              <div className="flex-1 min-h-0 overflow-y-auto"> {/* Scrollable comments area */}
+              <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide"> {/* Scrollable comments area */}
                 <div className="px-3 py-4 space-y-1">
                   {items.map(c => (
                     <Comment
@@ -148,7 +147,7 @@ export const CommentsSuspense = ({ videoId, openComments, onOpenChange, home }: 
             >
               <div className="mt-1 flex flex-col items-center text-center">
                 <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">Hover to view comments</p>
+                <p className="text-sm">Open Comment Section</p>
               </div>
             </motion.div>
           )}

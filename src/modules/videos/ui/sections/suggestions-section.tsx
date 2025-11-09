@@ -1,6 +1,6 @@
 'use client'
 import { motion } from "framer-motion";
-import { Play, Eye,  Star, TrendingUp, Sparkles } from "lucide-react";
+import { Play, Eye,  Star, Sparkles } from "lucide-react";
 import Image from "next/image";
 
 interface Video {
@@ -28,11 +28,11 @@ export const SuggestionsSection = ({
     title = "Watch next",
 }: SuggestionsSectionProps) => {
     return (
-        <div className="relative py-8">
+        <div className="relative w-full">
             {/* Background gradient */}
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-50/50 dark:to-gray-900/30" />
 
-            <div className="relative z-10">
+            <div className="relative z-10 w-full">
                 {/* Section header */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -41,15 +41,10 @@ export const SuggestionsSection = ({
                 >
                     {/* Centered title */}
                     <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-3">
-                        <div className="w-2 h-8 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full" />
                         <h2 className="text-2xl font-bold text-gray-900 text-center dark:text-white">{title}</h2>
                     </div>
 
-                    {/* End-aligned trending */}
-                    <div className="ml-auto flex items-center gap-2 text-amber-600 dark:text-amber-400">
-                        <TrendingUp className="w-5 h-5" />
-                        <span className="text-sm font-medium">Trending</span>
-                    </div>
+                    
                 </motion.div>
 
                 {/* Video grid */}
@@ -135,7 +130,6 @@ export const SuggestionsSection = ({
                                         {index < 2 && (
                                             <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
                                                 <Sparkles className="w-3 h-3" />
-                                                <span className="text-xs font-medium">Trending</span>
                                             </div>
                                         )}
                                     </div>
@@ -184,7 +178,7 @@ const mockVideos: Video[] = [
         rating: 4.8,
         user: {
             name: "NatureLover",
-            imageUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"
+            imageUrl: "/placeholder.webp"
         },
         category: "Nature"
     },
@@ -223,7 +217,7 @@ const mockVideos: Video[] = [
         rating: 4.7,
         user: {
             name: "ZenMaster",
-            imageUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"
+            imageUrl: "/placeholder.webp"
         },
         category: "Wellness"
     }
