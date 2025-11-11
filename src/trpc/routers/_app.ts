@@ -15,6 +15,7 @@ import { xpRouter } from '@/modules/xp/server/procedures';
 import { searchRouter } from '@/modules/search/server/procedures';
 import { uploadRouter } from '@/modules/upload/server/procedures';
 import { assetsRouter } from '@/modules/assets/server/procedures';
+import { notificationsRouter } from '@/modules/notifications/server/procedure';
 // import { followsRouter } from '@/modules/follows/server/procedure';
 
 export const appRouter = createTRPCRouter({
@@ -34,6 +35,7 @@ export const appRouter = createTRPCRouter({
     search: searchRouter,
     upload: uploadRouter,
     assets: assetsRouter,
+    notifications: notificationsRouter,
     // userFollowers: followsRouter
     
 

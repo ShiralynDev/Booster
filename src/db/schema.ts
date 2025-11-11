@@ -238,3 +238,25 @@ export const userAssets = pgTable("user_assets", {
     })
 ])
 
+export const notificationType = pgEnum("notification_type", [
+    'follow',
+    'comment',
+    'reply',
+    'boost',
+])
+
+export const notifications = pgTable("notifications", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(), // Recipient of the notification
+    type: notificationType('type').notNull(),
+    
+    // Foreign keys for different notification types
+    relatedUserId: uuid("related_user_id").references(() => users.id, { onDelete: "cascade" }), // Who followed/commented/boosted
+    videoId: uuid("video_id").references(() => videos.id, { onDelete: "cascade" }), // Video that was commented on
+    commentId: uuid("comment_id").references(() => comments.commentId, { onDelete: "cascade" }), // Comment/reply
+    boostAmount: integer("boost_amount"), // Amount of XP boosted
+    
+    isRead: boolean("is_read").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+})
+

@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { boostTransactions, userAssets, users, videos } from "@/db/schema";
+import { boostTransactions, notifications, userAssets, users, videos } from "@/db/schema";
 import { stripe } from "@/lib/stripe";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
@@ -177,8 +177,15 @@ export const xpRouter = createTRPCRouter({
                 })
                 .returning();
 
-
-
+            // Create boost notification (only if not boosting own channel)
+            if (userId !== recipientId) {
+                await db.insert(notifications).values({
+                    userId: recipientId, // Recipient of the boost (channel owner)
+                    type: 'boost',
+                    relatedUserId: userId, // Who boosted
+                    boostAmount: price, // Amount of XP boosted
+                });
+            }
 
             //insert transaction in transactionsTable
             //insert item in owns of user

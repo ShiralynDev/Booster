@@ -11,6 +11,7 @@ import { Tv2Icon, Upload } from "lucide-react";
 import { trpc } from "@/trpc/client";
 import { useAuth, useClerk } from "@clerk/nextjs";
 import { XpIndicator } from "@/modules/xp/ui/components/xp-indicator";
+import { NotificationBell } from "@/modules/notifications/components/notification-bell";
 
 // XP indicator with loading state and tooltip
 
@@ -146,6 +147,7 @@ export const ExplorerNavBar = () => {
           </NavItem>
 
           <XpIndicator xp={myXp?.xp || 0} isLoading={isLoading} />
+          <NotificationBell />
           <AuthButton />
         </div>
       </div>

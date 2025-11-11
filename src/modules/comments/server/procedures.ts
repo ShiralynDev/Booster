@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { commentReactions, comments, users } from "@/db/schema";
+import { commentReactions, comments, users, videos, notifications } from "@/db/schema";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
 import { eq, getTableColumns, inArray, desc, sql, or, and, lt, isNull, asc } from "drizzle-orm";
@@ -172,6 +172,22 @@ export const commentsRouter = createTRPCRouter({
           comment: comment,
         }).returning()
 
+      // Create notification for video owner (if not commenting on own video)
+      const [video] = await db
+        .select({ userId: videos.userId })
+        .from(videos)
+        .where(eq(videos.id, videoId));
+
+      if (video && video.userId !== userId) {
+        await db.insert(notifications).values({
+          userId: video.userId, // Video owner
+          type: 'comment',
+          relatedUserId: userId, // Commenter
+          videoId: videoId,
+          commentId: createdComment.commentId,
+        });
+      }
+
       return createdComment;
     }),
 
@@ -207,6 +223,24 @@ export const commentsRouter = createTRPCRouter({
         }).returning()
 
         if(!createdComment) return;
+        
+        // Get parent comment to notify its author
+        const [parentComment] = await db
+          .select({ userId: comments.userId })
+          .from(comments)
+          .where(eq(comments.commentId, parentId));
+
+        // Create notification for parent comment author (if not replying to own comment)
+        if (parentComment && parentComment.userId !== userId) {
+          await db.insert(notifications).values({
+            userId: parentComment.userId, // Parent comment author
+            type: 'reply',
+            relatedUserId: userId, // Replier
+            videoId: videoId,
+            commentId: createdComment.commentId,
+          });
+        }
+
         //TODO: update parent Id replies count
 
         // const [replies] = await db

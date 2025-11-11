@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { userFollows, users } from "@/db/schema";
+import { userFollows, users, notifications } from "@/db/schema";
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -80,6 +80,13 @@ export const followsRouter = createTRPCRouter({
           message: "Already following this user",
         });
       }
+
+      // Create notification for the followed user
+      await db.insert(notifications).values({
+        userId: creatorId, // Recipient: the person being followed
+        type: 'follow',
+        relatedUserId: user.id, // Who followed them
+      });
 
       return follow;
     }),
