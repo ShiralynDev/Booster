@@ -52,6 +52,15 @@ export const UsersView = ({ userId }: Props) => {
   const [boostPoints] = trpc.xp.getBoostByUserId.useSuspenseQuery({ userId });
   const [creatorViews] = trpc.videoViews.getAllViewsByUserId.useSuspenseQuery({ userId, });
 
+  // Fetch equipped asset to trigger re-renders when it changes
+  const { data: equippedAsset } = trpc.users.getEquippedAsset.useQuery(
+    { userId },
+    {
+      refetchOnMount: true,
+      staleTime: 0,
+    }
+  );
+
   // Check if viewing own profile
   const { data: currentUser } = trpc.users.getByClerkId.useQuery({
     clerkId: clerkUserId,
@@ -174,7 +183,7 @@ export const UsersView = ({ userId }: Props) => {
                   </h1>
                 </div>
                   {/* <PlanetIcon className="text-yellow-600 ml-2 shadow-red-100/50 bg-transparent size-8 flex-shrink-0" /> */}
-                  <div className="mt-1">
+                  <div className="mt-1" key={equippedAsset?.assetId || 'no-asset'}>
 
                   {getUserIcons(user.id,10)}
                   </div>

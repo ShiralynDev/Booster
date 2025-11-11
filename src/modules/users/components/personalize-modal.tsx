@@ -1,8 +1,8 @@
-"use client";
-
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { UserAvatar } from "@/components/user-avatar";
+import { useAuth } from "@clerk/nextjs";
 import { 
     User, 
     Rocket, 
@@ -21,24 +21,22 @@ import {
     Check,
     X,
     Upload,
-    Search
+    Search,
+    ShoppingBag,
+    type LucideIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { trpc } from "@/trpc/client";
+import { AnimatedPlanetIcon } from "@/modules/market/components/assetIcons/animated-planet-icon";
+import Link from "next/link";
 
-const ICONS = [
-    { icon: User, name: "user" },
-    { icon: Rocket, name: "rocket" },
-    { icon: Gamepad, name: "gamepad" },
-    { icon: Palette, name: "palette" },
-    { icon: Code, name: "code" },
-    { icon: Music, name: "music" },
-    { icon: Camera, name: "camera" },
-    { icon: Star, name: "star" },
-    { icon: Heart, name: "heart" },
-    { icon: Globe, name: "globe" },
-    { icon: Gem, name: "gem" },
-    { icon: Crown, name: "crown" },
+// Default icons available to everyone (free)
+const DEFAULT_ICONS = [
+    { iconNumber: -99, icon: X as LucideIcon, name: "remove", displayName: "Remove Icon", isLucideIcon: true as const, isRemoveOption: true },
+    { iconNumber: -1, icon: User as LucideIcon, name: "user", displayName: "User", isLucideIcon: true as const },
+    { iconNumber: -2, icon: Star as LucideIcon, name: "star", displayName: "Star", isLucideIcon: true as const },
+    { iconNumber: -3, icon: Heart as LucideIcon, name: "heart", displayName: "Heart", isLucideIcon: true as const },
 ];
 
 const ROLES = [
@@ -118,11 +116,9 @@ interface PersonalizeModalProps {
 }
 
 export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => {
+    const { userId: clerkUserId } = useAuth();
     const [activeTab, setActiveTab] = useState<'basic' | 'appearance'>('basic');
-    const [firstName, setFirstName] = useState('John');
-    const [lastName, setLastName] = useState('Doe');
-    const [username, setUsername] = useState('johndoe');
-    const [selectedIcon, setSelectedIcon] = useState(0);
+    const [previewIconIndex, setPreviewIconIndex] = useState<number | null>(null); // Preview state
     const [selectedRoles, setSelectedRoles] = useState<number[]>([1, 2]);
     const [showRoleModal, setShowRoleModal] = useState(false);
     const [showAvatarModal, setShowAvatarModal] = useState(false);
@@ -130,21 +126,144 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
     const [theme, setTheme] = useState<'light' | 'dark'>('light');
     const [selectedAccent, setSelectedAccent] = useState(0);
 
-    const SelectedIconComponent = ICONS[selectedIcon].icon;
+    // Fetch user's owned assets from marketplace
+    const { data: ownedAssets, isLoading: loadingAssets } = trpc.assets.getAssetsByUser.useQuery();
+    
+    // Fetch current user information with actual Clerk ID
+    const { data: currentUser } = trpc.users.getByClerkId.useQuery(
+        { clerkId: clerkUserId },
+        { enabled: !!clerkUserId }
+    );
+    
+    // Fetch boost points for XP bar
+    const { data: boostPoints } = trpc.xp.getBoostByUserId.useQuery(
+        { userId: currentUser?.id || '' },
+        { enabled: !!currentUser?.id }
+    );
+    
+    // Fetch currently equipped asset
+    const { data: equippedAsset } = trpc.users.getEquippedAsset.useQuery(
+        { userId: currentUser?.id || '' },
+        { enabled: !!currentUser?.id }
+    );
+
+    // Calculate channel level and XP
+    const channelLevel = currentUser && boostPoints 
+        ? Math.floor(Math.floor(Math.sqrt(boostPoints.boostPoints * 1000)) / 1000)
+        : 0;
+    
+    const f = (x: number) => Math.floor((x * x) / 1000);
+    const xpOnCurrentLevel = f(1000 * channelLevel);
+    const xpForNextLevel = f(1000 * (channelLevel + 1));
+    const xpProgress = boostPoints 
+        ? Math.max(0, Math.min(100, ((boostPoints.boostPoints - xpOnCurrentLevel) / (xpForNextLevel - xpOnCurrentLevel)) * 100))
+        : 0;
+
+    const utils = trpc.useUtils();
+
+    // Mutation to equip/unequip assets
+    const equipAssetMutation = trpc.users.equipAsset.useMutation({
+        onSuccess: async (data) => {
+            toast.success('Icon updated successfully!');
+            // Invalidate all queries to refresh the equipped asset display everywhere instantly
+            if (currentUser?.id) {
+                // Invalidate the equipped asset query for instant update
+                utils.users.getEquippedAsset.invalidate({ userId: currentUser.id });
+                // Also invalidate user data to refresh all components using user info
+                utils.users.getByUserId.invalidate({ userId: currentUser.id });
+                // Invalidate all instances of getEquippedAsset to update everywhere
+                utils.users.getEquippedAsset.invalidate();
+            }
+        },
+        onError: (error) => {
+            toast.error(error.message || 'Failed to update icon');
+        }
+    });
+
+    // Map iconNumber to component (extensible for future icons)
+    const getIconComponent = (iconNumber: number) => {
+        const iconMap = new Map([
+            [0, AnimatedPlanetIcon], // Founder Member Icon
+            // Add more icons here as marketplace grows
+        ]);
+        return iconMap.get(iconNumber);
+    };
+
+    // Combine default icons with purchased assets
+    const availableIcons = [
+        ...DEFAULT_ICONS,
+        ...(ownedAssets?.map(asset => ({
+            iconNumber: asset.iconNumber,
+            icon: getIconComponent(asset.iconNumber),
+            name: asset.name.toLowerCase().replace(/\s+/g, '-'),
+            displayName: asset.name,
+            isPurchased: true,
+            isLucideIcon: false,
+            assetId: asset.assetId
+        })) || [])
+    ];
+
+    // Find the index of currently equipped asset
+    const equippedIconIndex = equippedAsset 
+        ? availableIcons.findIndex(icon => 'assetId' in icon && icon.assetId === equippedAsset.assetId)
+        : -1;
+
+    // Use preview if set, otherwise show currently equipped
+    const displayIconIndex = previewIconIndex !== null ? previewIconIndex : equippedIconIndex;
+    const selectedIconData = displayIconIndex >= 0 ? availableIcons[displayIconIndex] : null;
     const currentAccent = ACCENT_COLORS[selectedAccent];
+
+    // Render the preview icon in the same style as channel page
+    const renderPreviewIcon = () => {
+        if (!selectedIconData) return null;
+        
+        // If the "Remove Icon" option is selected, show nothing
+        if ('isRemoveOption' in selectedIconData && selectedIconData.isRemoveOption) {
+            return <span className="text-muted-foreground text-sm">(No icon)</span>;
+        }
+        
+        const size = 10; // Same size as channel page (size 10 = big)
+        
+        if (selectedIconData.isLucideIcon && selectedIconData.icon) {
+            const IconComponent = selectedIconData.icon;
+            return <IconComponent size={40} className="w-10 h-10" />;
+        } else if (!selectedIconData.isLucideIcon && selectedIconData.icon) {
+            // Custom component like AnimatedPlanetIcon
+            const CustomIcon = selectedIconData.icon;
+            return <CustomIcon size={size} />;
+        }
+        
+        return null;
+    };
 
     const handleSave = (e: React.FormEvent) => {
         e.preventDefault();
+        
+        // Only save if there's a change to the icon
+        if (previewIconIndex !== null) {
+            const iconData = availableIcons[previewIconIndex];
+            
+            // Check if it's the remove icon option
+            if ('isRemoveOption' in iconData && iconData.isRemoveOption) {
+                // Unequip any equipped icon
+                equipAssetMutation.mutate({ assetId: null });
+            } else if ('isPurchased' in iconData && iconData.isPurchased && 'assetId' in iconData) {
+                // Equip the purchased asset
+                equipAssetMutation.mutate({ assetId: iconData.assetId });
+            } else {
+                // Unequip (default icons mean no asset equipped)
+                equipAssetMutation.mutate({ assetId: null });
+            }
+        }
+        
         toast.success('Profile updated successfully!');
+        setPreviewIconIndex(null); // Reset preview
         onClose();
     };
 
     const handleCancel = () => {
         if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
-            setFirstName('John');
-            setLastName('Doe');
-            setUsername('johndoe');
-            setSelectedIcon(0);
+            setPreviewIconIndex(null); // Reset preview
             setSelectedRoles([1, 2]);
             toast.info('Changes discarded');
             onClose();
@@ -164,7 +283,6 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
     );
 
     const primaryRole = ROLES.find(role => role.id === selectedRoles[0]);
-    const xpProgress = 65;
 
     if (!isOpen) return null;
 
@@ -198,12 +316,14 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
                                 <div className="bg-card rounded-xl border shadow-lg p-6 sticky top-0">
                                     <div className="text-center mb-6">
                                         <div className="relative inline-block mx-auto mb-4">
-                                            <div 
-                                                className="w-32 h-32 rounded-full flex items-center justify-center text-white text-4xl"
-                                                style={{ background: currentAccent.bgSolid }}
-                                            >
-                                                <SelectedIconComponent className="w-16 h-16" />
-                                            </div>
+                                            {/* User Avatar with actual profile picture */}
+                                            <UserAvatar
+                                                size="xl"
+                                                imageUrl={currentUser?.imageUrl || undefined}
+                                                name={currentUser?.name || "User"}
+                                                className="w-32 h-32 border-4 border-border"
+                                                userId={currentUser?.id || ''}
+                                            />
                                             <button
                                                 onClick={() => setShowAvatarModal(true)}
                                                 className="absolute bottom-1 right-1 bg-white dark:bg-gray-800 rounded-full w-9 h-9 flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
@@ -211,14 +331,20 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
                                                 <Camera className="w-4 h-4" />
                                             </button>
                                         </div>
-                                        <h2 className="text-2xl font-bold">{firstName} {lastName}</h2>
+                                        <h2 className="text-2xl font-bold">{currentUser?.name || 'Loading...'}</h2>
                                         <p className="text-muted-foreground">{primaryRole?.name || 'No role selected'}</p>
+                                        
+                                        {/* Icon Preview - Same as channel page */}
+                                        <div className="mt-1 flex justify-center">
+                                            {renderPreviewIcon()}
+                                        </div>
                                     </div>
 
-                                    {/* XP Progress */}
+                                    {/* XP Progress - Real Channel Booster */}
                                     <div className="border-t pt-4">
                                         <div className="flex justify-between mb-3">
                                             <span className="text-white font-bold text-sm">Channel Booster</span>
+                                            <span className="text-primary font-bold text-sm">Level {channelLevel}</span>
                                         </div>
                                         <div className="h-2.5 bg-muted rounded-full overflow-hidden">
                                             <div 
@@ -227,8 +353,8 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
                                             />
                                         </div>
                                         <div className="flex justify-between mt-1 text-xs text-muted-foreground">
-                                            <span>Level 4</span>
-                                            <span>Level 5</span>
+                                            <span>{xpProgress.toFixed(1)}% progress</span>
+                                            <span>{boostPoints ? (xpForNextLevel - boostPoints.boostPoints).toLocaleString() : 0} XP to next level</span>
                                         </div>
                                     </div>
 
@@ -291,35 +417,16 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
                                     {/* Basic Info Tab */}
                                     {activeTab === 'basic' && (
                                         <form onSubmit={handleSave} className="space-y-4">
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <label className="block text-sm mb-2 font-bold">First Name</label>
-                                                    <Input 
-                                                        value={firstName} 
-                                                        onChange={(e) => setFirstName(e.target.value)} 
-                                                        className="border-2 border-gray-300 dark:border-gray-600 focus:border-[#212121] dark:focus:border-[#212121]"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm  mb-2 font-bold">Last Name</label>
-                                                    <Input 
-                                                        value={lastName} 
-                                                        onChange={(e) => setLastName(e.target.value)} 
-                                                        className="border-2 border-gray-300 dark:border-gray-600 focus:border-[#212121] dark:focus:border-[#212121]"
-                                                    />
-                                                </div>
-                                            </div>
-
                                             <div>
-                                                <label className="block text-sm font-bold mb-2">Username</label>
-                                                <div className="flex">
-                                                    <span className="inline-flex items-center px-4 rounded-l-lg border-2 border-r-0 border-gray-300 dark:border-gray-600 bg-muted text-muted-foreground">@</span>
-                                                    <Input 
-                                                        value={username} 
-                                                        onChange={(e) => setUsername(e.target.value)} 
-                                                        className="rounded-l-none border-2 border-gray-300 dark:border-gray-600 focus:border-[#212121] dark:focus:border-[#212121]"
-                                                    />
-                                                </div>
+                                                <label className="block text-sm font-bold mb-2">Display Name</label>
+                                                <Input 
+                                                    value={currentUser?.name || ''} 
+                                                    disabled
+                                                    className="border-2 border-gray-300 dark:border-gray-600 bg-muted cursor-not-allowed"
+                                                />
+                                                <p className="text-xs text-muted-foreground mt-1">
+                                                    Name is managed through your account settings
+                                                </p>
                                             </div>
 
                                             <div>
@@ -338,25 +445,83 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
                                             </div>
 
                                             <div>
-                                                <label className="block text-sm font-bold mb-3">Displayed Icon</label>
+                                                <div className="flex justify-between items-center mb-3">
+                                                    <label className="block text-sm font-bold">Displayed Icon</label>
+                                                    {previewIconIndex !== null && (
+                                                        <span className="text-xs text-blue-500 font-semibold">
+                                                            Preview Mode - Save to apply
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <p className="text-xs text-muted-foreground mb-3">
+                                                    Select an icon to preview. Changes apply when you click "Save Changes".
+                                                </p>
                                                 <div className="grid grid-cols-6 gap-2">
-                                                    {ICONS.map((icon, idx) => {
-                                                        const IconComponent = icon.icon;
+                                                    {loadingAssets ? (
+                                                        <div className="col-span-6 text-center py-8 text-muted-foreground">
+                                                            Loading icons...
+                                                        </div>
+                                                    ) : availableIcons.length === 0 ? (
+                                                        <div className="col-span-6 text-center py-8">
+                                                            <ShoppingBag className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
+                                                            <p className="text-sm text-muted-foreground mb-2">No icons available</p>
+                                                            <Link href="/market">
+                                                                <Button variant="outline" size="sm">
+                                                                    Visit Marketplace
+                                                                </Button>
+                                                            </Link>
+                                                        </div>
+                                                    ) : availableIcons.map((iconData, idx) => {
+                                                        const isPurchased = 'isPurchased' in iconData && iconData.isPurchased;
+                                                        const isLucideIcon = 'isLucideIcon' in iconData && iconData.isLucideIcon;
+                                                        const assetId = 'assetId' in iconData ? iconData.assetId : null;
+                                                        const isEquipped = equippedAsset?.assetId === assetId;
+                                                        const isSelected = displayIconIndex === idx;
+                                                        
                                                         return (
                                                             <button
                                                                 key={idx}
                                                                 type="button"
-                                                                onClick={() => setSelectedIcon(idx)}
+                                                                onClick={() => {
+                                                                    // Just preview the selection, don't save yet
+                                                                    setPreviewIconIndex(idx);
+                                                                }}
                                                                 className={cn(
-                                                                    "w-10 h-10 rounded-lg flex items-center justify-center transition-all border-2",
-                                                                    selectedIcon === idx ? "" : "border-transparent hover:border-gray-300"
+                                                                    "w-10 h-10 rounded-lg flex items-center justify-center transition-all border-2 relative",
+                                                                    isSelected 
+                                                                        ? "border-blue-500 bg-blue-500/10" 
+                                                                        : isEquipped
+                                                                        ? "border-green-500 bg-green-500/5"
+                                                                        : "border-transparent hover:border-gray-300"
                                                                 )}
-                                                                style={selectedIcon === idx ? { 
-                                                                    borderColor: currentAccent.bgSolid,
-                                                                    backgroundColor: `${currentAccent.bgSolid}15`
-                                                                } : {}}
                                                             >
-                                                                <IconComponent className="w-4 h-4" />
+                                                                {/* Render appropriate icon component */}
+                                                                {(() => {
+                                                                    if (isPurchased && iconData.icon) {
+                                                                        if (iconData.iconNumber === 0) {
+                                                                            return <AnimatedPlanetIcon size={4} />;
+                                                                        }
+                                                                        return <span className="text-xs">?</span>;
+                                                                    }
+                                                                    if (isLucideIcon && iconData.icon) {
+                                                                        const IconComponent = iconData.icon as LucideIcon;
+                                                                        return <IconComponent className="w-4 h-4" />;
+                                                                    }
+                                                                    return <User className="w-4 h-4" />;
+                                                                })()}
+                                                                {isSelected && (
+                                                                    <div className="absolute -top-1 -right-1 h-4 w-4 bg-blue-500 rounded-full flex items-center justify-center">
+                                                                        <Check className="h-2.5 w-2.5 text-white" />
+                                                                    </div>
+                                                                )}
+                                                                {isEquipped && !isSelected && (
+                                                                    <div className="absolute -bottom-1 -right-1 px-1 py-0.5 bg-green-500/90 text-[8px] text-white rounded-full font-bold">
+                                                                        EQUIPPED
+                                                                    </div>
+                                                                )}
+                                                                {isPurchased && (
+                                                                    <div className="absolute -top-0.5 -left-0.5 w-2 h-2 bg-amber-500 rounded-full border border-background" />
+                                                                )}
                                                             </button>
                                                         );
                                                     })}

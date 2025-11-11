@@ -1,8 +1,8 @@
 import { db } from "@/db";
-import {  users, videoRatings, videos, videoViews } from "@/db/schema";
+import {  users, videoRatings, videos, videoViews, userAssets, assets } from "@/db/schema";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
-import { desc,eq, getTableColumns, inArray, sql } from "drizzle-orm";
+import { desc,eq, getTableColumns, inArray, sql, and } from "drizzle-orm";
 import z from "zod";
 
 export const usersRouter = createTRPCRouter({
@@ -84,6 +84,69 @@ export const usersRouter = createTRPCRouter({
 
     return { userVideos,  };
   }),
+
+  // Equip an asset (must be owned by user)
+  equipAsset: protectedProcedure
+    .input(z.object({ 
+      assetId: z.string().uuid().nullable() // null to unequip
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const { assetId } = input;
+      const userId = ctx.user.id;
+
+      // If equipping an asset, verify user owns it
+      if (assetId) {
+        const [ownership] = await db
+          .select()
+          .from(userAssets)
+          .where(and(
+            eq(userAssets.userId, userId),
+            eq(userAssets.assetId, assetId)
+          ));
+
+        if (!ownership) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't own this asset"
+          });
+        }
+      }
+
+      // Update user's equipped asset
+      const [updatedUser] = await db
+        .update(users)
+        .set({ equippedAssetId: assetId })
+        .where(eq(users.id, userId))
+        .returning();
+
+      return updatedUser;
+    }),
+
+  // Get user's currently equipped asset
+  getEquippedAsset: baseProcedure
+    .input(z.object({ userId: z.string().uuid() }))
+    .query(async ({ input }) => {
+      const { userId } = input;
+
+      const [user] = await db
+        .select({
+          equippedAssetId: users.equippedAssetId
+        })
+        .from(users)
+        .where(eq(users.id, userId));
+
+      if (!user || !user.equippedAssetId) {
+        return null;
+      }
+
+      // Fetch the actual asset details
+      const [asset] = await db
+        .select()
+        .from(assets)
+        .where(eq(assets.assetId, user.equippedAssetId));
+
+      return asset || null;
+    }),
 
   // getAssetsByUser
 

@@ -28,16 +28,25 @@ const renderIcon = (index: number, size: number) => {
 // Helper function to determine which icon to show based on user role/status
 export const getUserIcons = (userId: string, size:number) => {
 
-    const { data } = trpc.assets.getAssetsByUserId.useQuery({ userId: userId });
+    // Only fetch the equipped asset instead of all owned assets
+    // Add refetchOnWindowFocus and refetchOnMount to ensure updates are caught
+    const { data: equippedAsset } = trpc.users.getEquippedAsset.useQuery(
+        { userId: userId },
+        {
+            refetchOnWindowFocus: false,
+            refetchOnMount: true,
+            staleTime: 0, // Consider data stale immediately to allow refetch
+        }
+    );
+
+    // Only render if user has an equipped asset
+    if (!equippedAsset) {
+        return null;
+    }
 
     return (
         <>
-            {data?.map((icon) => (
-                renderIcon(icon.iconNumber,size)
-            ))
-            }
+            {renderIcon(equippedAsset.iconNumber, size)}
         </>
     )
-    // console.log(user,isCommentOwner)
-    // return <Zap className="w-3 h-3 text-gray-400" />;
 };
