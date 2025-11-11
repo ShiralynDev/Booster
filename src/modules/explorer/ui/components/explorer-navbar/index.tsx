@@ -51,7 +51,7 @@ const NavItem = ({
 
 export const ExplorerNavBar = () => {
 
-  
+
   const [isLoading, setIsLoading] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -81,20 +81,19 @@ export const ExplorerNavBar = () => {
   });
   const userId = user?.id;
   const { data: myXp } = trpc.xp.getXpByUserId.useQuery(
-  { userId: userId! },
-  {
-    enabled: !!userId,           // dont fetch until there is a user
-    staleTime: 60_000,           // reduce refetching
-    refetchOnWindowFocus: false, // optional (suggested by companion)
-  }
-);
+    { userId: userId! },
+    {
+      enabled: !!userId,
+      staleTime: 6000,           // reduce refetching
+      refetchOnWindowFocus: false, // optional 
+    }
+  );
 
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 h-16 bg-background backdrop-blur-md flex items-center px-4 border-b border-border/50 transition-all z-50 ${
-        isScrolled ? "shadow-sm" : ""
-      }`}
+      className={`fixed top-0 left-0 right-0 h-16 bg-background backdrop-blur-md flex items-center px-4 border-b border-border/50 transition-all z-50 ${isScrolled ? "shadow-sm" : ""
+        }`}
     >
       <div className="flex items-center justify-between w-full">
         {/* Menu and logo */}

@@ -120,11 +120,10 @@ const ExplorerSkeleton = () => {
 export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
     // const [selectedCategory] = useState(categoryId || "all");
 
-    const [selectedCategory ] = useState();
-    console.log(categoryId)
-
+    const [selectedCategory, setSelectedCategory] = useState(categoryId);
+    console.log("categoryId", categoryId)
     const [data, query] = trpc.explorer.getMany.useSuspenseInfiniteQuery(
-        { limit: DEFAULT_LIMIT * 2 },
+        { limit: DEFAULT_LIMIT * 2 ,categoryId},
         { getNextPageParam: (lastPage) => lastPage.nextCursor }
     );
 
@@ -558,7 +557,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                                                         whileHover={{ scale: 1.1 }}
                                                         className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1 rounded-lg text-xs font-semibold shadow-lg backdrop-blur-sm"
                                                     >
-                                                        {video.categoryId}
+                                                        {video.category?.name}
                                                     </motion.div>
                                                 )}
 

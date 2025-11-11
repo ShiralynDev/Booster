@@ -17,8 +17,9 @@ export const NotificationBell = () => {
         undefined,
         {
             enabled: !!clerkUserId,
-            refetchInterval: 30000, // Refetch every 30 seconds
-        }
+            //TODO: change or optimize
+            refetchInterval: 30000, // Refetch every 1min 30 seconds
+        },
     );
 
     // Close dropdown when clicking outside
@@ -47,6 +48,8 @@ export const NotificationBell = () => {
 
     if (!clerkUserId) return null;
 
+  
+
     return (
         <div className="relative" ref={dropdownRef}>
             <button
@@ -59,10 +62,10 @@ export const NotificationBell = () => {
                 aria-label="Notifications"
             >
                 <Mail className="size-5" />
-                {unreadCount && unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
-                        {unreadCount > 99 ? '99+' : unreadCount}
-                    </span>
+                {!!unreadCount && unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                    {unreadCount && unreadCount > 99 ? '99+' : ""}
+                </span>
                 )}
             </button>
 

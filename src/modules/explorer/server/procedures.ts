@@ -3,6 +3,7 @@ import { comments, userFollows, users, videoRatings, videos, videoViews } from "
 import { baseProcedure, createTRPCRouter } from "@/trpc/init";
 import { and, avg, count, desc, eq, getTableColumns, inArray, isNotNull, lt, not, or, sql, sum } from "drizzle-orm";
 import z from "zod";
+import { categories } from "../../../db/schema";
 
 export const explorerRouter = createTRPCRouter({
     getMany: baseProcedure
@@ -13,10 +14,11 @@ export const explorerRouter = createTRPCRouter({
                     score: z.number().nullish(),
                 }).nullish(),
                 limit: z.number().min(1).max(100),
+                categoryId: z.string().uuid().nullish(),
             })
         )
         .query(async ({ ctx, input }) => {
-            const { cursor, limit } = input;
+            const { cursor, limit,categoryId } = input;
             const { clerkUserId } = ctx;
 
             let userId;
@@ -90,6 +92,10 @@ export const explorerRouter = createTRPCRouter({
                 );
             }
 
+            if(categoryId){
+                whereParts.push( eq(videos.categoryId,categoryId) )
+            }
+
 
             const rows = await db
                 .with(viewerFollow, ratingStats, videoViewsStats)
@@ -113,7 +119,9 @@ export const explorerRouter = createTRPCRouter({
                         )   * COALESCE(SQRT(${users.boostPoints} * 1000) / 1000, 0)
                             `.as('score'),
 
-
+                    category: {
+                        ...getTableColumns(categories),
+                    },
                     
                     videoRatings: ratingStats.ratingCount,
                     averageRating: ratingStats.averageRating,
@@ -124,6 +132,7 @@ export const explorerRouter = createTRPCRouter({
                 .leftJoin(ratingStats, eq(ratingStats.videoId, videos.id))
                 .leftJoin(videoViewsStats, eq(videoViewsStats.videoId, videos.id))
                 .leftJoin(commentsAgg, eq(commentsAgg.videoId, videos.id))
+                .leftJoin(categories,eq(videos.categoryId,categories.id))
                 .where(and(...whereParts))
                 .orderBy(desc(sql`score`))
                 .limit(limit + 1); 
