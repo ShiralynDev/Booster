@@ -218,7 +218,7 @@ export const VideoSectionSuspense = ({ videoId, next, prev }: Props) => {
         <div className="h-full w-full flex flex-col overflow-hidden">
             {/* FIXED VIDEO PLAYER */}
             <motion.div
-                className={cn("flex-none relative rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm min-h-[50%]")}
+                className={cn("flex-none relative rounded-2xl overflow-hidden shadow-sm min-h-[50%]")}
                 initial={false}
                 animate={{ height: commentsOpen ? '50%' : '77%' }}
                 transition={{ duration: 0.35, ease: 'easeInOut' }}
@@ -274,21 +274,21 @@ export const VideoSectionSuspense = ({ videoId, next, prev }: Props) => {
 
                             <>
                                 <motion.div
-                                    className="hidden sm:absolute sm:block sm:left-4 sm:top-[40%] z-40"
+                                    className="hidden sm:absolute sm:block sm:left-8 sm:top-1/2 sm:-translate-y-1/2 z-40"
                                     onClick={prev}
                                 >
 
-                                    <div className="bg-transparent rounded-full p-3 hover:cursor-pointer hover:scale-105 dark:hover:bg-white/30 hover:bg-white/20 transition-all duration-200 ease-in-out">
-                                        <ChevronLeft className="h-6 w-6 text-white dark:text-white" />
+                                    <div className="bg-transparent rounded-full p-4 hover:cursor-pointer hover:scale-105 dark:hover:bg-white/30 hover:bg-white/20 transition-all duration-200 ease-in-out">
+                                        <ChevronLeft className="h-8 w-8 text-white dark:text-white" />
                                     </div>
                                 </motion.div>
 
                                 <motion.div
-                                    className="hidden sm:block sm:absolute right-4 top-[40%] z-40"
+                                    className="hidden sm:block sm:absolute right-8 top-1/2 -translate-y-1/2 z-40"
                                     onClick={next}
                                 >
-                                    <div className="bg-transparent rounded-full p-3 hover:cursor-pointer hover:scale-105 dark:hover:bg-white/30 hover:bg-white/20 transition-all duration-200 ease-in-out">
-                                        <ChevronRight className="h-6 w-6 text-white dark:text-white" />
+                                    <div className="bg-transparent rounded-full p-4 hover:cursor-pointer hover:scale-105 dark:hover:bg-white/30 hover:bg-white/20 transition-all duration-200 ease-in-out">
+                                        <ChevronRight className="h-8 w-8 text-white dark:text-white" />
                                     </div>
                                 </motion.div>
                             </>
