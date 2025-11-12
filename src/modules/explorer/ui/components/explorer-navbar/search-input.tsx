@@ -14,19 +14,15 @@ export const SearchInput = () => {
     const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const url = new URL("/search", process.env.NEXT_PUBLIC_VERCEL_URL || "http://localhost:3000")
         const newQuery = value.trim();
 
-
-        url.searchParams.set("query", encodeURIComponent(newQuery))
-
         if (newQuery === "") {
-            url.searchParams.delete("query")
+            router.push("/search")
+        } else {
+            router.push(`/search?query=${encodeURIComponent(newQuery)}`)
         }
 
         setValue(newQuery)
-
-        router.push(url.toString())
     }
 
     return (

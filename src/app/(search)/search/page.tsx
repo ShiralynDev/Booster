@@ -16,6 +16,7 @@ const Page = async ({searchParams}: Props) => {
     const {query} = await searchParams;
 
     void trpc.search.getManyByQuery.prefetchInfinite({limit: DEFAULT_LIMIT, query})
+    void trpc.search.getChannelsByQuery.prefetch({limit: 5, query})
 
     return (
         <HydrateClient>

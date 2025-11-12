@@ -9,6 +9,12 @@ import { UserAvatar } from "@/components/user-avatar"
 import { Rating, RatingButton } from "@/components/ui/shadcn-io/rating"
 import { InfiniteScroll } from "@/components/infinite-scroll"
 import { ErrorBoundary } from "react-error-boundary"
+import Link from "next/link"
+import { SubButton } from "@/modules/subscriptions/ui/components/sub-button"
+import { useFollow } from "@/modules/follows/hooks/follow-hook"
+import { Spinner } from "@/components/ui/shadcn-io/spinner"
+import { Button } from "@/components/ui/button"
+import { useAuth } from "@clerk/nextjs"
 
 interface SearchViewProps {
     query: string | undefined
@@ -18,7 +24,14 @@ interface SearchViewProps {
 export const SearchView = ({ query }: SearchViewProps) => {
     return (
         <Suspense fallback={<SearchViewSkeleton />}>
-            <ErrorBoundary fallback={<p>Error</p>}>
+            <ErrorBoundary fallback={
+                <div className="min-h-screen bg-[#212121] text-white flex items-center justify-center">
+                    <div className="text-center">
+                        <p className="text-xl text-red-500 mb-2">Error loading search results</p>
+                        <p className="text-gray-400">Please try again</p>
+                    </div>
+                </div>
+            }>
                 <SearchViewSuspense query={query} />
             </ErrorBoundary>
         </Suspense>
@@ -92,12 +105,90 @@ const SearchViewSkeleton = () => {
     )
 }
 
+interface ChannelCardProps {
+    channel: {
+        id: string
+        clerkId: string
+        name: string
+        imageUrl: string
+        followsCount: number
+        videoCount: number
+        viewerIsFollowing?: boolean
+    }
+}
+
+const ChannelCard = ({ channel }: ChannelCardProps) => {
+    const { userId: viewerClerkId } = useAuth()
+    const isOwnChannel = viewerClerkId === channel.clerkId
+    
+    const { onClick, isPending, isFollowing } = useFollow({
+        userId: channel.id,
+        isFollowing: channel.viewerIsFollowing ?? false,
+    })
+
+    return (
+        <div className="bg-[#333333] rounded-xl p-6 border border-gray-700 hover:border-yellow-400/30 transition-all duration-300 hover:shadow-2xl">
+            <div className="flex items-start gap-4 mb-4">
+                <Link href={`/users/${channel.id}`}>
+                    <UserAvatar
+                        imageUrl={channel.imageUrl}
+                        name={channel.name}
+                        userId={channel.id}
+                        disableLink={true}
+                        size="lg"
+                    />
+                </Link>
+                <div className="flex-1 min-w-0">
+                    <Link href={`/users/${channel.id}`}>
+                        <h3 className="text-lg font-semibold truncate hover:text-yellow-400 transition-colors">
+                            {channel.name}
+                        </h3>
+                    </Link>
+                    <div className="flex items-center gap-2 text-sm text-gray-400 mb-3">
+                        <span>{compactNumber(channel.followsCount)} followers</span>
+                        <span>•</span>
+                        <span>{channel.videoCount} videos</span>
+                    </div>
+                    {isOwnChannel ? (
+                        <Link href={`/users/${channel.id}`} className="w-full block">
+                            <Button
+                                size="sm"
+                                className="w-full rounded-full"
+                                variant="outline"
+                            >
+                                View My Channel
+                            </Button>
+                        </Link>
+                    ) : isPending ? (
+                        <div className="flex justify-center">
+                            <Spinner variant="circle" size="sm" />
+                        </div>
+                    ) : (
+                        <SubButton
+                            onClick={onClick}
+                            disabled={isPending}
+                            isSubscribed={isFollowing}
+                            size="sm"
+                            className="w-full"
+                        />
+                    )}
+                </div>
+            </div>
+        </div>
+    )
+}
+
 export const SearchViewSuspense = ({ query }: SearchViewProps) => {
 
     const [data, resultQuery] = trpc.search.getManyByQuery.useSuspenseInfiniteQuery(
         { query, limit: DEFAULT_LIMIT },
         { getNextPageParam: (lastPage) => lastPage.nextCursor }
     )
+
+    const channelsQuery = trpc.search.getChannelsByQuery.useQuery({
+        query,
+        limit: 5 // Show top 5 matching channels
+    })
 
     // Use actual data when available, otherwise use mock data
     const videos = useMemo(() => {
@@ -108,13 +199,26 @@ export const SearchViewSuspense = ({ query }: SearchViewProps) => {
         );
     }, [data]);
 
+    const channels = channelsQuery.data?.items ?? [];
+
+    console.log('🎨 Search View - Query:', query);
+    console.log('🎨 Search View - Videos:', videos.length);
+    console.log('🎨 Search View - Channels:', channels.length);
+    console.log('🎨 Search View - Channels Loading:', channelsQuery.isLoading);
+    console.log('🎨 Search View - Channels Error:', channelsQuery.error);
+    
+    // Show error message if channels query fails
+    if (channelsQuery.error) {
+        console.error('🎨 Channel Query Error Details:', channelsQuery.error);
+    }
+
     return (
         <div className="min-h-screen bg-[#212121] text-white">
             {/* Results Header */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-4 border-b border-gray-700">
                     <div className="text-gray-400 text-sm">
-                        {videos.length} results
+                        {videos.length} video results {channels.length > 0 && `• ${channels.length} channel${channels.length !== 1 ? 's' : ''}`}
                     </div>
                     <div className="flex items-center gap-3">
                         <span className="text-gray-300">Sort by:</span>
@@ -127,12 +231,47 @@ export const SearchViewSuspense = ({ query }: SearchViewProps) => {
                     </div>
                 </div>
 
-                {/* Video List */}
-                <div className="space-y-6">
+                {/* Channels Section */}
+                {channelsQuery.isLoading ? (
+                    <div className="mb-12">
+                        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                            <span className="text-yellow-400">Channels</span>
+                        </h2>
+                        <div className="text-gray-400">Loading channels...</div>
+                    </div>
+                ) : channelsQuery.error ? (
+                    <div className="mb-12">
+                        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                            <span className="text-yellow-400">Channels</span>
+                        </h2>
+                        <div className="text-red-500">Error loading channels: {channelsQuery.error.message}</div>
+                    </div>
+                ) : channels.length > 0 ? (
+                    <div className="mb-12">
+                        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                            <span className="text-yellow-400">Channels</span>
+                        </h2>
+                        <div className="space-y-6">
+                            {channels.map((channel) => (
+                                <ChannelCard key={channel.id} channel={channel} />
+                            ))}
+                        </div>
+                    </div>
+                ) : null}
+
+                {/* Videos Section */}
+                {videos.length > 0 && (
+                    <div>
+                        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                            <span className="text-yellow-400">Videos</span>
+                        </h2>
+                        {/* Video List */}
+                        <div className="space-y-6">
                     {videos.map((video) => (
-                        <div
+                        <Link
                             key={video.id}
-                            className="flex flex-col lg:flex-row bg-[#333333] rounded-xl overflow-hidden border border-gray-700 hover:border-yellow-400/30 transition-all duration-300 hover:shadow-2xl "
+                            href={`/explorer/videos/${video.id}`}
+                            className="flex flex-col lg:flex-row bg-[#333333] rounded-xl overflow-hidden border border-gray-700 hover:border-yellow-400/30 transition-all duration-300 hover:shadow-2xl"
                         >
                             {/* Thumbnail */}
                             <div className="relative lg:w-96 xl:w-[400px] h-48 lg:h-56 flex-shrink-0">
@@ -157,7 +296,7 @@ export const SearchViewSuspense = ({ query }: SearchViewProps) => {
                                         <span>{compactDate(video.createdAt)}</span>
                                     </div>
                                     <div className="flex items-center gap-3 mb-3">
-                                        <UserAvatar imageUrl={video.user.imageUrl} name={video.user.name} userId={video.user.id} />
+                                        <UserAvatar imageUrl={video.user.imageUrl} name={video.user.name} userId={video.user.id} disableLink={true} />
                                         <span className="font-medium">{video.user.name}</span>
                                         {/* TODO: verified */}
                                         {/* {video.channel.verified && (
@@ -181,12 +320,22 @@ export const SearchViewSuspense = ({ query }: SearchViewProps) => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
                     ))}
                 </div>
 
                 {/* Pagination */}
                 <InfiniteScroll isManual={false} hasNextPage={resultQuery.hasNextPage} isFetchingNextPage={resultQuery.isFetchingNextPage} fetchNextPage={resultQuery.fetchNextPage} />
+                    </div>
+                )}
+
+                {/* No Results Message */}
+                {videos.length === 0 && channels.length === 0 && (
+                    <div className="text-center py-16">
+                        <div className="text-gray-400 text-lg mb-2">No results found</div>
+                        <p className="text-gray-500 text-sm">Try adjusting your search terms</p>
+                    </div>
+                )}
             </div>
         </div>
     )

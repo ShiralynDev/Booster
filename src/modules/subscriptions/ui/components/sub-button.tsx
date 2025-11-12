@@ -17,8 +17,14 @@ export const SubButton = ({
     return (
         <Button
             size={size}
-            variant={isSubscribed ? "ghost" : "default"}
-            className={cn(`rounded-full ${isSubscribed ? "opacity-50" : ""}`,className)}
+            variant={isSubscribed ? "default" : "default"}
+            className={cn(
+                `rounded-full`,
+                isSubscribed 
+                    ? "bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700" 
+                    : "bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600",
+                className
+            )}
             onClick={onClick}
         >
 
