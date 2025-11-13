@@ -232,6 +232,7 @@ export const assets = pgTable("assets", {
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
     iconNumber: integer("icon_number").notNull().default(0),
+    requiredLevel: integer("required_level").default(0), // Level required to unlock this reward
 })
 
 export const userAssets = pgTable("user_assets", {

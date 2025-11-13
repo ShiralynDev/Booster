@@ -22,6 +22,7 @@ import Link from "next/link";
 import { LevelUpBadge } from "../components/level-up-badge";
 import { LevelUpAnimation } from "../components/level-up-animation";
 import { BoosterRankings } from "../components/boosters-rankings";
+import { RewardsView } from "@/modules/rewards/views/rewards-views";
 import { useFollow } from "@/modules/follows/hooks/follow-hook";
 import { SubButton } from "@/modules/subscriptions/ui/components/sub-button";
 import { Spinner } from "@/components/ui/shadcn-io/spinner";
@@ -96,7 +97,7 @@ export const UsersView = ({ userId }: Props) => {
   // Handle navigation to specific tab via URL hash
   useEffect(() => {
     const hash = window.location.hash.substring(1); // Remove the # symbol
-    if (hash === "community" || hash === "about") {
+    if (hash === "community" || hash === "about" || hash === "rewards") {
       setActiveTab(hash);
     }
   }, []);
@@ -380,7 +381,7 @@ export const UsersView = ({ userId }: Props) => {
 
         {/* Content Tabs */}
         <div className="flex flex-wrap gap-2 my-6 bg-muted/50 p-2 rounded-xl border border-border w-fit">
-          {["videos", "community", "about"].map((tab) => (
+          {["videos", "community", "rewards", "about"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -435,6 +436,17 @@ export const UsersView = ({ userId }: Props) => {
         )}
 
         {activeTab === "community" && <BoosterRankings userId={userId} />}
+
+        {activeTab === "rewards" && <RewardsView userId={userId} />}
+
+        {activeTab === "about" && (
+          <div className="bg-card rounded-xl p-6 border border-border">
+            <h3 className="text-lg font-semibold mb-4">About</h3>
+            <p className="text-muted-foreground">
+              {user.about || "No description available."}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Personalize Modal */}
