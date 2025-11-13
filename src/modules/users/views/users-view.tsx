@@ -14,6 +14,7 @@ import {
   Sparkles,
   StarIcon,
   Settings,
+  MessageSquare,
 } from "lucide-react";
 import { XpCard } from "@/modules/home/ui/components/xp-card";
 import { VideoThumbnail } from "@/modules/videos/ui/components/video-thumbnail";
@@ -27,6 +28,7 @@ import { Spinner } from "@/components/ui/shadcn-io/spinner";
 import { getUserIcons } from "@/modules/market/components/assetIcons/functions/get-user-icons";
 import { useAuth } from "@clerk/nextjs";
 import { PersonalizeModal } from "../components/personalize-modal";
+import { useNotificationDropdown } from "@/contexts/notification-context";
 
 interface Props {
   userId: string;
@@ -46,6 +48,7 @@ const diff_time = (date?: Date | string | null): number => {
 
 export const UsersView = ({ userId }: Props) => {
   const { userId: clerkUserId } = useAuth();
+  const { openMessages } = useNotificationDropdown();
   const [user] = trpc.users.getByUserId.useSuspenseQuery({ userId });
   const [followers] = trpc.follows.getFollowersByUserId.useSuspenseQuery({ userId, });
   const [userVideos] = trpc.users.getVideosByUserId.useSuspenseQuery({ userId, });
@@ -68,6 +71,12 @@ export const UsersView = ({ userId }: Props) => {
     enabled: !!clerkUserId,
   });
   const isOwnProfile = currentUser?.id === userId;
+
+  // Check if users can message each other (mutual follows)
+  const { data: mutualFollows } = trpc.messages.getMutualFollows.useQuery(undefined, {
+    enabled: !!clerkUserId && !isOwnProfile,
+  });
+  const canMessage = mutualFollows?.some(user => user.id === userId) || false;
 
   const utils = trpc.useUtils();
 
@@ -280,7 +289,7 @@ export const UsersView = ({ userId }: Props) => {
                   XP for next level
                 </span>
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
 
                 {isOwnProfile ? (
                   // Show "Personalize Channel" button for own profile
@@ -310,6 +319,16 @@ export const UsersView = ({ userId }: Props) => {
                       />
                     )}
                   </>
+                )}
+
+                {!isOwnProfile && canMessage && (
+                  <Button
+                    onClick={() => openMessages(userId)}
+                    className="bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold py-2 px-6 rounded-full hover:opacity-90 transition-all hover:scale-105 active:scale-95"
+                  >
+                    <MessageSquare className="size-4 mr-2" />
+                    Message
+                  </Button>
                 )}
 
                 {!isOwnProfile && (

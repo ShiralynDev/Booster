@@ -8,6 +8,7 @@ import "./globals.css";
 
 import { TRPCProvider } from "@/trpc/client";
 import { ThemeProvider } from "@/components/theme-provider";
+import { NotificationProvider } from "@/contexts/notification-context";
 
 const montserrat = Montserrat({ 
     subsets: ["latin"], 
@@ -59,9 +60,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <body className={`${montserrat.className} antialiased`}>
                     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
                         <TRPCProvider>
-                            {children}
-                            <Toaster richColors closeButton />
-                            <Analytics />
+                            <NotificationProvider>
+                                {children}
+                                <Toaster richColors closeButton />
+                                <Analytics />
+                            </NotificationProvider>
                         </TRPCProvider>
                     </ThemeProvider>
                 </body>

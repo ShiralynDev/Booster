@@ -2,13 +2,14 @@
 
 import { Mail } from "lucide-react";
 import { trpc } from "@/trpc/client";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { NotificationDropdown } from "./notification-dropdown";
 import { useAuth } from "@clerk/nextjs";
+import { useNotificationDropdown } from "@/contexts/notification-context";
 
 export const NotificationBell = () => {
-    const [isOpen, setIsOpen] = useState(false);
+    const { isOpen, close, openNotifications } = useNotificationDropdown();
     const dropdownRef = useRef<HTMLDivElement>(null);
     const { userId: clerkUserId } = useAuth();
 
@@ -22,11 +23,22 @@ export const NotificationBell = () => {
         },
     );
 
+    // Get unread messages count
+    const { data: unreadMessagesCount, refetch: refetchMessages } = trpc.messages.getUnreadCount.useQuery(
+        undefined,
+        {
+            enabled: !!clerkUserId,
+            refetchInterval: 30000, // Refetch every 30 seconds
+        },
+    );
+
+    const totalUnread = (unreadCount || 0) + (unreadMessagesCount || 0);
+
     // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
+                close();
             }
         };
 
@@ -37,14 +49,15 @@ export const NotificationBell = () => {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [isOpen]);
+    }, [isOpen, close]);
 
     // Refetch when dropdown opens
     useEffect(() => {
         if (isOpen) {
             refetch();
+            refetchMessages();
         }
-    }, [isOpen, refetch]);
+    }, [isOpen, refetch, refetchMessages]);
 
     if (!clerkUserId) return null;
 
@@ -53,7 +66,7 @@ export const NotificationBell = () => {
     return (
         <div className="relative" ref={dropdownRef}>
             <button
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={() => isOpen ? close() : openNotifications()}
                 className={cn(
                     "relative p-2 rounded-lg transition-colors",
                     "hover:bg-muted",
@@ -62,16 +75,16 @@ export const NotificationBell = () => {
                 aria-label="Notifications"
             >
                 <Mail className="size-5" />
-                {!!unreadCount && unreadCount > 0 && (
+                {totalUnread > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
-                    {unreadCount && unreadCount > 99 ? '99+' : unreadCount}
+                    {totalUnread > 99 ? '99+' : totalUnread}
                 </span>
                 )}
             </button>
 
             {isOpen && (
                 <NotificationDropdown 
-                    onClose={() => setIsOpen(false)}
+                    onClose={close}
                     onNotificationRead={refetch}
                 />
             )}

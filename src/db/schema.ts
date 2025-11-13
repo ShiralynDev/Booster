@@ -260,3 +260,16 @@ export const notifications = pgTable("notifications", {
     createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 
+export const messages = pgTable("messages", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    senderId: uuid("sender_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    receiverId: uuid("receiver_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    content: text("content").notNull(),
+    isRead: boolean("is_read").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+})
+
+export const messageInsertSchema = createInsertSchema(messages);
+export const messageSelectSchema = createSelectSchema(messages);
+

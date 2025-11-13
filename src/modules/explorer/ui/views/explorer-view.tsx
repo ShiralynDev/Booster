@@ -499,7 +499,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.4 }}
-                        className="grid grid-cols-1 lg:grid-cols-2 gap-6 space-y-8 items-end "
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                     >
                         {videos.filter(v => !v.isFeatured).map((video, index) => (
                             <motion.div
