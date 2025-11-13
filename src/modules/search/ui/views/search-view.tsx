@@ -263,7 +263,7 @@ export const SearchViewSuspense = ({ query }: SearchViewProps) => {
                 {videos.length > 0 && (
                     <div>
                         <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                            <span className="text-yellow-400">Videos</span>
+                            <span className="text-[#ffca55]">Videos</span>
                         </h2>
                         {/* Video List */}
                         <div className="space-y-6">
