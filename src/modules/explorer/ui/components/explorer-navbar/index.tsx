@@ -104,13 +104,13 @@ export const ExplorerNavBar = () => {
             className="flex items-center p-2 rounded-md hover:bg-muted transition-colors"
           >
             <div className="flex items-center">
-              <Image
+              {/*<Image
                 src="/logo.webp"
                 alt="Logo"
                 width={30}
                 height={30}
                 className="mr-2"
-              />
+              /> */}
               <Image
                 src="/BoosterLongLogo.webp"
                 alt="Booster"
