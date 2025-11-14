@@ -1,7 +1,7 @@
 'use client';
 
 import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
-import { EarthIcon, FlameIcon, PlayIcon, ShoppingCart, Users, ShieldQuestionIcon } from "lucide-react";
+import { EarthIcon,  PlayIcon, ShoppingCart, Users, ShieldQuestionIcon } from "lucide-react";
 import { useAuth, useClerk } from "@clerk/nextjs";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -65,12 +65,12 @@ export const MainSection = () => {
                             <SidebarMenuItem key={item.title} className="relative">
                                 {/* Active state background */}
                                 {isActive && (
-                                    <div className="absolute inset-0 bg-white/10 rounded-lg border border-white/20 shadow-sm" />
+                                    <div className="absolute inset-0 bg-white/10 rounded-full border border-white/20 shadow-sm" />
                                 )}
                                 
                                 {/* Hover state background */}
                                 {isHovered && !isActive && (
-                                    <div className="absolute inset-0 bg-white/5 rounded-lg transition-all duration-200" />
+                                    <div className="absolute inset-0 bg-white/5 rounded-full transition-all duration-200" />
                                 )}
 
                                 <SidebarMenuButton
@@ -89,14 +89,14 @@ export const MainSection = () => {
                                     className={`
                                         relative
                                         transition-all duration-200
+                                        rounded-full
                                         ${isActive 
-                                            ? 'bg-white/5' 
+                                            ? 'bg-white/5 rounded-full' 
                                             : 'hover:bg-white/3'
                                         }
-                                        rounded-lg
                                         group
-                                        h-10 /* Fixed height for consistency */
-                                        mx-0.5 /* Add some horizontal margin */
+                                        h-10 
+                                        mx-0.5 
                                     `}
                                 >
                                     <Link 

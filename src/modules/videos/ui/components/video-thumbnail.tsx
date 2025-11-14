@@ -14,18 +14,18 @@ export const VideoThumbnail = ({imageUrl,title,previewUrl, duration}: VideoThumb
         <div className="relative group">
             {/* thumbnail wrapper */}
             <div className="relative w-full rounded-2xl aspect-video overflow-hidden">
-                <Image 
+                {/* <Image 
                 src={imageUrl ?? THUMBNAIL_FALLBACK} 
                 alt={title} 
                 fill 
                 className='size-full object-cover group-hover:opacity-0 rounded-2xl'
-                />
+                /> */}
                 <Image 
                 unoptimized={!!previewUrl}
                 src={previewUrl ?? imageUrl ?? THUMBNAIL_FALLBACK} 
                 alt='thumbnail' 
                 fill 
-                className='size-full object-cover opacity-0 group-hover:opacity-100 rounded-2xl'
+                className='size-full object-cover  rounded-2xl'
                 />
             </div>
 

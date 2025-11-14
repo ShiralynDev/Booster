@@ -88,7 +88,7 @@ const ExplorerSkeleton = () => {
                     <div className="w-24 h-12 bg-gray-200 dark:bg-gray-800 rounded-xl"></div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6">
                     {[...Array(9)].map((_, index) => (
                         <div key={index} className="group cursor-pointer relative">
                             <div className="relative bg-gray-200 dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700">
@@ -121,7 +121,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
     // const [selectedCategory] = useState(categoryId || "all");
 
     const [selectedCategory, setSelectedCategory] = useState(categoryId);
-    console.log("categoryId", categoryId)
+
     const [data, query] = trpc.explorer.getMany.useSuspenseInfiniteQuery(
         { limit: DEFAULT_LIMIT * 2, categoryId },
         { getNextPageParam: (lastPage) => lastPage.nextCursor }
@@ -136,7 +136,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
     return (
         <div className="overflow-hidden mb-10 px-4 pt-2.5 flex flex-col gap-y-12 sm:ml-16">
             {/* Enhanced Header Section */}
-            <motion.div
+            {/* <motion.div
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
@@ -149,12 +149,12 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3, duration: 0.6 }}
-                        className="text-5xl md:text-7xl font-bold text-white mt-5 pt-5 leading-tight"
+                        className="text-5xl md:text-7xl font-bold text-textprimary mt-2 pt-2 leading-tight"
                     >
                         Explorer
                     </motion.h1>
                 </div>
-            </motion.div>
+            </motion.div> */}
 
 
 
@@ -163,32 +163,32 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.6 }}
-                className="relative"
+                className="relative mt-5"
             >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/5 to-transparent blur-xl transform scale-110" />
                 <div className="relative z-10">
-                    <CategoriesSection categoryId={selectedCategory || "all"} />
+                    <CategoriesSection categoryId={selectedCategory || "all"} setSelectedCategory={setSelectedCategory}/>
                 </div>
             </motion.div>
 
             {/* Enhanced Featured Video Section */}
             {featuredVideo && (
                 <motion.div
-                    initial={{ opacity: 0, y: 40 }}
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6, duration: 0.7 }}
+                    transition={{  duration: 0.2 }}
                     className="relative w-full group"
                 >
                     {/* Animated Background Glow - Outside container */}
-                    <div className="absolute inset-0 rounded-3xl blur-lg opacity-0 group-hover:opacity-100 bg-[#ffca55] transition-opacity duration-500 pointer-events-none -z-10" />
+                    <div className="absolute inset-0 rounded-3xl blur-lg opacity-0  bg-secondary transition-opacity duration-500 pointer-events-none -z-10" />
 
-                    <div className="relative bg-[#212121] rounded-3xl p-10 shadow-2xl overflow-hidden">
+                    <div className="relative shadow-2xl overflow-hidden">
                         {/* Header */}
                         <div className="flex items-center justify-between mb-6">
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-3">
                                     <motion.div
-                                        className="w-3 h-10 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full shadow-lg"
+                                        className="w-3 h-10 bg-gradient-to-b from-primary to-secondary rounded-full shadow-lg"
                                     />
                                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Earn XP with Advertisement</h2>
                                 </div>
@@ -226,7 +226,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                                                     </h3>
                                                     <motion.div
                                                         whileHover={{ scale: 1.1 }}
-                                                        className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold shadow-lg whitespace-nowrap"
+                                                        className="bg-gradient-to-r from-primary to-secondary text-textprimary px-3 py-1.5 rounded-xl text-xs font-semibold shadow-lg whitespace-nowrap"
                                                     >
                                                         Featured
                                                     </motion.div>
@@ -264,7 +264,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                                                 className="flex justify-center"
                                             >
                                                 <div className="bg-white/20 backdrop-blur-md rounded-full p-3 border border-white/30">
-                                                    <Play className="w-8 h-8 text-white fill-white" />
+                                                    <Play className="w-8 h-8 text-textprimary fill-white" />
                                                 </div>
                                             </motion.div>
                                         </div>
@@ -294,12 +294,12 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                                     <div className="absolute inset-0 p-4 flex flex-col justify-between">
                                         <div>
                                             <div className="flex items-start justify-between mb-2">
-                                                <h3 className="text-xl font-bold text-white line-clamp-2 pr-2 flex-1 leading-tight">
+                                                <h3 className="text-xl font-bold text-whiteline-clamp-2 pr-2 flex-1 leading-tight">
                                                     Coming Soon - Premium Content
                                                 </h3>
                                                 <motion.div
                                                     whileHover={{ scale: 1.1 }}
-                                                    className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold shadow-lg whitespace-nowrap"
+                                                    className="bg-gradient-to-r from-primary to-secondary text-textprimary px-3 py-1.5 rounded-xl text-xs font-semibold shadow-lg whitespace-nowrap"
                                                 >
                                                     Featured
                                                 </motion.div>
@@ -365,7 +365,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                                                 <h3 className="text-xl font-bold text-white line-clamp-2 pr-2 flex-1 leading-tight">
                                                     Exclusive Tutorial Series
                                                 </h3>
-                                                <motion.div whileHover={{ scale: 1.1 }} className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold shadow-lg whitespace-nowrap">
+                                                <motion.div whileHover={{ scale: 1.1 }} className="bg-gradient-to-r from-amber-500 to-orange-500 text-textprimary px-3 py-1.5 rounded-xl text-xs font-semibold shadow-lg whitespace-nowrap">
                                                     Featured
                                                 </motion.div>
                                             </div>
@@ -416,7 +416,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                                                 <h3 className="text-xl font-bold text-white line-clamp-2 pr-2 flex-1 leading-tight">
                                                     Master Class in Design
                                                 </h3>
-                                                <motion.div whileHover={{ scale: 1.1 }} className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold shadow-lg whitespace-nowrap">
+                                                <motion.div whileHover={{ scale: 1.1 }} className="bg-gradient-to-r from-primary to-secondary text-textprimary px-3 py-1.5 rounded-xl text-xs font-semibold shadow-lg whitespace-nowrap">
                                                     Featured
                                                 </motion.div>
                                             </div>
@@ -454,19 +454,19 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
             <motion.div
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.7 }}
+                transition={{ delay: 0.2, duration: 0.7 }}
                 className="relative"
             >
                 {/* Section Header */}
-                <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-4">
                         <motion.div
                             animate={{ scale: [1, 1.1, 1] }}
                             transition={{ duration: 2, repeat: Infinity }}
-                            className="w-2 h-12 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full shadow-lg"
+                            className="w-2 h-12 bg-gradient-to-b from-primary to-secondary rounded-full shadow-lg"
                         />
                         <div>
-                            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+                            <h2 className="text-3xl font-bold text-gray-900 dark:text-white ">
                                 {selectedCategory === "all" ? "Trending Videos" : `${selectedCategory ?? "All"} Videos`}
                             </h2>
                             {/* <p className="text-gray-600 dark:text-gray-400 mt-1 flex items-center gap-2">
@@ -498,22 +498,22 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 0.4 }}
-                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                        transition={{ duration: 0.2 }}
+                        className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6"
                     >
                         {videos.filter(v => !v.isFeatured).map((video, index) => (
                             <motion.div
                                 key={video.id}
-                                initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                transition={{ duration: 0.3, delay: index * 0.1 }}
+                                initial={{ opacity: 0, y: 30,  }}
+                                animate={{ opacity: 1, y: 0,  }}
+                                transition={{ duration: 0.3, delay: Math.floor(((index)/4)) * 0.5 }}
                                 className="group cursor-pointer relative"
                             >
                                 <Link href={`/explorer/videos/${video.id}`}>
                                     {/* Enhanced Hover Glow */}
-                                    <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-orange-400/20 rounded-2xl blur-md opacity-0 " />
+                                    <div className="absolute inset-0 bg-gradient-to-r  rounded-2xl blur-md opacity-0 " />
 
-                                    <div className="relative bg-transparent  rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl">
+                                    <div className="relative bg-transparent  rounded-2xl overflow-hidden">
                                         {/* Video Thumbnail */}
                                         <div className="relative aspect-video overflow-hidden ">
                                             <VideoThumbnail
@@ -524,14 +524,14 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                                             />
 
                                             {/* Enhanced Overlay */}
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                            {/* <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" /> */}
 
                                             {/* Enhanced Video Info Overlay */}
                                             <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
-                                                {video.categoryId && (
+                                                {video.categoryId && !selectedCategory && (
                                                     <motion.div
                                                         whileHover={{ scale: 1.1 }}
-                                                        className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1 rounded-lg text-xs font-semibold shadow-lg backdrop-blur-sm"
+                                                        className="bg-gradient-to-r from-primary to-secondary text-textprimary px-3 py-1 rounded-lg text-xs font-semibold shadow-lg backdrop-blur-sm"
                                                     >
                                                         {video.category?.name}
                                                     </motion.div>
@@ -624,6 +624,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
             </motion.div>
 
             <InfiniteScroll
+            
                 isManual={false}
                 hasNextPage={query.hasNextPage}
                 isFetchingNextPage={query.isFetchingNextPage}

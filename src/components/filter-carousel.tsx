@@ -16,7 +16,7 @@ import { Skeleton } from "./ui/skeleton";
 interface FilterCarouselProps {
     value?: string | null;
     isLoading?: boolean;
-    onSelect?: (value: string | null) => void;
+    onSelect?: (value: string | null, label: string | null) => void;
     data: {
         value: string;
         label: string;
@@ -32,6 +32,7 @@ export const FilterCarousel = ({
     const [api, setApi] = useState<CarouselApi>();
     const [current, setCurrent] = useState(0);
     const [count, setCount] = useState(0);
+    const [active,setActive] = useState("");
 
     useEffect(() => {
         if (!api) return;
@@ -63,13 +64,13 @@ export const FilterCarousel = ({
                 <CarouselContent className="-ml-3">
                     {!isLoading && (
                         <CarouselItem
-                            onClick={() => onSelect?.(null)}
+                            onClick={() => {onSelect?.(null,null);setActive("")}}
                             className="pl-3 basis-auto"
                         >
                             <Badge
                                 variant={!value ? "default" : "secondary"}
                                 className={cn(
-                                    "rounded-lg px-3 py-1 cursor-pointer whitespace-nowrap text-sm",
+                                    "rounded-2xl px-3 py-1 cursor-pointer whitespace-nowrap text-sm",
                                     !value ? "bg-[#333333] text-white hover:bg-[#333333]/90" : "bg-[#333333] text-white hover:bg-[#333333]/80"
                                 )}
                             >
@@ -80,7 +81,7 @@ export const FilterCarousel = ({
                     {isLoading &&
                         Array.from({ length: 14 }).map((_, index) => (
                             <CarouselItem key={index} className="pl-3 basis-auto">
-                                <Skeleton className="rounded-lg px-3 py-1 h-full text-sm w-[100px] font-semibold ">
+                                <Skeleton className="rounded-3xl px-3 py-1 h-full text-sm w-[100px] font-semibold ">
                                     &nbsp;
                                 </Skeleton>
                             </CarouselItem>
@@ -90,13 +91,13 @@ export const FilterCarousel = ({
                             <CarouselItem
                                 key={item.value}
                                 className="pl-3 basis-auto"
-                                onClick={() => onSelect?.(item.value)}
+                                onClick={() => {onSelect?.(item.value,item.label);setActive(item.value)}}
                             >
                                 <Badge
                                     variant={value === item.value ? "default" : "secondary"}
                                     className={cn(
-                                        "rounded-lg px-3 py-1 cursor-pointer whitespace-nowrap text-sm",
-                                        value === item.value ? "bg-[#333333] text-white hover:bg-[#333333]/90" : "bg-[#333333] text-white hover:bg-[#333333]/80"
+                                        "rounded-2xl px-3 py-1 cursor-pointer whitespace-nowrap text-sm",
+                                        active === item.value ? "bg-gradient-to-b from-primary to-secondary text-textprimary hover:bg-[#333333]/90 " : "bg-[#333333] text-white hover:bg-[#333333]/80"
                                     )}
                                 >
                                     {item.label}

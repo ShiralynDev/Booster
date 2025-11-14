@@ -70,7 +70,7 @@ export const PersonalSection = () => {
                             <SidebarMenuItem key={item.title} className="relative">
                                 {/* Active state background with subtle animation */}
                                 {isActive && (
-                                    <div className="absolute inset-0 bg-white/10 rounded-lg border  shadow-sm backdrop-blur-sm" />
+                                    <div className="absolute inset-0 bg-white/10 rounded-3xl border  shadow-sm backdrop-blur-sm" />
                                 )}
 
                                 {/* Hover state background */}
@@ -95,12 +95,10 @@ export const PersonalSection = () => {
                                         relative
                                         transition-all duration-300 ease-out
                                         ${isActive
-                                            ? ' bg-white/5 shadow-sm'
+                                            ? ' bg-white/5 shadow-sm rounded-full'
                                             : ' hover:scale-[1.01] hover:bg-white/3'
                                         }
                                         border border-transparent
-                                        ${isActive ? '' : ''}
-                                        rounded-lg
                                         overflow-hidden
                                         group
                                         backdrop-blur-sm

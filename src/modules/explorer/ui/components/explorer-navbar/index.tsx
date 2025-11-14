@@ -7,7 +7,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { SearchInput } from "./search-input";
 import { AuthButton } from "@/modules/auth/ui/components/auth-button";
 
-import { Tv2Icon, Upload } from "lucide-react";
+import { Tv2Icon,  Video } from "lucide-react";
 import { trpc } from "@/trpc/client";
 import { useAuth, useClerk } from "@clerk/nextjs";
 import { XpIndicator } from "@/modules/xp/ui/components/xp-indicator";
@@ -140,13 +140,13 @@ export const ExplorerNavBar = () => {
 
           <NavItem clerk={clerk} userId={userId} href="/studio">
             <div className="flex items-center gap-1">
-              <Upload className="size-4" />
-              Upload
+              <Video className="size-5" />
+              
             </div>
           </NavItem>
 
-          <XpIndicator xp={myXp?.xp || 0} isLoading={isLoading} />
           <NotificationBell />
+          <XpIndicator xp={myXp?.xp || 0} isLoading={isLoading} />
           <AuthButton />
         </div>
       </div>

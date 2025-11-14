@@ -16,8 +16,6 @@ export const searchRouter = createTRPCRouter({
 
             const hasQuery = query && query.trim().length > 0;
 
-            console.log('🔍 Channel Search - Query:', query, 'Has Query:', hasQuery);
-
             if (!hasQuery) {
                 return { items: [] };
             }
@@ -130,7 +128,6 @@ export const searchRouter = createTRPCRouter({
 
             const hasQuery = query && query.trim().length > 0;
 
-            console.log('🔍 Video Search - Query:', query, 'Has Query:', hasQuery);
 
             const videoViewsStats = db.$with("video_views_stats").as(
                 db
@@ -248,7 +245,6 @@ export const searchRouter = createTRPCRouter({
 
             const items = hasMore ? data.slice(0, -1) : data;
 
-            console.log('🔍 Video Search Results:', items.length, 'videos found');
 
             const lastItem = items[items.length - 1];
             const nextCursor = hasMore

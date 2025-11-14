@@ -18,7 +18,7 @@ export default withUt({
         	montserrat: ['var(--font-montserrat)', 'sans-serif'], 
 		},
   		colors: {
-  			background: '#000000',
+  			background: '#0f0f0f',
   			foreground: 'hsl(var(--foreground))',
   			card: {
   				DEFAULT: 'hsl(var(--card))',
@@ -48,6 +48,9 @@ export default withUt({
   				DEFAULT: 'hsl(var(--destructive))',
   				foreground: 'hsl(var(--destructive-foreground))'
   			},
+			textprimary: {
+				DEFAULT: "#000000",
+			},
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',

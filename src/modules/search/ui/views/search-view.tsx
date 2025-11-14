@@ -40,7 +40,7 @@ export const SearchView = ({ query }: SearchViewProps) => {
 
 const SearchViewSkeleton = () => {
     return (
-        <div className="min-h-screen bg-[#212121] text-white">
+        <div className="min-h-screen bg-background text-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Results Header Skeleton */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-4 border-b border-gray-700">
@@ -213,7 +213,7 @@ export const SearchViewSuspense = ({ query }: SearchViewProps) => {
     }
 
     return (
-        <div className="min-h-screen bg-[#212121] text-white">
+        <div className="min-h-screen bg-background text-white">
             {/* Results Header */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-4 border-b border-gray-700">
