@@ -2,7 +2,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { CategoriesSection } from "../sections/categories-section";
 import { Play, Eye, ArrowRight, StarIcon, Calendar1, RocketIcon, Trophy } from "lucide-react";
-import { useState, useMemo, Suspense } from "react";
+import { useState, useMemo, Suspense, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { trpc } from "@/trpc/client";
 import { DEFAULT_LIMIT } from "@/constants";
 import { compactDate } from "@/lib/utils";
@@ -122,19 +123,58 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
 
     const [selectedCategory, setSelectedCategory] = useState(categoryId);
 
-    const [data, query] = trpc.explorer.getMany.useSuspenseInfiniteQuery(
-        { limit: DEFAULT_LIMIT * 2, categoryId },
-        { getNextPageParam: (lastPage) => lastPage.nextCursor }
-    );
+        const searchParams = useSearchParams();
+        const aiQuery = searchParams?.get("q") ?? undefined;
+        const isAiMode = Boolean(searchParams?.get("ai") && aiQuery);
 
-    const videos = useMemo(() => data ? data.pages.flatMap(p => p.items) : [], [data]);
-    const featuredVideo = videos.find(v => v.isFeatured);
+        // Show a brief glow when AI search starts: visible briefly then fade out
+        const [glowVisible, setGlowVisible] = useState(false);
+        const [glowFading, setGlowFading] = useState(false);
+
+        useEffect(() => {
+            let fadeTimer: ReturnType<typeof setTimeout> | undefined;
+            let hideTimer: ReturnType<typeof setTimeout> | undefined;
+
+            if (isAiMode && aiQuery) {
+                // start visible, then begin fading so total visible time <= 1000ms
+                setGlowFading(false);
+                setGlowVisible(true);
+                // start fade after 700ms
+                fadeTimer = setTimeout(() => setGlowFading(true), 600);
+                // remove glow after 1000ms
+                hideTimer = setTimeout(() => setGlowVisible(false), 1200);
+            } else {
+                // ensure cleared when leaving ai mode
+                setGlowFading(false);
+                setGlowVisible(false);
+            }
+
+            return () => {
+                if (fadeTimer) clearTimeout(fadeTimer);
+                if (hideTimer) clearTimeout(hideTimer);
+            };
+        }, [isAiMode, aiQuery]);
+
+        const [data, query] = (
+            isAiMode
+                ? trpc.explorer.aiSearch.useSuspenseInfiniteQuery(
+                        { text: aiQuery || "", limit: DEFAULT_LIMIT * 2 },
+                        { getNextPageParam: (lastPage) => lastPage.nextCursor }
+                    )
+                : trpc.explorer.getMany.useSuspenseInfiniteQuery(
+                        { limit: DEFAULT_LIMIT * 2, categoryId },
+                        { getNextPageParam: (lastPage) => lastPage.nextCursor }
+                    )
+        ) as any;
+
+    const videos = useMemo(() => (data ? (data.pages as any[]).flatMap((p: any) => p.items as any[]) : []), [data]);
+    const featuredVideo = (videos as any[]).find((v: any) => v.isFeatured);
 
 
 
 
     return (
-        <div className="overflow-hidden mb-10 px-4 pt-2.5 flex flex-col gap-y-12 sm:ml-16">
+        <div className="overflow-hidden mb-10 px-4 flex flex-col gap-y-12">
             {/* Enhanced Header Section */}
             {/* <motion.div
                 initial={{ opacity: 0, y: 40 }}
@@ -197,22 +237,28 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
 
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {/* Enhanced Video Card 1 - Real Featured Video */}
-                            <Link href={`/explorer/videos/${featuredVideo.id}`}>
+                            <Link href={`/videos/${featuredVideo.id}`}>
                                 <motion.div
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                     transition={{ type: "spring", stiffness: 300 }}
                                     className="relative group/card cursor-pointer"
                                 >
-                                    <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-transparent"
-                                    >
-                                        <VideoThumbnail
+                                    <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-transparent">
+                                        {(glowVisible || glowFading) && (
+                                            <div className={`absolute -inset-6 -z-10 pointer-events-none transition-opacity duration-300 ${glowFading ? 'opacity-0' : 'opacity-100'}`}>
+                                                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-amber-400/60 via-yellow-300/40 to-transparent animate-pulse blur-[40px] opacity-95 transform scale-105" />
+                                            </div>
+                                        )}
 
-                                            duration={featuredVideo.duration || 0}
-                                            title={featuredVideo.title}
-                                            imageUrl={featuredVideo.thumbnailUrl}
-                                            previewUrl={featuredVideo.previewUrl}
-                                        />
+                                        <div className="relative aspect-video overflow-hidden">
+                                            <VideoThumbnail
+                                                duration={featuredVideo.duration || 0}
+                                                title={featuredVideo.title}
+                                                imageUrl={featuredVideo.thumbnailUrl}
+                                                previewUrl={featuredVideo.previewUrl}
+                                            />
+                                        </div>
 
                                         {/* Enhanced Gradient Overlay */}
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
@@ -272,179 +318,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                                 </motion.div>
                             </Link>
 
-                            {/* Dummy Video Card 2 */}
-                            <motion.div
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                transition={{ type: "spring", stiffness: 300 }}
-                                className="relative group/card cursor-pointer"
-                            >
-                                <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-transparent">
-                                    <VideoThumbnail
-                                        duration={180}
-                                        title="Coming Soon - Premium Content"
-                                        imageUrl="/placeholder-thumbnail.jpg"
-                                        previewUrl={null}
-                                    />
-
-                                    {/* Enhanced Gradient Overlay */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-
-                                    {/* Enhanced Content Overlay */}
-                                    <div className="absolute inset-0 p-4 flex flex-col justify-between">
-                                        <div>
-                                            <div className="flex items-start justify-between mb-2">
-                                                <h3 className="text-xl font-bold text-whiteline-clamp-2 pr-2 flex-1 leading-tight">
-                                                    Coming Soon - Premium Content
-                                                </h3>
-                                                <motion.div
-                                                    whileHover={{ scale: 1.1 }}
-                                                    className="bg-gradient-to-r from-primary to-secondary text-textprimary px-3 py-1.5 rounded-xl text-xs font-semibold shadow-lg whitespace-nowrap"
-                                                >
-                                                    Featured
-                                                </motion.div>
-                                            </div>
-
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <UserAvatar
-                                                    size="md"
-                                                    imageUrl="/public-user.png"
-                                                    name="Premium Creator"
-                                                    userId="dummy-id"
-                                                    badgeSize={5}
-                                                    disableLink
-                                                />
-                                                <div>
-                                                    <p className="text-white font-medium text-sm">Premium Creator</p>
-                                                    <div className="flex items-center gap-2 text-white/80 text-xs mt-0.5">
-                                                        <div className="flex items-center gap-1">
-                                                            <Eye className="w-3 h-3" />
-                                                            <span>Coming Soon</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-1">
-                                                            <StarIcon className="w-3 h-3 text-yellow-300" />
-                                                            <span>5.0</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Play Button Overlay */}
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 20 }}
-                                            whileHover={{ opacity: 1, y: 0 }}
-                                            className="flex justify-center"
-                                        >
-                                            <div className="bg-white/20 backdrop-blur-md rounded-full p-3 border border-white/30">
-                                                <Play className="w-8 h-8 text-white fill-white" />
-                                            </div>
-                                        </motion.div>
-                                    </div>
-                                </div>
-                            </motion.div>
-
-                            {/* Dummy Video Card 3 */}
-                            <motion.div
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                transition={{ type: "spring", stiffness: 300 }}
-                                className="relative group/card cursor-pointer"
-                            >
-                                <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-transparent">
-                                    <VideoThumbnail
-                                        duration={240}
-                                        title="Exclusive Tutorial Series"
-                                        imageUrl="/placeholder-thumbnail.jpg"
-                                        previewUrl={null}
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                                    <div className="absolute inset-0 p-4 flex flex-col justify-between">
-                                        <div>
-                                            <div className="flex items-start justify-between mb-2">
-                                                <h3 className="text-xl font-bold text-white line-clamp-2 pr-2 flex-1 leading-tight">
-                                                    Exclusive Tutorial Series
-                                                </h3>
-                                                <motion.div whileHover={{ scale: 1.1 }} className="bg-gradient-to-r from-amber-500 to-orange-500 text-textprimary px-3 py-1.5 rounded-xl text-xs font-semibold shadow-lg whitespace-nowrap">
-                                                    Featured
-                                                </motion.div>
-                                            </div>
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <UserAvatar size="md" imageUrl="/public-user.png" name="Tech Guru" userId="dummy-id-2" badgeSize={5} disableLink />
-                                                <div>
-                                                    <p className="text-white font-medium text-sm">Tech Guru</p>
-                                                    <div className="flex items-center gap-2 text-white/80 text-xs mt-0.5">
-                                                        <div className="flex items-center gap-1">
-                                                            <Eye className="w-3 h-3" />
-                                                            <span>12K</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-1">
-                                                            <StarIcon className="w-3 h-3 text-yellow-300" />
-                                                            <span>4.8</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <motion.div initial={{ opacity: 0, y: 20 }} whileHover={{ opacity: 1, y: 0 }} className="flex justify-center">
-                                            <div className="bg-white/20 backdrop-blur-md rounded-full p-3 border border-white/30">
-                                                <Play className="w-8 h-8 text-white fill-white" />
-                                            </div>
-                                        </motion.div>
-                                    </div>
-                                </div>
-                            </motion.div>
-
-                            {/* Dummy Video Card 4 */}
-                            <motion.div
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                transition={{ type: "spring", stiffness: 300 }}
-                                className="relative group/card cursor-pointer"
-                            >
-                                <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-transparent">
-                                    <VideoThumbnail
-                                        duration={320}
-                                        title="Master Class in Design"
-                                        imageUrl="/placeholder-thumbnail.jpg"
-                                        previewUrl={null}
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                                    <div className="absolute inset-0 p-4 flex flex-col justify-between">
-                                        <div>
-                                            <div className="flex items-start justify-between mb-2">
-                                                <h3 className="text-xl font-bold text-white line-clamp-2 pr-2 flex-1 leading-tight">
-                                                    Master Class in Design
-                                                </h3>
-                                                <motion.div whileHover={{ scale: 1.1 }} className="bg-gradient-to-r from-primary to-secondary text-textprimary px-3 py-1.5 rounded-xl text-xs font-semibold shadow-lg whitespace-nowrap">
-                                                    Featured
-                                                </motion.div>
-                                            </div>
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <UserAvatar size="md" imageUrl="/public-user.png" name="Design Master" userId="dummy-id-3" badgeSize={5} disableLink />
-                                                <div>
-                                                    <p className="text-white font-medium text-sm">Design Master</p>
-                                                    <div className="flex items-center gap-2 text-white/80 text-xs mt-0.5">
-                                                        <div className="flex items-center gap-1">
-                                                            <Eye className="w-3 h-3" />
-                                                            <span>8.5K</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-1">
-                                                            <StarIcon className="w-3 h-3 text-yellow-300" />
-                                                            <span>4.9</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <motion.div initial={{ opacity: 0, y: 20 }} whileHover={{ opacity: 1, y: 0 }} className="flex justify-center">
-                                            <div className="bg-white/20 backdrop-blur-md rounded-full p-3 border border-white/30">
-                                                <Play className="w-8 h-8 text-white fill-white" />
-                                            </div>
-                                        </motion.div>
-                                    </div>
-                                </div>
-                            </motion.div>
+                            
                         </div>
                     </div>
                 </motion.div>
@@ -476,7 +350,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                         </div>
                     </div>
 
-                    <Link href="/" className="relative group">
+                    <Link href="/next-up" className="relative group">
                         {/* Hover glow effect */}
                         <div className="absolute inset-0 rounded-xl blur-lg opacity-0 group-hover:opacity-100 bg-[#ffca55] transition-opacity duration-500 pointer-events-none -z-10" />
 
@@ -509,11 +383,15 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                                 transition={{ duration: 0.3, delay: Math.floor(((index)/4)) * 0.5 }}
                                 className="group cursor-pointer relative"
                             >
-                                <Link href={`/explorer/videos/${video.id}`}>
-                                    {/* Enhanced Hover Glow */}
-                                    <div className="absolute inset-0 bg-gradient-to-r  rounded-2xl blur-md opacity-0 " />
+                                <Link href={`/videos/${video.id}`}>
 
                                     <div className="relative bg-transparent  rounded-2xl overflow-hidden">
+                                        {(glowVisible || glowFading) && (
+                                            <div className={`absolute -inset-6 -z-10 pointer-events-none transition-opacity duration-300 ${glowFading ? 'opacity-0' : 'opacity-100'}`}>
+                                                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-amber-400/60 via-yellow-300/40 to-transparent animate-pulse blur-[40px] opacity-95 transform scale-105" />
+                                            </div>
+                                        )}
+
                                         {/* Video Thumbnail */}
                                         <div className="relative aspect-video overflow-hidden ">
                                             <VideoThumbnail
@@ -528,14 +406,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
 
                                             {/* Enhanced Video Info Overlay */}
                                             <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
-                                                {video.categoryId && !selectedCategory && (
-                                                    <motion.div
-                                                        whileHover={{ scale: 1.1 }}
-                                                        className="bg-gradient-to-r from-primary to-secondary text-textprimary px-3 py-1 rounded-lg text-xs font-semibold shadow-lg backdrop-blur-sm"
-                                                    >
-                                                        {video.category?.name}
-                                                    </motion.div>
-                                                )}
+                                               
 
                                                 <motion.div
                                                     initial={{ opacity: 0, scale: 0.8 }}

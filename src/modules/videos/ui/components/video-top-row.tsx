@@ -43,11 +43,11 @@ export const VideoTopRow = ({ video, onRate }: Props) => {
                 <VideoViews compactViews={compactViews} expandedViews={expandedViews} />
             </div>
 
-            <div className="flex lg:items-start justify-between z-30 min-w-0 gap-10">
+            <div className="flex lg:items-start justify-end z-30 min-w-0 gap-10">
                 {/* <div className="min-w-0 overflow-hidden order-2 ">
                     <VideoOwner user={video.user} videoId={video.id}  />
                 </div> */}
-                <div className="mt-2 sm:mt-4 w-full ">
+                {/* <div className="mt-2 sm:mt-4 w-full ">
                     <VideoDescription
                         compactViews={compactViews}
                         expandedViews={expandedViews}
@@ -55,14 +55,14 @@ export const VideoTopRow = ({ video, onRate }: Props) => {
                         expandedDate={expandedDate}
                         description={video.description}
                     />
-                </div>
+                </div> */}
                 <div className="flex flex-row md:items-start justify-between sm:justify-end sm:min-w-[180px] gap-2 ">
-                    <VideoReactions
+                    {/* <VideoReactions
                         onRate={onRate}
                         viewerRating={video.user.viewerRating}
                         avgRating={video.averageRating}
                         videoRatings={video.videoRatings}
-                    />
+                    /> */}
                     <VideoMenu videoId={video.id} variant="secondary" />
                 </div>
 

@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
+import {  ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import { useState } from "react";
 
 interface Props {
@@ -15,15 +15,15 @@ export const VideoDescription = ({
   expandedViews,
   compactDate,
   expandedDate,
-  description
+  description,
 }: Props) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div 
+    <div
       className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-[#333333] dark:to-[#333333] rounded-2xl p-5 cursor-pointer 
-                 border border-yellow-200/50 dark:border-yellow-800/50 shadow-lg hover:shadow-xl transition-all duration-300
-                 hover:border-yellow-300/70 dark:hover:border-yellow-700/70"
+                    shadow-lg hover:shadow-xl transition-all duration-300
+                 "
       onClick={() => setIsExpanded((current) => !current)}
     >
       <div className="flex justify-between items-center mb-3">
@@ -35,42 +35,59 @@ export const VideoDescription = ({
             {isExpanded ? expandedDate : compactDate}
           </span>
         </div>
-        
-        <div className={cn(
-          "p-1.5 rounded-full transition-all duration-300",
-          isExpanded 
-            ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white rotate-180" 
-            : "bg-yellow-100 text-amber-600 hover:bg-yellow-200"
-        )}>
-          {isExpanded ? (
-            <ChevronUpIcon className="size-4" />
-          ) : (
-            <ChevronDownIcon className="size-4" />
+
+        <div
+          className={cn(
+            "p-1.5 rounded-full transition-all duration-300",
+            isExpanded
+              ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white rotate-180"
+              : "bg-yellow-100 text-amber-600 hover:bg-yellow-200"
           )}
+        >
+          <ChevronDownIcon className="size-4" />
         </div>
       </div>
-      
+
       <div className="relative">
-        <p className={cn(
-          "text-gray-700 dark:text-gray-300 transition-all duration-500",
-          !isExpanded && "line-clamp-3"
-        )}>
-          {description || "No description available for this video."}
-        </p>
-        
-        <div className={cn(
-          "flex items-center gap-1 mt-4 text-sm font-semibold transition-opacity duration-300",
-          isExpanded ? "text-amber-600" : "text-yellow-600"
-        )}>
-          {isExpanded ? (
-            <>
-              Show less
-            </>
-          ) : (
-            <>
-              Show more
-            </>
+        <p
+          className={cn(
+            "text-gray-700 dark:text-gray-300 transition-all duration-500 whitespace-pre-wrap",
+            !isExpanded && "line-clamp-3"
           )}
+        >
+          {description
+            ? // Split text by URL-like substrings and render anchors for links.
+              // Use whitespace-pre-wrap on the container to preserve newlines and spaces.
+              ((): React.ReactNode => {
+                const urlRegex = /(https?:\/\/[^\s]+)/g;
+                const parts = description.split(urlRegex);
+                return parts.map((part, idx) => {
+                  if (urlRegex.test(part)) {
+                    return (
+                      <a
+                        key={idx}
+                        href={part}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-orange-500 dark:text-orange-300 hover:underline"
+                      >
+                        {part}
+                      </a>
+                    );
+                  }
+                  return <span key={idx}>{part}</span>;
+                });
+              })()
+            : "No description available for this video."}
+        </p>
+
+        <div
+          className={cn(
+            "flex items-center gap-1 mt-4 text-sm font-semibold transition-opacity duration-300",
+            isExpanded ? "text-amber-600" : "text-yellow-600"
+          )}
+        >
+          {isExpanded ? <>Show less</> : <>Show more</>}
         </div>
       </div>
     </div>

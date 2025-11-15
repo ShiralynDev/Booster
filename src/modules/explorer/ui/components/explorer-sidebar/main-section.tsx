@@ -7,16 +7,17 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 
 const items = [
-    {
+     {
         title: "Next Up",
-        url: "/",
+        url: "/next-up",
         icon: PlayIcon,
     },
-    {
+     {
         title: "Explorer",
-        url: "/explorer",
+        url: "/",
         icon: EarthIcon
     },
+   
     {
         title: "Following",
         url: "/feed/follows",
@@ -38,7 +39,7 @@ const items = [
 export const MainSection = () => {
     const { isSignedIn } = useAuth();
     const clerk = useClerk();
-    const [activeItem, setActiveItem] = useState("Next Up");
+    const [activeItem, setActiveItem] = useState("Explorer");
     const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
     useEffect(() => {

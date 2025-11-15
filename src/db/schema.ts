@@ -1,4 +1,4 @@
-import { pgTable, text, uuid, timestamp, uniqueIndex, integer, pgEnum, primaryKey, AnyPgColumn, boolean, index } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid, timestamp, uniqueIndex, integer, pgEnum, primaryKey, AnyPgColumn, boolean, index, vector } from "drizzle-orm/pg-core";
 
 import {
     createInsertSchema,
@@ -94,6 +94,7 @@ export const videos = pgTable("videos", {
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 
     isAi: boolean("is_ai").notNull().default(false),
+    embedding: vector("embedding", { dimensions: 1536 } ), // OpenAI text-embedding-ada-002 dimension is 1536
 }, (t) => [
     index("videos_user_idx").on(t.userId),
     index("videos_category_idx").on(t.categoryId),

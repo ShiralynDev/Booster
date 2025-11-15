@@ -116,9 +116,11 @@ export const searchRouter = createTRPCRouter({
         .input(z.object({
             query: z.string().nullish(),
             // categoryId: z.string().uuid().nullish(),
+            // Cursor may contain either an `updatedAt` (legacy) or a `score` for deterministic paging.
             cursor: z.object({
                 id: z.string().uuid(),
-                updatedAt: z.date(),
+                updatedAt: z.date().optional(),
+                score: z.number().optional(),
             }).nullish(),
             limit: z.number().min(1).max(100)
         }))
@@ -150,25 +152,9 @@ export const searchRouter = createTRPCRouter({
                     .groupBy(videoRatings.videoId)
             );
 
-            const data = await db
-                .with(ratingStats, videoViewsStats)
-                .select({
-                    ...getTableColumns(videos),
-                    user: {
-                        ...getTableColumns(users),
-                        followsCount: sql<number>` (SELECT COUNT(*) FROM ${userFollows} WHERE ${userFollows.creatorId} = ${users.id}) `.mapWith(Number),
-                        videoCount: sql<number>`(SELECT COUNT(*) FROM ${videos} WHERE ${videos.userId} = ${users.id})`.mapWith(Number),
-                    },
-                    category: {
-                        id: categories.id,
-                        name: categories.name,
-                    },
-                    videoRatings: ratingStats.ratingCount,
-                    averageRating: ratingStats.averageRating,
-                    videoViews: videoViewsStats.viewCount,
-                    // Relevance score for ranking
-                    relevanceScore: hasQuery 
-                        ? sql<number>`
+            // Build the same score expression once so we can reuse it for ordering and pagination
+            const scoreExpr = hasQuery 
+                ? sql<number>`
                             -- Exact title match (highest priority)
                             (CASE WHEN LOWER(${videos.title}) = LOWER(${query}) THEN 100 ELSE 0 END) +
                             -- Title starts with query (high priority)
@@ -187,11 +173,30 @@ export const searchRouter = createTRPCRouter({
                             (COALESCE(${videoViewsStats.viewCount}, 0)::float / 10000.0) +
                             (COALESCE(${ratingStats.averageRating}, 0)::float / 2.0)
                         `.mapWith(Number)
-                        : sql<number>`
+                : sql<number>`
                             -- When no query, sort by popularity
                             (COALESCE(${videoViewsStats.viewCount}, 0)::float / 1000.0) +
                             (COALESCE(${ratingStats.averageRating}, 0)::float * 2)
-                        `.mapWith(Number),
+                        `.mapWith(Number);
+
+            const data = await db
+                .with(ratingStats, videoViewsStats)
+                .select({
+                    ...getTableColumns(videos),
+                    user: {
+                        ...getTableColumns(users),
+                        followsCount: sql<number>` (SELECT COUNT(*) FROM ${userFollows} WHERE ${userFollows.creatorId} = ${users.id}) `.mapWith(Number),
+                        videoCount: sql<number>`(SELECT COUNT(*) FROM ${videos} WHERE ${videos.userId} = ${users.id})`.mapWith(Number),
+                    },
+                    category: {
+                        id: categories.id,
+                        name: categories.name,
+                    },
+                    videoRatings: ratingStats.ratingCount,
+                    averageRating: ratingStats.averageRating,
+                    videoViews: videoViewsStats.viewCount,
+                    // Relevance score for ranking (same expression as `scoreExpr`)
+                    relevanceScore: scoreExpr,
                 }).from(videos)
                 .innerJoin(users, eq(videos.userId, users.id))
                 .leftJoin(categories, eq(videos.categoryId, categories.id))
@@ -211,32 +216,19 @@ export const searchRouter = createTRPCRouter({
                         )
                         : undefined,
                     eq(videos.visibility, 'public'),
-                    cursor ?
-                        or(
-                            lt(videos.updatedAt, cursor.updatedAt)
-                            , and(
+                    // Pagination: if client provides `cursor.score` use a row-wise comparator on (score, id)
+                    cursor && cursor.score != null
+                        ? sql`(${scoreExpr}, ${videos.id}) < (${cursor.score}, ${cursor.id})`
+                        : cursor && cursor.updatedAt != null ? or(
+                            lt(videos.updatedAt, cursor.updatedAt),
+                            and(
                                 eq(videos.updatedAt, cursor.updatedAt),
                                 lt(videos.id, cursor.id)
-                            ))
-                        : undefined))
+                            )
+                        ) : undefined
+                ))
                 .orderBy(
-                    desc(hasQuery 
-                        ? sql<number>`
-                            (CASE WHEN LOWER(${videos.title}) = LOWER(${query}) THEN 100 ELSE 0 END) +
-                            (CASE WHEN LOWER(${videos.title}) LIKE LOWER(${query + '%'}) THEN 50 ELSE 0 END) +
-                            (CASE WHEN LOWER(COALESCE(${categories.name}, '')) = LOWER(${query}) THEN 40 ELSE 0 END) +
-                            (CASE WHEN LOWER(COALESCE(${categories.name}, '')) LIKE LOWER(${'%' + query + '%'}) THEN 25 ELSE 0 END) +
-                            (CASE WHEN LOWER(${videos.title}) LIKE LOWER(${'%' + query + '%'}) THEN 20 ELSE 0 END) +
-                            (CASE WHEN LOWER(COALESCE(${videos.description}, '')) LIKE LOWER(${'%' + query + '%'}) THEN 10 ELSE 0 END) +
-                            (CASE WHEN LOWER(${users.name}) LIKE LOWER(${'%' + query + '%'}) THEN 5 ELSE 0 END) +
-                            (COALESCE(${videoViewsStats.viewCount}, 0)::float / 10000.0) +
-                            (COALESCE(${ratingStats.averageRating}, 0)::float / 2.0)
-                        `.mapWith(Number)
-                        : sql<number>`
-                            (COALESCE(${videoViewsStats.viewCount}, 0)::float / 1000.0) +
-                            (COALESCE(${ratingStats.averageRating}, 0)::float * 2)
-                        `.mapWith(Number)
-                    ),
+                    desc(scoreExpr),
                     desc(videos.id)
                 )
                 .limit(limit + 1); //ad 1 to limit to check if there's more data
@@ -250,6 +242,8 @@ export const searchRouter = createTRPCRouter({
             const nextCursor = hasMore
                 ? {
                     id: lastItem.id,
+                    // prefer returning the relevance score so subsequent pages can reuse the same ordering value
+                    score: lastItem.relevanceScore,
                     updatedAt: lastItem.updatedAt,
                 } : null
 

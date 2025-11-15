@@ -270,7 +270,7 @@ export const SearchViewSuspense = ({ query }: SearchViewProps) => {
                     {videos.map((video) => (
                         <Link
                             key={video.id}
-                            href={`/explorer/videos/${video.id}`}
+                            href={`/videos/${video.id}`}
                             className="flex flex-col lg:flex-row bg-[#333333] rounded-xl overflow-hidden border border-gray-700 hover:border-yellow-400/30 transition-all duration-300 hover:shadow-2xl"
                         >
                             {/* Thumbnail */}

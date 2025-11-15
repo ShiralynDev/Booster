@@ -1,18 +1,29 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { trpc } from "@/trpc/client";
 import { SearchIcon, Stars, XIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { DEFAULT_LIMIT } from '@/constants';
 
 export const SearchInput = () => {
   const [value, setValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [isStarMode, setIsStarMode] = useState(false);
   const router = useRouter();
+  const utils = trpc.useUtils();
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+
+    // Prevent the form from submitting / reloading the page immediately
+    // so our async AI search can run to completion.
     e.preventDefault();
+
+    if (isStarMode) {
+      handleAiSearch();
+      return;
+    }
 
     const newQuery = value.trim();
 
@@ -24,6 +35,20 @@ export const SearchInput = () => {
 
     setValue(newQuery);
   };
+
+
+
+  const handleAiSearch = async () => {
+
+    const text = value.trim();
+
+    if(!text) return;
+    // Navigate to Explorer with AI query params; Explorer will use trpc.explorer.aiSearch
+    router.push(`/?ai=1&q=${encodeURIComponent(text)}`);
+    setIsStarMode(false);
+    setValue(text);
+    
+  }
 
   const handleStarClick = () => {
     setIsStarMode(!isStarMode);
@@ -54,7 +79,7 @@ export const SearchInput = () => {
                 ${value ? "pr-12" : "pr-4"}
                 border-border
               `}
-            />
+              />
           </div>
 
           {/* Star Mode Input */}
@@ -87,6 +112,7 @@ export const SearchInput = () => {
               disabled={!value.trim()}
               type="submit"
               className="px-4 rounded-r-full flex text-gray-500 items-center justify-center focus:outline-none transition-colors duration-200 hover:bg-muted/50"
+              onSubmit={handleAiSearch}
             >
               <SearchIcon className="size-5" />
             </button>

@@ -402,7 +402,7 @@ export const UsersView = ({ userId }: Props) => {
               <Link
                 key={video.id}
                 className="group bg-[#000000] rounded-2xl transition-transform hover:scale-[1.02] cursor-pointer"
-                href={`/explorer/videos/${video.id}`}
+                href={`/videos/${video.id}`}
               >
                 <div className="relative overflow-hidden rounded-t-2xl">
                   <VideoThumbnail

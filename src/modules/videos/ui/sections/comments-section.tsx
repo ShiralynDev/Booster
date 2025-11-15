@@ -80,13 +80,13 @@ export const CommentsSuspense = ({ videoId, openComments, onOpenChange, home }: 
 
 
   return (
-    <div className="h-full flex flex-col overflow-hidden border border-gray-900 dark:border-gray-800 rounded-lg bg-gray-50 dark:bg-black"
+    <div className="h-full flex flex-col overflow-hidden rounded-3xl"
       onMouseLeave={() => { if (!home) return; setOpen(false); }}
       onMouseEnter={() => { if (!home) return; setOpen(true); }}
     >
       {/* HEADER — always visible */}
       <div
-        className="h-[70px] p-3 flex items-start justify-between border-b border-white/10 hover:cursor-pointer"
+        className="h-[70px] p-3 flex items-start justify-between hover:cursor-pointer"
       >
         <h2 className="text-[1.1rem] font-semibold flex items-center gap-2 text-gray-900 dark:text-white">
           <MessageCircle className="w-5 h-5 text-gray-900 dark:text-white" />
@@ -111,7 +111,7 @@ export const CommentsSuspense = ({ videoId, openComments, onOpenChange, home }: 
               exit={{ opacity: 0, height: 0 }}
               className="flex-1 overflow-y-auto min-h-0 flex flex-col" /* Fill available height */
             >
-              <div className="px-5 border-b border-white/10">
+              <div className="px-5">
                 <CommentInput viewer={viewer} createComment={createComment} isPending={isPending} />
               </div>
 

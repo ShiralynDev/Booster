@@ -28,77 +28,71 @@ export const SuggestionsSection = ({ videoId }: SuggestionsSectionProps) => {
     return (
         <div className="relative w-full">
             {/* Background gradient */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-50/50 dark:to-gray-900/30" />
+            <div className="absolute inset-0 " />
 
             <div className="relative z-10 w-full">
                 {/* Section header */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="relative flex items-center w-full mb-8 px-4"
+                    className="relative flex items-center w-full px-4"
                 >
                     {/* Centered title */}
-                    <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-3">
-                        <h2 className="text-2xl font-bold text-gray-900 text-center dark:text-white">Watch Next</h2>
-                    </div>
+                   
 
 
                 </motion.div>
 
-                {/* Video grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 px-4">
+                {/* Video list (single column) */}
+                <div className="grid grid-cols-1 gap-3">
                     {watchNext.map((video, index) => (
                         <motion.div
                             key={video.id}
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1 }}
+                            transition={{ delay: index * 0.06 }}
                             className="group cursor-pointer"
                         >
-                            <div className="relative  rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
-                                {/* Thumbnail container */}
-                                <VideoThumbnail
-                                    title={video.title}
-                                    duration={video.duration}
-                                    imageUrl={video.thumbnailUrl || THUMBNAIL_FALLBACK}
-                                    previewUrl={video.previewUrl}
-                                    key={video.id}
-                                />
+                            <div className="flex items-start rounded-2xl transition-all duration-300 hover:shadow-2xl overflow-hidden relative">
+                                {/* Left: fixed thumbnail */}
+                                <div className="relative w-64 h-36">
+                                    <VideoThumbnail
+                                        previewUrl={video.previewUrl ?? video.thumbnailUrl ?? THUMBNAIL_FALLBACK}
+                                        duration={video.duration}
+                                        title={video.title}
+                                    />
+                                </div>
 
-                                {/* Content */}
-                                <div className="p-4">
-                                    {/* Title */}
-                                    <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-2 mb-2 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-                                        {video.title}
-                                    </h3>
+                                {/* Right: content */}
+                                <div className="p-3 flex-1 flex flex-col justify-between">
+                                    <div>
+                                        <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-2 mb-2 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                                            {video.title}
+                                        </h3>
 
-                                    {/* User info */}
-                                    <div className="flex items-center gap-2 mb-3">
-                                        <UserAvatar
-                                            size="md"
-                                            imageUrl={video.user?.imageUrl || "/public-user.png"}
-                                            name={video.user?.name || "Anonymous"}
-                                            userId={video.user?.id}
-                                            badgeSize={5}
-                                        />
-                                        <div className="flex-1 min-w-0">
-                                            <p className="font-medium text-gray-900 dark:text-white text-sm truncate">
-                                                {video.user?.name?.replace(/\s*null\s*$/i, "") || "Anonymous"}
-                                            </p>
-                                            {video.user?.name === "sammas24 null" ? (
-                                                <p className="flex items-center gap-2 text-orange-500 text-xs">
-                                                    Founder & Developer <RocketIcon className="size-3" />
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <UserAvatar
+                                                size="sm"
+                                                imageUrl={video.user?.imageUrl || "/public-user.png"}
+                                                name={video.user?.name || "Anonymous"}
+                                                userId={video.user?.id}
+                                                badgeSize={4}
+                                            />
+                                            <div className="flex-1 min-w-0">
+                                                <p className="font-medium text-gray-900 dark:text-white text-sm truncate">
+                                                    {video.user?.name?.replace(/\s*null\s*$/i, "") || "Anonymous"}
                                                 </p>
-                                            ) : (
-                                                <p className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-xs">
-                                                    Top Content Creator <Trophy className="size-3" />
-
+                                                <p className="text-gray-500 dark:text-gray-400 text-xs">
+                                                    {video.user?.name === "sammas24 null" ? (
+                                                        <span className="flex items-center gap-1 text-orange-500">Founder & Developer <RocketIcon className="size-3" /></span>
+                                                    ) : (
+                                                        <span className="flex items-center gap-1">Top Content Creator <Trophy className="size-3" /></span>
+                                                    )}
                                                 </p>
-                                            )}
+                                            </div>
                                         </div>
                                     </div>
 
-                                    {/* Stats */}
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
                                             <div className="flex items-center gap-1">
@@ -110,13 +104,6 @@ export const SuggestionsSection = ({ videoId }: SuggestionsSectionProps) => {
                                                 <span>{Number(video.averageRating).toFixed(1)}</span>
                                             </div>
                                         </div>
-
-                                        {/* Trending indicator */}
-                                        {index < 2 && (
-                                            <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
-                                                <Sparkles className="w-3 h-3" />
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
 

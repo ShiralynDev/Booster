@@ -80,7 +80,7 @@ export const NotificationDropdown = ({ onClose, onNotificationRead }: Notificati
                 return `/users/${notification.relatedUserId}`;
             case 'comment':
             case 'reply':
-                return `/explorer/videos/${notification.videoId}`;
+                return `/videos/${notification.videoId}`;
             case 'boost':
                 return `/users/${notification.userId}`; // Navigate to the boosted user's channel
             default:

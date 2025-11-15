@@ -16,8 +16,19 @@ export const snakeCaseToTitle = (str: string) => {
   return str.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
 
 }
-export const compactDate = (commentDate: Date) => {
-  return formatDistanceToNow(commentDate, { addSuffix: true })
+export const compactDate = (commentDate?: string | Date | number | null) => {
+  if (!commentDate) return "";
+
+  let date: Date;
+  if (typeof commentDate === "string" || typeof commentDate === "number") {
+    date = new Date(commentDate as any);
+  } else {
+    date = commentDate as Date;
+  }
+
+  if (!(date instanceof Date) || isNaN(date.getTime())) return "";
+
+  return formatDistanceToNow(date, { addSuffix: true });
 }
 export const compactNumber = (commentLikes: number) => {
   return Intl.NumberFormat("en", {
