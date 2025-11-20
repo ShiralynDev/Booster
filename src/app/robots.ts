@@ -1,12 +1,20 @@
 import type { MetadataRoute } from "next";
 
+const SITE_URL = 'https://www.boostervideos.net'
+
 export default function robots(): MetadataRoute.Robots {
   return {
+    host: SITE_URL,
     rules: [
+      // Allow all standard crawlers on the main site
       { userAgent: "*", allow: "/" },
-      // { userAgent: "*", disallow: "/api" },
+      // Disallow internal and API routes from being indexed
+      { userAgent: "*", disallow: "/api" },
+      { userAgent: "*", disallow: "/_next" },
+      { userAgent: "*", disallow: "/internal" },
     ],
-    sitemap: "https://www.boostervideos.net/sitemap.xml",
+    // reference the sitemap
+    sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }
 

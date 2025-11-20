@@ -9,6 +9,7 @@ import "./globals.css";
 import { TRPCProvider } from "@/trpc/client";
 import { ThemeProvider } from "@/components/theme-provider";
 import { NotificationProvider } from "@/contexts/notification-context";
+import UnreadTitleUpdater from '@/components/unread-title-updater'
 
 const montserrat = Montserrat({ 
     subsets: ["latin"], 
@@ -25,6 +26,7 @@ export const metadata: Metadata = {
         template: "%s | Booster",
     },
     description: "Video platform oriented for creators and users",
+    keywords: ['video', 'creators', 'video platform', 'shorts', 'longform', 'streaming', 'uploader', 'booster videos'],
     alternates: {
         canonical: "/",
     },
@@ -38,12 +40,24 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: "summary_large_image",
-        site: "@your_handle",
+                site: "@BoosterVideos",
     },
     icons: [
         { rel: "icon", url: "/favicon.ico" },
         { rel: "apple-touch-icon", url: "/apple-touch-icon.png" },
     ],
+        // allow indexing by default
+        robots: {
+            index: true,
+            follow: true,
+            nosnippet: false,
+            noarchive: false,
+            // Search engine-specific directives
+            googleBot: {
+                index: true,
+                follow: true,
+            }
+        }
 };
 
 export const viewport: Viewport = {
@@ -56,11 +70,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <html lang="en" suppressHydrationWarning className={montserrat.variable}>
                 <head>
                     <link rel="preconnect" href="https://vitals.vercel-analytics.com" crossOrigin="" />
+                    {/* JSON-LD structured data for Organization + WebSite */}
+                    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "WebSite",
+                        "url": "https://www.boostervideos.net",
+                        "name": "Booster",
+                        "potentialAction": {
+                          "@type": "SearchAction",
+                          "target": "https://www.boostervideos.net/search?q={search_term_string}",
+                          "query-input": "required name=search_term_string"
+                        }
+                    }) }} />
                 </head>
                 <body className={`${montserrat.className} antialiased`}>
                     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
                         <TRPCProvider>
                             <NotificationProvider>
+                                <UnreadTitleUpdater />
                                 {children}
                                 <Toaster richColors closeButton />
                                 <Analytics />
