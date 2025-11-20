@@ -63,12 +63,29 @@ export default async function Head({ params }: Props) {
       <meta property="og:description" content={description} />
       <meta property="og:url" content={pageUrl} />
       <meta property="og:image" content={image} />
+      <meta property="og:image:alt" content={row?.title ?? 'Booster video'} />
+
+      {row?.playbackUrl && (
+        <>
+          <meta property="og:video" content={row.playbackUrl} />
+          <meta property="og:video:secure_url" content={row.playbackUrl} />
+          <meta property="og:video:type" content="video/mp4" />
+        </>
+      )}
 
       {/* Twitter */}
       <meta name="twitter:card" content="player" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={image} />
+      <meta name="twitter:image:alt" content={row?.title ?? 'Booster video'} />
+      {row?.playbackUrl && (
+        <>
+          <meta name="twitter:player" content={row.playbackUrl} />
+          <meta name="twitter:player:width" content="1280" />
+          <meta name="twitter:player:height" content="720" />
+        </>
+      )}
 
       {/* JSON-LD VideoObject */}
       {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />}
