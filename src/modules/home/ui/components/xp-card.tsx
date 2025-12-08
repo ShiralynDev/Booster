@@ -76,7 +76,7 @@ export const XpCard = ({ user,setShowAddXpModal,videoId }: Props) => {
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white dark:bg-gray-900 rounded-2xl p-6 w-full max-w-md border border-gray-200 dark:border-gray-700 shadow-xl"
+            className="bg-card rounded-2xl p-6 w-full max-w-md border border-gray-200 dark:border-gray-700 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">

@@ -56,7 +56,7 @@ const VideoSectionSkeleton = () => {
 
                     <div className="flex flex-col sm:flex-row gap-4">
                         {/* Channel Info Card Skeleton */}
-                        <div className="flex items-center bg-white dark:bg-[#333333] rounded-2xl px-4 py-3 border border-gray-200 dark:border-gray-700 shadow-sm flex-1">
+                        <div className="flex items-center bg-card rounded-2xl px-4 py-3 border border-gray-200 dark:border-gray-700 shadow-sm flex-1">
                             <div className="flex items-center gap-3 w-full">
                                 <div className="w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-600"></div>
                                 <div className="flex-1 space-y-2">
@@ -89,7 +89,7 @@ const VideoSectionSkeleton = () => {
             </div>
 
             {/* COMMENTS PANEL SKELETON */}
-            <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#333333] overflow-hidden shadow-sm h-[60px]">
+            <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-card overflow-hidden shadow-sm h-[60px]">
                 <div className="p-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -354,7 +354,7 @@ export const VideoSectionSuspense = ({ videoId, next, prev }: Props) => {
                     </div>
 
                     <div className="flex items-start gap-5 mt-3 mr-5 flex-shrink-0">
-                        <div className="inline-flex items-center gap-2 bg-white dark:bg-[#333333] border border-gray-300 dark:border-gray-600 px-3 py-1.5 rounded-full text-gray-700 dark:text-gray-300 flex-shrink-0">
+                        <div className="inline-flex items-center gap-2 bg-card border border-gray-300 dark:border-gray-600 px-3 py-1.5 rounded-full text-gray-700 dark:text-gray-300 flex-shrink-0">
                             <Eye className="h-4 w-4" /><span className="font-medium">{compactNumber(video.videoViews)}</span>
                         </div>
                         {video.isFeatured && (
@@ -372,7 +372,7 @@ export const VideoSectionSuspense = ({ videoId, next, prev }: Props) => {
 
                 {/* COMMENTS PANEL */}
                 <motion.div
-                    className={cn("flex-1 min-h-0 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#212121] backdrop-blur-md shadow-sm mt-[14px]")}
+                    className={cn("flex-1 min-h-0 rounded-2xl border border-gray-200 dark:border-gray-700 bg-card backdrop-blur-md shadow-sm mt-[14px]")}
                     initial={false}
                     transition={{ duration: 0.35, ease: 'easeInOut' }}
                     onMouseEnter={() => setCommentsOpen(true)}

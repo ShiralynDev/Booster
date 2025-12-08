@@ -33,11 +33,11 @@ export const CommentsSection = (props: CommentSectionProps) => {
 
 const CommentsSkeleton = () => (
   <div className="h-full flex flex-col">
-    <div className="h-[30px] px-5 flex items-center justify-between border-b border-white/10">
-      <div className="h-6 w-40 bg-white/10 rounded animate-pulse" />
-      <div className="h-10 w-10 bg-white/10 rounded-full animate-pulse" />
+    <div className="h-[30px] px-5 flex items-center justify-between border-b border-border">
+      <div className="h-6 w-40 bg-muted rounded animate-pulse" />
+      <div className="h-10 w-10 bg-muted rounded-full animate-pulse" />
     </div>
-    <div className="flex-1 bg-white/5" />
+    <div className="flex-1 bg-muted/50" />
   </div>
 );
 
@@ -88,11 +88,11 @@ export const CommentsSuspense = ({ videoId, openComments, onOpenChange, home }: 
       <div
         className="h-[70px] p-3 flex items-start justify-between hover:cursor-pointer"
       >
-        <h2 className="text-[1.1rem] font-semibold flex items-center gap-2 text-gray-900 dark:text-white">
-          <MessageCircle className="w-5 h-5 text-gray-900 dark:text-white" />
+        <h2 className="text-[1.1rem] font-semibold flex items-center gap-2 text-foreground">
+          <MessageCircle className="w-5 h-5 text-foreground" />
           <span>Comments {compactNumber(rootComments.pages[0].commentCount ?? 0)}</span>
         </h2>
-        <span className="h-10 w-10 rounded-full bg-white dark:bg-[#212121] hover:bg-white/20 dark:hover:bg-[#333333]/80 inline-flex items-center justify-center transition">
+        <span className="h-10 w-10 rounded-full bg-card hover:bg-muted inline-flex items-center justify-center transition">
           {query.isFetching && !query.isFetchingNextPage
             ? <Spinner variant='circle' className="w-5 h-5" />
             : (open ? <ChevronUp className="h-5 w-5" onClick={() => { setOpen(false); onOpenChange?.(false) }} /> : <ChevronDown onClick={() => { setOpen(true); onOpenChange?.(true) }} className="h-5 w-5" />)}

@@ -8,13 +8,15 @@ interface ResponsiveModalProps{
     open: boolean;
     title: string;
     onOpenChange: (open: boolean) => void;
+    className?: string;
 }
 
 export const ResponsiveModal = ({
     children,
     open,
     title,
-    onOpenChange
+    onOpenChange,
+    className
 }: ResponsiveModalProps) => {
 
     const isMobile = useIsMobile();
@@ -34,7 +36,7 @@ export const ResponsiveModal = ({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent>
+            <DialogContent className={className}>
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
                 </DialogHeader>

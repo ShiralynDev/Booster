@@ -65,7 +65,7 @@ export const NoVideosEmptyState = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full blur-md opacity-50" />
             
             {/* Main icon container */}
-            <div className="relative bg-white dark:bg-[#1a1a1a] rounded-full p-6 border border-gray-200 dark:border-gray-700 shadow-2xl">
+            <div className="relative bg-card rounded-full p-6 border border-gray-200 dark:border-gray-700 shadow-2xl">
               <motion.div
                 animate={{ 
                   rotate: [0, 10, -10, 0],

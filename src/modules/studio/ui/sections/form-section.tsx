@@ -144,7 +144,7 @@ const FormSectionSkeleton = () => {
 
 const FormErrorFallback = () => {
   return (
-    <div className="flex flex-col items-center justify-center p-12 text-center bg-white dark:bg-[#333333] rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
+    <div className="flex flex-col items-center justify-center p-12 text-center bg-card rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
       <div className="p-3 bg-red-100 rounded-full mb-4">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -292,7 +292,7 @@ const FormSectionSuspense = ({ videoId }: PageProps) => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
-                  className="w-48 rounded-xl shadow-lg border border-gray-200 bg-white p-2"
+                  className="w-48 rounded-xl shadow-lg border border-gray-200 bg-card p-2"
                 >
                   <DropdownMenuItem
                     onClick={() => remove.mutate({ id: videoId })}
@@ -309,7 +309,7 @@ const FormSectionSuspense = ({ videoId }: PageProps) => {
           <div className="grid grid-cols-1 lg:grid-cols-5 justify-between">
             <div className="space-y-6 lg:col-span-3 mr-44">
               {/* Title Field */}
-              <div className="bg-white dark:bg-[#333333] p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+              <div className="bg-card p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
                 <FormField
                   control={form.control}
                   name="title"
@@ -341,7 +341,7 @@ const FormSectionSuspense = ({ videoId }: PageProps) => {
               </div>
 
               {/* Description Field */}
-              <div className="bg-white dark:bg-[#333333] p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+              <div className="bg-card p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
                 <FormField
                   control={form.control}
                   name="description"
@@ -375,7 +375,7 @@ const FormSectionSuspense = ({ videoId }: PageProps) => {
               </div>
 
               {/* Thumbnail Field */}
-              <div className="bg-white dark:bg-[#333333] p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex items-start justify-start gap-3">
+              <div className="bg-card p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex items-start justify-start gap-3">
                 <div className="">
                   <FormLabel className="text-base font-medium text-gray-800 dark:text-white">
                     Thumbnail
@@ -400,7 +400,7 @@ const FormSectionSuspense = ({ videoId }: PageProps) => {
                         <DropdownMenuContent
                           align="start"
                           side="right"
-                          className="rounded-xl shadow-lg border border-gray-200 w-44 bg-white dark:bg-[#333333]"
+                          className="rounded-xl shadow-lg border border-gray-200 w-44 bg-card"
                         >
                           <DropdownMenuItem
                             onClick={() => setThumbnailModalOpen(true)}
@@ -432,7 +432,7 @@ const FormSectionSuspense = ({ videoId }: PageProps) => {
                 </div>
 
                 {/* AI Field */}
-                <div className="bg-white dark:bg-[#333333] p-2 rounded-2xl border  shadow-sm">
+                <div className="bg-card p-2 rounded-2xl border  shadow-sm">
                   <FormField
                     control={form.control}
                     name="isAi"
@@ -467,7 +467,7 @@ const FormSectionSuspense = ({ videoId }: PageProps) => {
               </div>
 
               {/* Category Field */}
-              <div className="bg-white dark:bg-[#333333] p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+              <div className="bg-card p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
                 <FormField
                   control={form.control}
                   name="categoryId"
@@ -489,7 +489,7 @@ const FormSectionSuspense = ({ videoId }: PageProps) => {
                             <SelectValue placeholder="Select a category" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="rounded-xl border border-gray-200 shadow-lg bg-whitea dark:bg-[#333333]">
+                        <SelectContent className="rounded-xl border border-gray-200 shadow-lg bg-card">
                           {categories.map((category) => (
                             <SelectItem
                               key={category.id}
@@ -510,7 +510,7 @@ const FormSectionSuspense = ({ videoId }: PageProps) => {
 
             <div className="flex flex-col gap-y-6 lg:col-span-2 -pl-24">
               {/* Video Preview Card */}
-              <div className="flex flex-col gap-4 bg-white dark:bg-[#333333] rounded-2xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm h-fit">
+              <div className="flex flex-col gap-4 bg-card rounded-2xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm h-fit">
                 <h3 className="font-semibold text-gray-800 dark:text-white text-lg">
                   Video Preview
                 </h3>
@@ -641,7 +641,7 @@ const FormSectionSuspense = ({ videoId }: PageProps) => {
               </div>
 
               {/* Visibility Field */}
-              <div className="bg-white dark:bg-[#333333] p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+              <div className="bg-card p-6 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
                 <FormField
                   control={form.control}
                   name="visibility"
@@ -663,7 +663,7 @@ const FormSectionSuspense = ({ videoId }: PageProps) => {
                             <SelectValue placeholder="Select visibility" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="rounded-xl border border-gray-200 shadow-lg bg-white dark:focus:bg-slate-700 dark:bg-[#333333]">
+                        <SelectContent className="rounded-xl border border-gray-200 shadow-lg bg-card dark:focus:bg-slate-700">
                           <SelectItem
                             value="public"
                             className="rounded-lg px-4 py-3 focus:bg-blue-50 dark:focus:bg-slate-700 transition-colors duration-200"

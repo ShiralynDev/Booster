@@ -30,13 +30,13 @@ export const About = () => {
 
     const XpBar = () => (
         <div className="mt-4">
-            <div className="h-5 bg-gray-700 rounded-full overflow-hidden mt-2">
+            <div className="h-5 bg-muted rounded-full overflow-hidden mt-2">
                 <div
                     className="h-full bg-gradient-to-r from-[#ffca55] to-[#ffa100] rounded-full"
                     style={{ width: '65%' }}
                 />
             </div>
-            <div className="flex justify-between mt-2 text-sm text-gray-400">
+            <div className="flex justify-between mt-2 text-sm text-muted-foreground">
                 <span>Level 7</span>
                 <span>65% to next level</span>
             </div>
@@ -44,7 +44,7 @@ export const About = () => {
     );
 
     const StepNumber = ({ number }: { number: number }) => (
-        <span className="inline-block bg-gradient-to-br from-[#ffca55] to-[#ffa100] text-[#212121] w-7 h-7 rounded-full text-center leading-7 font-bold mr-2">
+        <span className="inline-block bg-gradient-to-br from-[#ffca55] to-[#ffa100] text-gray-900 w-7 h-7 rounded-full text-center leading-7 font-bold mr-2">
             {number}
         </span>
     );
@@ -66,9 +66,9 @@ export const About = () => {
         buttonText: string;
         wide?: boolean;
     }) => (
-        <div className={`card bg-gray-800 rounded-2xl overflow-hidden shadow-lg transition-all duration-300 ease-in-out flex flex-col h-full border border-gray-700 hover:-translate-y-2.5 hover:shadow-xl ${wide ? 'w-full max-w-4xl' : ''
+        <div className={`card bg-card rounded-2xl overflow-hidden shadow-lg transition-all duration-300 ease-in-out flex flex-col h-full border border-border hover:-translate-y-2.5 hover:shadow-xl ${wide ? 'w-full max-w-4xl' : ''
             }`}>
-            <div className="h-30 flex items-center justify-center bg-gradient-to-br from-[#ffca55] to-[#ffa100] text-[#212121] text-5.5xl p-2">
+            <div className="h-30 flex items-center justify-center bg-gradient-to-br from-[#ffca55] to-[#ffa100] text-gray-900 text-5.5xl p-2">
                 {icon}
             </div>
             <div className="p-8 flex flex-col flex-grow">
@@ -76,11 +76,11 @@ export const About = () => {
                     <StepNumber number={step} />
                     {title}
                 </h3>
-                <p className="text-gray-300 mb-6 flex-grow">{description}</p>
+                <p className="text-muted-foreground mb-6 flex-grow">{description}</p>
                 {children}
                 <a
                     href="#"
-                    className="inline-block bg-gradient-to-br from-[#ffca55] to-[#ffa100] text-[#212121] px-6 py-3 rounded-full font-semibold mt-4 transition-all duration-300 ease-in-out shadow-lg shadow-amber-500/30 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-500/40"
+                    className="inline-block bg-gradient-to-br from-[#ffca55] to-[#ffa100] text-gray-900 px-6 py-3 rounded-full font-semibold mt-4 transition-all duration-300 ease-in-out shadow-lg shadow-amber-500/30 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-500/40"
                 >
                     {buttonText}
                 </a>
@@ -89,7 +89,7 @@ export const About = () => {
     );
 
     return (
-        <div className="min-h-screen bg-background text-gray-100 py-8 px-4">
+        <div className="min-h-screen bg-background text-foreground py-8 px-4">
             <div className="max-w-7xl mx-auto">
                 <header className="flex items-center justify-center mb-12 py-8">
                     <h1 className="flex items-center gap-5 text-5xl font-bold bg-gradient-to-r from-[#ffca55] to-[#ffa100] bg-clip-text text-transparent mb-4">

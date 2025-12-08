@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { Coins, ShoppingCart, Search, Filter, Crown, Palette, Sparkles, BadgeCheck, Zap, Star, Heart, Rocket, Lock, Check, Boxes, Box, Landmark, X, Video, CreditCard } from "lucide-react"
+import { Coins, ShoppingCart, Search, Filter, Crown, Palette, Sparkles, Zap, Star, Heart, Rocket, Lock, Check, Boxes, Box, Landmark, X, Video, CreditCard } from "lucide-react"
 import { XpIndicator } from "@/modules/xp/ui/components/xp-indicator"
 import { trpc } from "@/trpc/client"
 import { useAuth } from "@clerk/nextjs"
@@ -61,16 +61,18 @@ export const MarketSectionSuspense = () => {
   const dummyItems = [
     { assetId: "dummy-1", name: "Golden Crown", price: 850, category: "icons", iconNumber: 0, emoji: "👑" },
     { assetId: "dummy-2", name: "Fire Effect", price: 1200, category: "effects", iconNumber: 0, emoji: "🔥" },
-    { assetId: "dummy-3", name: "Rainbow Badge", price: 650, category: "badges", iconNumber: 0, emoji: "🌈" },
+    { assetId: "dummy-3", name: "CEO", price: 5000, category: "titles", iconNumber: 0, emoji: "👔" },
     { assetId: "dummy-4", name: "Neon Glow", price: 950, category: "effects", iconNumber: 0, emoji: "✨" },
     { assetId: "dummy-5", name: "Diamond Frame", price: 1500, category: "frames", iconNumber: 0, emoji: "💎" },
     { assetId: "dummy-6", name: "Purple Theme", price: 2000, category: "themes", iconNumber: 0, emoji: "💜" },
     { assetId: "dummy-7", name: "Lightning Bolt", price: 750, category: "icons", iconNumber: 0, emoji: "⚡" },
     { assetId: "dummy-8", name: "Sunset Background", price: 1800, category: "backgrounds", iconNumber: 0, emoji: "🌅" },
-    { assetId: "dummy-9", name: "VIP Badge", price: 3000, category: "badges", iconNumber: 0, emoji: "⭐" },
+    { assetId: "dummy-9", name: "BornToBoost", price: 3000, category: "titles", iconNumber: 0, emoji: "🚀" },
     { assetId: "dummy-10", name: "Pink Color", price: 500, category: "colors", iconNumber: 0, emoji: "🩷" },
     { assetId: "dummy-11", name: "Rocket Icon", price: 900, category: "icons", iconNumber: 0, emoji: "🚀" },
     { assetId: "dummy-12", name: "Galaxy Theme", price: 2500, category: "themes", iconNumber: 0, emoji: "🌌" },
+    { assetId: "dummy-13", name: "President", price: 10000, category: "titles", iconNumber: 0, emoji: "🏛️" },
+    { assetId: "dummy-14", name: "Founder figure", price: 8000, category: "titles", iconNumber: 0, emoji: "💡" },
   ].filter(item => {
     const matchesCategory = selectedCategory === "all" || item.category === selectedCategory
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -118,7 +120,7 @@ export const MarketSectionSuspense = () => {
   const categories = [
     { id: "all", name: "All Items", icon: <Sparkles className="h-4 w-4" /> },
     { id: "icons", name: "Icons", icon: <Star className="h-4 w-4" /> },
-    { id: "badges", name: "Badges", icon: <BadgeCheck className="h-4 w-4" /> },
+    { id: "titles", name: "Titles", icon: <Crown className="h-4 w-4" /> },
     { id: "backgrounds", name: "Backgrounds", icon: <Palette className="h-4 w-4" /> },
     { id: "effects", name: "Effects", icon: <Zap className="h-4 w-4" /> },
     { id: "colors", name: "Colors", icon: <Palette className="h-4 w-4" /> },
@@ -170,7 +172,7 @@ export const MarketSectionSuspense = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-6 ml-16 relative overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground p-6 ml-16 relative overflow-hidden">
 
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -180,7 +182,7 @@ export const MarketSectionSuspense = () => {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-[#ffca55] to-[#FFA100] bg-clip-text text-transparent">
               Marketplace
             </h1>
-            <p className="text-gray-400 mt-2">Personalize your profile with exclusive items</p>
+            <p className="text-muted-foreground mt-2">Personalize your profile with exclusive items</p>
           </div>
 
           <div className="flex items-center gap-4 mt-4 md:mt-0 relative">
@@ -198,9 +200,9 @@ export const MarketSectionSuspense = () => {
         {/* XP Popup Modal */}
         {showXpPopup && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-            <div className="bg-[#1e1e1e] rounded-2xl border border-gray-700 max-w-md w-full max-h-[90vh] overflow-y-auto relative overflow-hidden">
+            <div className="bg-card rounded-2xl border border-border max-w-md w-full max-h-[90vh] overflow-y-auto relative overflow-hidden">
               {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-700 relative">
+              <div className="flex items-center justify-between p-6 border-b border-border relative">
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-[#ffca55] to-[#FFA100] bg-clip-text text-transparent">
                   Get More XP
                 </h2>
@@ -208,16 +210,16 @@ export const MarketSectionSuspense = () => {
                   variant="ghost"
                   size="icon"
                   onClick={() => setShowXpPopup(false)}
-                  className="text-gray-400 hover:text-white hover:bg-gray-700/50 rounded-full transition-all"
+                  className="text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-all"
                 >
                   <X className="h-5 w-5" />
                 </Button>
               </div>
 
               {/* Current Balance */}
-              <div className="p-6 border-b border-gray-700">
+              <div className="p-6 border-b border-border">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-400">Current Balance:</span>
+                  <span className="text-muted-foreground">Current Balance:</span>
                   <div className="flex items-center gap-2">
                     <Boxes className="h-5 w-5 text-purple-500" />
                     <span className="text-xl font-bold">{Intl.NumberFormat("en").format(userCoins)} XP</span>
@@ -226,22 +228,22 @@ export const MarketSectionSuspense = () => {
               </div>
 
               {/* Free Option - Rewarded Ads */}
-              <div className="p-6 border-b border-gray-700">
+              <div className="p-6 border-b border-border">
                 <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                   <Video className="h-5 w-5 text-blue-400" />
                   Free XP - Watch Ads
                 </h3>
-                <p className="text-gray-400 text-sm mb-4">
+                <p className="text-muted-foreground text-sm mb-4">
                   Watch an ad to earn XP for free!
                 </p>
-                <div className="flex items-center justify-between p-5 bg-[#252525] rounded-xl border-2 border-gray-700 hover:border-blue-500 transition-colors">
+                <div className="flex items-center justify-between p-5 bg-muted/50 rounded-xl border-2 border-border hover:border-blue-500 transition-colors">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-blue-600/20 rounded-lg">
                       <Video className="h-6 w-6 text-blue-400" />
                     </div>
                     <div>
-                      <div className="font-semibold text-white text-base">Rewarded Ads</div>
-                      <div className="text-sm text-gray-400">
+                      <div className="font-semibold text-foreground text-base">Rewarded Ads</div>
+                      <div className="text-sm text-muted-foreground">
                         {rewardedAdsEnabled ? "✓ Ads are active" : "Enable to watch ads"}
                       </div>
                     </div>
@@ -260,7 +262,7 @@ export const MarketSectionSuspense = () => {
                   <CreditCard className="h-5 w-5 text-green-400" />
                   Buy XP Packages
                 </h3>
-                <p className="text-gray-400 text-sm mb-4">
+                <p className="text-muted-foreground text-sm mb-4">
                   Get instant XP with these premium packages
                 </p>
 
@@ -270,13 +272,13 @@ export const MarketSectionSuspense = () => {
                       key={index}
                       className={`relative p-4 rounded-xl border-2 cursor-pointer ${pkg.popular
                         ? "border-purple-500 bg-gradient-to-r from-purple-700/10 to-purple-100/10"
-                        : "border-gray-600 bg-[#252525] hover:border-gray-500"
+                        : "border-border bg-muted/50 hover:border-muted-foreground"
                         }`}
                       onClick={() => handlePurchaseXp(pkg.lookup)}
                     >
                       {pkg.popular && (
                         <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
-                          <span className="bg-purple-500 text-gray-900 text-xs px-2 py-1 rounded-full font-semibold">
+                          <span className="bg-purple-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
                             MOST POPULAR
                           </span>
                         </div>
@@ -287,12 +289,12 @@ export const MarketSectionSuspense = () => {
                           <Boxes className="h-6 w-6 text-purple-500" />
                           <div>
                             <div className="font-semibold text-lg">{pkg.amount.toLocaleString()} XP</div>
-                            <div className="text-gray-400 text-sm">Instant delivery</div>
+                            <div className="text-muted-foreground text-sm">Instant delivery</div>
                           </div>
                         </div>
                         <div className="text-right">
                           <div className="font-bold text-lg">${pkg.price}</div>
-                          <div className="text-gray-400 text-sm">
+                          <div className="text-muted-foreground text-sm">
                             ${(pkg.price / (pkg.amount / 1000)).toFixed(2)} per 1K XP
                           </div>
                         </div>
@@ -302,8 +304,8 @@ export const MarketSectionSuspense = () => {
                 </div>
 
                 {/* Security Note */}
-                <div className="mt-4 p-3 bg-gray-800/50 rounded-lg">
-                  <div className="flex items-center gap-2 text-xs text-gray-400">
+                <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Lock className="h-3 w-3" />
                     <span>Secure payment processing. Your transaction is safe and encrypted.</span>
                   </div>
@@ -315,26 +317,26 @@ export const MarketSectionSuspense = () => {
 
         {/* Rest of your existing JSX remains the same, just add animation classes */}
         {/* Search and Filter Section */}
-        <div className="bg-[#1e1e1e] rounded-xl border border-gray-800 p-4 mb-8 relative overflow-hidden">
+        <div className="bg-card rounded-xl border border-border p-4 mb-8 relative overflow-hidden">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Search items..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-full bg-[#252525] border border-gray-700 focus:border-[#ffca55] focus:outline-none transition-all duration-300"
+                className="w-full pl-10 pr-4 py-3 rounded-full bg-muted/50 border border-border focus:border-primary focus:outline-none transition-all duration-300"
               />
             </div>
 
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-gray-400" />
-              <span className="text-sm text-gray-400">Filter:</span>
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Filter:</span>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="rounded-full bg-[#252525] border border-gray-700 text-white px-3 py-2 text-sm focus:border-[#ffca55] focus:outline-none transition-all duration-300"
+                className="rounded-full bg-muted/50 border border-border text-foreground px-3 py-2 text-sm focus:border-primary focus:outline-none transition-all duration-300"
               >
                 {categories.map(category => (
                   <option key={category.id} value={category.id}>{category.name}</option>
@@ -351,7 +353,7 @@ export const MarketSectionSuspense = () => {
                 onClick={() => setSelectedCategory(category.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm ${selectedCategory === category.id
                   ? "bg-gradient-to-r from-[#ffca55] to-[#FFA100] text-gray-900"
-                  : "bg-[#252525] text-gray-300 hover:bg-[#2d2d2d]"
+                  : "bg-muted/50 text-muted-foreground hover:bg-muted"
                   }`}
               >
                 {category.icon}
@@ -371,11 +373,11 @@ export const MarketSectionSuspense = () => {
             return (
               <Card
                 key={item.assetId}
-                className="bg-[#1e1e1e] border border-gray-800 overflow-hidden group relative"
+                className="bg-card border border-border overflow-hidden group relative"
               >
                 <CardContent className="p-0">
                   {/* Item Image */}
-                  <div className="h-40 flex items-center justify-center bg-gradient-to-b from-[#2a2a2a] to-[#1e1e1e] relative">
+                  <div className="h-40 flex items-center justify-center bg-gradient-to-b from-muted/50 to-card relative">
                     <span className="text-5xl">
                       {isDummy ? (item as any).emoji : assetIcon.get(item.iconNumber)}
                     </span>
@@ -420,7 +422,7 @@ export const MarketSectionSuspense = () => {
                             </Button>
                           ) : (
                             <Button
-                              className="rounded-xl bg-[#333333] text-white text-sm font-semibold shadow-lg hover:shadow-[#ffca55] transition-all duration-300 hover:scale-105 hover:-translate-y-0.5"
+                              className="rounded-xl bg-secondary text-secondary-foreground hover:bg-secondary/80 text-sm font-semibold shadow-lg hover:shadow-[#ffca55] transition-all duration-300 hover:scale-105 hover:-translate-y-0.5"
                               onClick={() => handlePurchase(item.assetId, item.price)}
                             >
                               <ShoppingCart className="h-4 w-4 mr-1" />
@@ -441,9 +443,9 @@ export const MarketSectionSuspense = () => {
         {
           allItems.length === 0 && (
             <div className="text-center py-16">
-              <Search className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-xl font-semibold text-gray-300">No items found</h3>
-              <p className="text-gray-500 mt-2">Try adjusting your search or filter criteria</p>
+              <Search className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="text-xl font-semibold text-foreground">No items found</h3>
+              <p className="text-muted-foreground mt-2">Try adjusting your search or filter criteria</p>
             </div>
           )
         }
@@ -460,7 +462,7 @@ export const MarketSectionSuspense = () => {
               <div className="text-6xl">🌟</div>
               <div>
                 <h3 className="text-xl font-bold">Premium Creator Pack</h3>
-                <p className="text-gray-300 mt-2">Get access to exclusive items and special features</p>
+                <p className="text-muted-foreground mt-2">Get access to exclusive items and special features</p>
                 <div className="flex items-center mt-4">
                   <Coins className="h-5 w-5 text-[#ffca55] mr-2" />
                   <span className="font-semibold">2,500</span>
@@ -476,10 +478,10 @@ export const MarketSectionSuspense = () => {
               <div className="text-6xl">⚡</div>
               <div>
                 <h3 className="text-xl font-bold">Weekly Special Offer</h3>
-                <p className="text-gray-300 mt-2">Limited time offer - 50% off on all effects</p>
+                <p className="text-muted-foreground mt-2">Limited time offer - 50% off on all effects</p>
                 <div className="flex items-center mt-4">
                   <Boxes className="h-5 w-5 text-[#ffca55] mr-2" />
-                  <span className="font-semibold line-through text-gray-400">1,500</span>
+                  <span className="font-semibold line-through text-muted-foreground">1,500</span>
                   <span className="font-semibold ml-2">750</span>
                   <Button className="ml-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:opacity-90">
                     <Zap className="h-4 w-4 mr-2" />

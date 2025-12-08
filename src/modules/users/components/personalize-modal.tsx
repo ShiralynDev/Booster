@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +32,7 @@ import { toast } from "sonner";
 import { trpc } from "@/trpc/client";
 import { AnimatedPlanetIcon } from "@/modules/market/components/assetIcons/animated-planet-icon";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 
 // Default icons available to everyone (free)
 const DEFAULT_ICONS = [
@@ -123,7 +126,7 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
     const [showRoleModal, setShowRoleModal] = useState(false);
     const [showAvatarModal, setShowAvatarModal] = useState(false);
     const [roleSearch, setRoleSearch] = useState('');
-    const [theme, setTheme] = useState<'light' | 'dark'>('light');
+    const { theme, setTheme } = useTheme();
     const [selectedAccent, setSelectedAccent] = useState(0);
 
     // Fetch user's owned assets from marketplace
@@ -343,7 +346,7 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
                                     {/* XP Progress - Real Channel Booster */}
                                     <div className="border-t pt-4">
                                         <div className="flex justify-between mb-3">
-                                            <span className="text-white font-bold text-sm">Channel Booster</span>
+                                            <span className="text-foreground font-bold text-sm">Channel Booster</span>
                                             <span className="text-primary font-bold text-sm">Level {channelLevel}</span>
                                         </div>
                                         <div className="h-2.5 bg-muted rounded-full overflow-hidden">
@@ -563,8 +566,8 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
                                                                 <Sun className="w-6 h-6 text-yellow-600" />
                                                             </div>
                                                             <div className="text-left flex-1">
-                                                                <div className="font-bold text-gray-900">Light Mode</div>
-                                                                <div className="text-xs text-gray-600 mt-0.5">Bright & clean interface</div>
+                                                                <div className="font-bold text-gray-900 dark:text-gray-100">Light Mode</div>
+                                                                <div className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Bright & clean interface</div>
                                                             </div>
                                                         </div>
                                                         {/* Selection indicator */}

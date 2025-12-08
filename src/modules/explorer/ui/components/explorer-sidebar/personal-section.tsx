@@ -70,12 +70,12 @@ export const PersonalSection = () => {
                             <SidebarMenuItem key={item.title} className="relative">
                                 {/* Active state background with subtle animation */}
                                 {isActive && (
-                                    <div className="absolute inset-0 bg-white/10 rounded-3xl border  shadow-sm backdrop-blur-sm" />
+                                    <div className="absolute inset-0 bg-accent rounded-3xl border border-border shadow-sm backdrop-blur-sm" />
                                 )}
 
                                 {/* Hover state background */}
                                 {isHovered && !isActive && (
-                                    <div className="absolute inset-0 bg-white/5 rounded-lg transition-all duration-200" />
+                                    <div className="absolute inset-0 bg-accent/50 rounded-lg transition-all duration-200" />
                                 )}
 
                                 <SidebarMenuButton
@@ -95,8 +95,8 @@ export const PersonalSection = () => {
                                         relative
                                         transition-all duration-300 ease-out
                                         ${isActive
-                                            ? ' bg-white/5 shadow-sm rounded-full'
-                                            : ' hover:scale-[1.01] hover:bg-white/3'
+                                            ? ' bg-accent/50 shadow-sm rounded-full'
+                                            : ' hover:scale-[1.01] hover:bg-accent/30'
                                         }
                                         border border-transparent
                                         overflow-hidden
@@ -116,7 +116,7 @@ export const PersonalSection = () => {
                                             transition-all duration-300 ease-out
                                             ${isActive
                                                 ? 'bg-amber-500 text-slate-900 shadow-sm'
-                                                : 'bg-white/5 text-white/70 group-hover:bg-amber-300/10 group-hover:text-white'
+                                                : 'bg-muted text-muted-foreground group-hover:bg-amber-500/10 group-hover:text-foreground'
                                             }
                                             rounded-lg 
                                             w-6 h-6
@@ -132,8 +132,8 @@ export const PersonalSection = () => {
                                          <span className={`
                                             text-sm font-medium transition-all duration-200
                                             ${isActive 
-                                                ? 'text-white font-semibold' 
-                                                : 'text-white/70 group-hover:text-white/90'
+                                                ? 'text-foreground font-semibold' 
+                                                : 'text-muted-foreground group-hover:text-foreground'
                                             }
                                             whitespace-nowrap
                                             overflow-hidden

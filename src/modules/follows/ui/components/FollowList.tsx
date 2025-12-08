@@ -43,7 +43,7 @@ export const FollowList = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1, duration: 0.2 }}
-                            className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mt-6 mx-auto leading-relaxed"
+                            className="text-xl text-muted-foreground max-w-2xl mt-6 mx-auto leading-relaxed"
                         >
                             See who you follow!
                         </motion.p>
@@ -59,19 +59,19 @@ export const FollowList = () => {
                 >
                     <div className="absolute inset-0 rounded-2xl blur-xl transform scale-105" />
 
-                    <div className="relative bg-[#212121] backdrop-blur-md rounded-2xl p-6 shadow-xl">
+                    <div className="relative bg-card backdrop-blur-md rounded-2xl p-6 shadow-xl border border-border">
                         <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
                             {/* Enhanced Search */}
                             <div className="relative w-full lg:w-96">
                                 <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-xl blur-sm" />
                                 <div className="relative">
-                                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white h-5 w-5 z-10 pointer-events-none" />
+                                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5 z-10 pointer-events-none" />
                                     <input
                                         type="text"
                                         placeholder="Search profiles..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-12 pr-4 py-3 bg-white/80 dark:bg-[#212121] text-gray-900 dark:text-white rounded-xl backdrop-blur-sm placeholder-gray-500 dark:placeholder-gray-400 relative"
+                                        className="w-full pl-12 pr-4 py-3 bg-background/50 text-foreground rounded-xl backdrop-blur-sm placeholder-muted-foreground relative border border-border focus:outline-none focus:ring-2 focus:ring-amber-500/50"
                                     />
                                 </div>
                             </div>
@@ -80,7 +80,7 @@ export const FollowList = () => {
                             <div className="flex flex-wrap gap-6">
                                 <motion.div
                                     whileHover={{ scale: 1.05 }}
-                                    className="flex items-center gap-3 bg-white/50 dark:bg-gray-700/50 px-4 py-3 rounded-xl  backdrop-blur-sm"
+                                    className="flex items-center gap-3 bg-muted/50 px-4 py-3 rounded-xl backdrop-blur-sm border border-border"
                                 >
                                     <div className="p-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg">
                                         <Users className="h-5 w-5 text-white" />
@@ -89,7 +89,7 @@ export const FollowList = () => {
                                         <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">
                                             {followList.length}
                                         </div>
-                                        <div className="text-sm text-gray-600 dark:text-gray-400">Following</div>
+                                        <div className="text-sm text-muted-foreground">Following</div>
                                     </div>
                                 </motion.div>
 
@@ -123,7 +123,7 @@ export const FollowList = () => {
                                 {/* Hover Glow Effect */}
                                 <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-orange-400/20 rounded-2xl blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-105 -z-10" />
 
-                                <div className="relative bg-[#212121] rounded-2xl p-6 shadow-lg hover:shadow-2xl dark:border-amber-800 group-hover:border-amber-300 dark:group-hover:border-amber-600 transition-all duration-300 overflow-hidden">
+                                <div className="relative bg-card rounded-2xl p-6 shadow-lg hover:shadow-2xl border border-border group-hover:border-amber-300 dark:group-hover:border-amber-600 transition-all duration-300 overflow-hidden">
                                     {/* Premium Badge for Top Creators */}
                                     {(user.user?.followsCount || 0) >= 5 && (
                                         <motion.div
@@ -156,7 +156,7 @@ export const FollowList = () => {
                                                 {/* <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-800" /> */}
                                             </motion.div>
                                             <div className="flex-1 min-w-0">
-                                                <h3 className="font-bold text-gray-900 dark:text-white text-lg truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                                                <h3 className="font-bold text-foreground text-lg truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                                                     {user.user?.name}
                                                 </h3>
                                                 <div className="flex items-center text-amber-600 dark:text-amber-400 text-sm mt-1">
@@ -172,7 +172,7 @@ export const FollowList = () => {
 
 
                                     {/* Action Buttons */}
-                                    <div className="flex gap-3 pt-4 border-t border-gray-500">
+                                    <div className="flex gap-3 pt-4 border-t border-border">
                                         <Link
                                             href={`/users/${user.user?.id}`}
                                             className="flex-1"
@@ -180,7 +180,7 @@ export const FollowList = () => {
                                             <motion.button
                                                 whileHover={{ scale: 1.05, y: -2 }}
                                                 whileTap={{ scale: 0.95 }}
-                                                className="w-full bg-[#333333] text-white py-3 rounded-xl font-semibold text-sm shadow-lg hover:shadow-[#ffca55] transition-all duration-300 flex items-center justify-center gap-2"
+                                                className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/80 py-3 rounded-xl font-semibold text-sm shadow-lg hover:shadow-[#ffca55] transition-all duration-300 flex items-center justify-center gap-2"
                                             >
                                                 <UserPlus className="h-4 w-4" />
                                                 View Profile

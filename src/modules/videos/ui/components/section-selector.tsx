@@ -31,15 +31,15 @@ export const SectionSelector = ({ videoId }: { videoId: string }) => {
   }
 
   return (
-    <div className="mt-2 flex flex-col items-center">
-      <div className="w-full max-w-[880px]">
-        <div className="flex justify-center items-center gap-3 mb-5">
+    <div className="flex flex-col h-full w-full">
+      <div className="shrink-0 w-full max-w-[880px] mx-auto">
+        <div className="flex justify-center items-center gap-3 mb-5 pt-2">
             <button
                 onClick={() => setTab("info")}
                 className={`px-3 py-1.5 rounded-full font-medium transition ${
                   tab === "info"
-                   ? "bg-gradient-to-b from-primary to-secondary text-textprimary"
-                    : "bg-[#333333]   text-white"
+                   ? "bg-gradient-to-b from-primary to-secondary text-primary-foreground"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
                 }`}
               >
                 Info
@@ -49,8 +49,8 @@ export const SectionSelector = ({ videoId }: { videoId: string }) => {
             onClick={() => setTab("videos")}
             className={`px-3 py-1.5 rounded-full font-medium transition ${
               tab === "videos"
-               ? "bg-gradient-to-b from-primary to-secondary text-textprimary"
-                : "bg-[#333333]   text-white"
+               ? "bg-gradient-to-b from-primary to-secondary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
             }`}
           >
             Videos
@@ -59,30 +59,32 @@ export const SectionSelector = ({ videoId }: { videoId: string }) => {
             onClick={() => setTab("comments")}
             className={`px-3 py-1.5 rounded-full font-medium transition ${
               tab === "comments"
-                ? "bg-gradient-to-b from-primary to-secondary text-textprimary"
-                : "bg-[#333333]   text-white"
+                ? "bg-gradient-to-b from-primary to-secondary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
             }`}
           >
             Comments
           </button>
               
         </div>
+      </div>
 
-        <div>
+      <div className={`flex-1 min-h-0 w-full ${tab === "comments" ? "overflow-hidden" : "overflow-y-auto"}`}>
+        <div className="w-full max-w-[880px] mx-auto h-full">
           {tab === "videos" && (
-            <div>
+            <div className="pb-4">
               <SuggestionsSection videoId={videoId} />
             </div>
           )}
 
           {tab === "comments" && (
-            <div>
+            <div className="h-full">
               <CommentsSection videoId={videoId} openComments home={false} />
             </div>
           )}
 
           {tab === "info" && (
-            <div>
+            <div className="pb-4">
               {video ? (
                 <div className="flex flex-col gap-4">
                   <VideoReactions

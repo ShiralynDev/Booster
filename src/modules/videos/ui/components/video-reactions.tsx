@@ -42,7 +42,7 @@ export const VideoReactions = ({
   return (
     <>
       {!small ? (
-        <div className="flex justify-between p-3 bg-white dark:bg-[#333333] rounded-2xl shadow-[0_5px_25px_rgba(255,161,0,0.1)]">
+        <div className="flex justify-between p-3 bg-card rounded-2xl shadow-[0_5px_25px_rgba(255,161,0,0.1)]">
           {/* Header */}
           {/* <div className="text-center">
                         <p className="font-bold text-lg text-amber-900 dark:text-amber-100">Rate this video</p>

@@ -32,7 +32,7 @@ const NavItem = ({
     return (
       <button
         onClick={() => clerk.openSignIn()}
-        className="px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        className="px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
       >
         {children}
       </button>
@@ -41,7 +41,7 @@ const NavItem = ({
     return (
       <Link
         href={href}
-        className="px-2 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+        className="px-2 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
       >
         {children}
       </Link>

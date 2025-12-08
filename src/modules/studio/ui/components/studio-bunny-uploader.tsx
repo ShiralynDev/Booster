@@ -1,6 +1,6 @@
 "use client";
 
-import { LockIcon, Upload } from "lucide-react";
+import { LockIcon, Upload, Loader2 } from "lucide-react";
 import { ChangeEvent, DragEvent, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
@@ -10,16 +10,25 @@ import { useRouter } from "next/navigation";
 
 import * as tus from 'tus-js-client'
 
-export const StudioBunnyUploader = () => {
+interface StudioBunnyUploaderProps {
+  onSuccess?: (videoId: string) => void;
+  onUploadStarted?: (videoId: string) => void;
+  children?: React.ReactNode;
+}
+
+export const StudioBunnyUploader = ({ onSuccess, onUploadStarted, children }: StudioBunnyUploaderProps) => {
   const [state, setState] = useState<{ file: File | null; progress: number; uploading: boolean }>({
     file: null, progress: 0, uploading: false
   });
   const utils = trpc.useUtils();
   const router = useRouter();
+  const videoIdRef = useRef<string | null>(null);
+
   const createAfterUpload = trpc.videos.createAfterUpload.useMutation({
     onSuccess: (data) => {
       utils.studio.getMany.invalidate({ limit: DEFAULT_LIMIT })
-      router.push(`/studio/videos/${data.id}`)
+      videoIdRef.current = data.id;
+      onUploadStarted?.(data.id);
     }
   });
   const xhrRef = useRef<XMLHttpRequest | null>(null);
@@ -79,6 +88,11 @@ export const StudioBunnyUploader = () => {
         onSuccess: async () => {
           setState((s) => ({ ...s, progress: 100, uploading: false }));
           toast.success("Uploaded! Processing started.");
+          if (onSuccess && videoIdRef.current) {
+            onSuccess(videoIdRef.current);
+          } else if (!onSuccess && videoIdRef.current) {
+            router.push(`/studio/videos/${videoIdRef.current}`)
+          }
         },
       })
       upload.findPreviousUploads().then(async function (previousUploads) {
@@ -140,7 +154,11 @@ export const StudioBunnyUploader = () => {
         if (xhr.status >= 200 && xhr.status < 300) {
           setState((s) => ({ ...s, progress: 100, uploading: false }));
 
-          // use row.id to navigate or refresh list
+          if (onSuccess && videoIdRef.current) {
+            onSuccess(videoIdRef.current);
+          } else if (!onSuccess && videoIdRef.current) {
+            router.push(`/studio/videos/${videoIdRef.current}`)
+          }
         } else {
           setState((s) => ({ ...s, uploading: false }));
           toast.error(`Upload failed (${xhr.status}).`);
@@ -164,8 +182,35 @@ export const StudioBunnyUploader = () => {
 
   const { file, progress } = state;
 
+  if (file) {
+    return (
+      <div className="flex flex-col h-full w-full">
+        <div className="flex-1 overflow-y-auto p-4">
+          {children || (
+            <div className="flex flex-col items-center justify-center h-full space-y-4">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              <p className="text-muted-foreground">Preparing your video...</p>
+            </div>
+          )}
+        </div>
+        <div className="p-4 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky bottom-0 z-10">
+          <div className="flex justify-between text-xs mb-2">
+            <div className="flex items-center gap-2">
+              <span className="font-medium truncate max-w-[200px]">{file.name}</span>
+              <span className="text-muted-foreground">
+                {progress === 100 ? "Processing..." : "Uploading..."}
+              </span>
+            </div>
+            <span className="font-medium">{progress}%</span>
+          </div>
+          <Progress value={progress} className="h-2" />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex items-center justify-center p-3 w-full max-w-lg h-full z-50">
+    <div className="flex items-center justify-center p-3 w-full max-w-lg h-full z-50 mx-auto">
       <form className="w-full" onSubmit={(e) => e.preventDefault()}>
         <div
           className="flex justify-center rounded-md border mt-2 border-dashed border-input px-6 py-12"
@@ -200,15 +245,6 @@ export const StudioBunnyUploader = () => {
           </span>
         </p>
 
-        {file && (
-          <div className="mt-4">
-            <div className="flex justify-between text-xs mb-1">
-              <span className="truncate">{file.name}</span>
-              <span>{progress}%</span>
-            </div>
-            <Progress value={progress} />
-          </div>
-        )}
       </form>
     </div>
   );

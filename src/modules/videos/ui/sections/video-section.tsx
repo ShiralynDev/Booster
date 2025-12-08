@@ -30,14 +30,14 @@ export const VideoSection = ({ videoId }: VideoSectionProps) => {
 
 const VideoSectionSkeleton = () => {
     return (
-        <div className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-700/30 to-transparent animate-shimmer" />
+        <div className="relative aspect-video rounded-3xl overflow-hidden bg-muted">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-muted-foreground/10 to-transparent animate-shimmer" />
             <div className="absolute inset-0 flex items-center justify-center">
                 <div className="flex flex-col items-center gap-3">
                     <div className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center">
                         <Loader2 className="h-8 w-8 text-white animate-spin" />
                     </div>
-                    <p className="text-gray-300 font-medium">Loading your video...</p>
+                    <p className="text-muted-foreground font-medium">Loading your video...</p>
                 </div>
             </div>
         </div>
@@ -46,13 +46,13 @@ const VideoSectionSkeleton = () => {
 
 const VideoErrorFallback = () => {
     return (
-        <div className="relative aspect-video rounded-3xl overflow-hidden bg-gradient-to-br from-red-900/20 to-rose-900/20 backdrop-blur-md border border-red-500/30">
+        <div className="relative aspect-video rounded-3xl overflow-hidden bg-destructive/10 backdrop-blur-md border border-destructive/30">
             <div className="absolute inset-0 flex items-center justify-center flex-col gap-4 p-8 text-center">
                 <div className="w-20 h-20 rounded-full bg-gradient-to-r from-red-500 to-rose-500 flex items-center justify-center">
                     <span className="text-2xl">⚠️</span>
                 </div>
-                <h3 className="text-xl font-semibold text-white">Video Unavailable</h3>
-                <p className="text-gray-300">We&aposre having trouble loading this video. Please try again later.</p>
+                <h3 className="text-xl font-semibold text-foreground">Video Unavailable</h3>
+                <p className="text-muted-foreground">We&aposre having trouble loading this video. Please try again later.</p>
                 <button className="px-6 py-2 bg-gradient-to-r from-red-500 to-rose-500 rounded-full text-white font-medium hover:shadow-lg transition-all">
                     Retry
                 </button>

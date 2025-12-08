@@ -54,7 +54,7 @@ export const UserInfo = ({
                         </Link>
                     </div>
                 </TooltipTrigger>
-                <TooltipContent className="bg-black/70 dark:bg-white" align="center">
+                <TooltipContent className="bg-black/70 text-white dark:bg-white dark:text-black" align="center">
                     <p>{name}</p>
                 </TooltipContent>
             </Tooltip>

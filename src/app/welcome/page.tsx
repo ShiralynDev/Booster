@@ -25,7 +25,7 @@ export default function WelcomePage() {
       <main className="flex-1 flex flex-col items-center">
         {/* Hero Section */}
         <section className="w-full py-20 px-6 flex flex-col items-center text-center max-w-4xl mx-auto space-y-8">
-            <h1 className="text-5xl md:text-7xl font-black tracking-tighter bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <h1 className="text-5xl md:text-7xl font-black tracking-tighter bg-gradient-to-r from-primary to-muted-foreground bg-clip-text text-transparent">
                 Boost Your Creativity
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl">

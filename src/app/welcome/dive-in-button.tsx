@@ -9,7 +9,7 @@ export function DiveInButton() {
     <Button 
       onClick={() => diveIn()} 
       size="lg" 
-      className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-black font-bold text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group"
+      className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group"
     >
       Dive In
       <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />

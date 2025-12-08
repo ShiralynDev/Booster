@@ -89,7 +89,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                                                     }
                                             }) }} />
                 </head>
-                <body className={`${montserrat.className} antialiased`}>
+                <body className={`${montserrat.className} antialiased bg-background text-foreground`}>
                     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
                         <TRPCProvider>
                             <NotificationProvider>
