@@ -1,14 +1,26 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ResponsiveModal } from '@/components/responsive-modal';
 import { Button } from '@/components/ui/button';
 import { PlusIcon } from 'lucide-react';
 import { StudioBunnyUploader } from './studio-bunny-uploader';
 import { FormSection } from '@/modules/studio/ui/sections/form-section';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 export const StudioUploadModal = () => {
     const [open, setOpen] = useState(false);
     const [videoId, setVideoId] = useState<string | null>(null);
+    const searchParams = useSearchParams();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (searchParams.get('create') === 'true') {
+            setOpen(true);
+            setVideoId(null);
+            // Clean up the URL
+            router.replace('/studio');
+        }
+    }, [searchParams, router]);
 
     const handleOpen = () => {
         setOpen(true);
