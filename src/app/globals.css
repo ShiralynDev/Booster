@@ -49,22 +49,22 @@ body {
   .dark {
     --background: 0 0% 0%; /* #000000 pitch black */
     --foreground: 0 0% 98%;
-    --card: 0 0% 20%; /* #333333 */
+    --card: 0 0% 0%; /* Match background */
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 20%; /* #333333 */
+    --popover: 0 0% 0%; /* Match background */
     --popover-foreground: 0 0% 98%;
     --primary: 0 0% 98%;
     --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 20%; /* #333333 */
+    --secondary: 0 0% 10%; 
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 20%; /* #333333 */
+    --muted: 0 0% 10%; 
     --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 20%; /* #333333 */
+    --accent: 0 0% 10%; 
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 20%; /* #333333 */
-    --input: 0 0% 20%; /* #333333 */
+    --border: 0 0% 20%; /* Visible border */
+    --input: 0 0% 20%; 
     --ring: 0 0% 83.1%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
@@ -75,9 +75,9 @@ body {
     --sidebar-foreground: 0 0% 98%;
     --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 20%; /* #333333 */
+    --sidebar-accent: 0 0% 10%; 
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 0 0% 20%; /* #333333 */
+    --sidebar-border: 0 0% 20%; 
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
