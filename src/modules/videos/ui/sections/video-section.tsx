@@ -2,14 +2,15 @@
 
 import { cn } from "@/lib/utils";
 import { trpc } from "@/trpc/client";
-import { Suspense, useState, useRef, useEffect } from "react";
+import { Suspense, useState, useRef, useEffect, useCallback } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { VideoBanner } from "../components/video-banner";
 import { VideoTopRow } from "../components/video-top-row";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Eye, Clock, Loader2 } from "lucide-react";
 import { BunnyEmbed } from "./BunnyEmbed";
+import { toast } from "sonner";
 // import Player from "./Player";
 
 interface VideoSectionProps {
@@ -62,6 +63,37 @@ const VideoErrorFallback = () => {
 const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
     const [video] = trpc.videos.getOne.useSuspenseQuery({ id: videoId });
 
+    const { user: clerkUser } = useUser();
+    const clerkUserId = clerkUser?.id;
+    const { data: user } = trpc.users.getByClerkId.useQuery({
+        clerkId: clerkUserId,
+    });
+    const userId = user?.id;
+
+    const [hasRewarded, setHasRewarded] = useState(false);
+    const isRewardingRef = useRef(false);
+    const utils = trpc.useUtils();
+
+    // Add XP reward mutation for featured videos
+    const { mutate: rewardXp } = trpc.xp.rewardXp.useMutation({
+        onSuccess: (data) => {
+            utils.xp.getXpByUserId.invalidate({ userId });
+            // Show success message for XP reward
+            toast.success(`🎉 You earned ${data.xpAdded} XP for watching this featured video to the end!`);
+        },
+        onError: (error) => {
+            console.error("Failed to reward XP:", error);
+            toast.error("Failed to award XP. Please try again later.");
+            setHasRewarded(false); // Reset on error so user can try again
+            isRewardingRef.current = false; // Reset ref flag on error
+        }
+    });
+
+    // Reset reward flag when video changes
+    useEffect(() => {
+        setHasRewarded(false);
+        isRewardingRef.current = false;
+    }, [video.id]);
    
     
     // console.log("BOOST AAAA",boostPoints.boostPoints)
@@ -71,12 +103,35 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
     const videoPlayerRef = useRef<{ play: () => void; pause: () => void }>(null);
 
     const { isSignedIn, } = useAuth();
-    const utils = trpc.useUtils();
+    
     const createView = trpc.videoViews.create.useMutation({
         onSuccess: () => {
             utils.videos.getOne.invalidate({ id: videoId }) //invalidate cache and get new updated views value
         },
     });
+
+    // Handle video end for featured videos - give XP when video is watched to completion
+    const handleVideoEnd = useCallback(() => {
+        console.log("Video ended for video:", video.id, "isFeatured:", video.isFeatured, "isSignedIn:", isSignedIn, "userId:", userId, "hasRewarded:", hasRewarded, "isRewarding:", isRewardingRef.current);
+
+        // Prevent multiple executions with synchronous flag
+        if (hasRewarded || isRewardingRef.current) {
+            console.log("XP already rewarded or currently rewarding for this video, skipping");
+            return;
+        }
+
+        if (video.isFeatured && isSignedIn && userId) {
+            console.log("Awarding XP for featured video completion");
+            isRewardingRef.current = true; // Set synchronous flag immediately
+            setHasRewarded(true); // Set state flag
+            rewardXp({
+                amount: 20,
+                videoId: video.id
+            });
+        } else {
+            console.log("XP not awarded - conditions not met");
+        }
+    }, [video.isFeatured, video.id, isSignedIn, userId, hasRewarded, rewardXp]);
 
     // const [shouldPlay, setShouldPlay] = useState(false);
 
@@ -159,7 +214,7 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
                         playbackId={video.muxPlaybackId}
                         thumbnailUrl={video.thumbnailUrl}
                     /> */}
-                     <BunnyEmbed libraryId={video.bunnyLibraryId} videoId={video.bunnyVideoId} /> 
+                     <BunnyEmbed libraryId={video.bunnyLibraryId} videoId={video.bunnyVideoId} onVideoEnd={handleVideoEnd} /> 
                     {/*<Player src={video.playbackUrl} autoPlay={shouldPlay} isAI={video.isAi} />*/}
                 </div>
 

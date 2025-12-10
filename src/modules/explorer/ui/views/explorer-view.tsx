@@ -222,13 +222,13 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                     {/* Animated Background Glow - Outside container */}
                     <div className="absolute inset-0 rounded-3xl blur-lg opacity-0  bg-secondary transition-opacity duration-500 pointer-events-none -z-10" />
 
-                    <div className="relative shadow-2xl overflow-hidden">
+                    <div className="relative  overflow-hidden">
                         {/* Header */}
                         <div className="flex items-center justify-between mb-6">
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-3">
                                     <motion.div
-                                        className="w-3 h-10 bg-gradient-to-b from-primary to-secondary rounded-full shadow-lg"
+                                        className="w-3 h-10 bg-gradient-to-b from-primary to-secondary rounded-full "
                                     />
                                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Earn free XP</h2>
                                 </div>
@@ -239,12 +239,12 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                             {/* Enhanced Video Card 1 - Real Featured Video */}
                             <Link href={`/videos/${featuredVideo.id}`}>
                                 <motion.div
-                                    whileHover={{ scale: 1.02 }}
+                                    
                                     whileTap={{ scale: 0.98 }}
                                     transition={{ type: "spring", stiffness: 300 }}
                                     className="relative group/card cursor-pointer"
                                 >
-                                    <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-transparent">
+                                    <div className="relative rounded-2xl overflow-hidden border-2 border-transparent">
                                         {(glowVisible || glowFading) && (
                                             <div className={`absolute -inset-6 -z-10 pointer-events-none transition-opacity duration-300 ${glowFading ? 'opacity-0' : 'opacity-100'}`}>
                                                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-amber-400/60 via-yellow-300/40 to-transparent animate-pulse blur-[40px] opacity-95 transform scale-105" />

@@ -5,7 +5,6 @@ import { UserAvatar } from "@/components/user-avatar";
 import { formatDistanceToNow } from "date-fns";
 import { Send, ArrowLeft, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect, useRef } from "react";
 
@@ -115,7 +114,7 @@ export const MessageChat = ({ userId, onBack, onClose }: MessageChatProps) => {
             </div>
 
             {/* Messages Area */}
-            <ScrollArea className="flex-1 p-4 max-h-[400px]">
+            <div className="flex-1 p-4 max-h-[400px] overflow-y-auto">
                 <div className="space-y-3">
                     {messages && messages.length > 0 ? (
                         messages.map((message) => {
@@ -160,7 +159,7 @@ export const MessageChat = ({ userId, onBack, onClose }: MessageChatProps) => {
                     )}
                     <div ref={scrollRef} />
                 </div>
-            </ScrollArea>
+            </div>
 
             {/* Message Input */}
             <form onSubmit={handleSendMessage} className="p-3 border-t border-border">

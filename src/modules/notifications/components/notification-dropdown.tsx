@@ -6,7 +6,6 @@ import { formatDistanceToNow } from "date-fns";
 import { CheckCheck, MessageCircle, UserPlus, X, Mail, Rocket, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNotificationDropdown } from "@/contexts/notification-context";
 import { MessageChat } from "@/modules/messages/ui/components/message-chat";
 
@@ -165,7 +164,7 @@ export const NotificationDropdown = ({ onClose, onNotificationRead }: Notificati
                     )}
 
                     {/* Notification List */}
-                    <ScrollArea className="max-h-[500px]">
+                    <div className="max-h-[500px] overflow-y-auto">
                         {isLoading ? (
                             <div className="p-8 text-center text-muted-foreground">
                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
@@ -239,7 +238,7 @@ export const NotificationDropdown = ({ onClose, onNotificationRead }: Notificati
                                 <p className="text-sm mt-1">When you get notifications, they&apos;ll show up here</p>
                             </div>
                         )}
-                    </ScrollArea>
+                    </div>
                 </>
             ) : (
                 /* DMs Tab Content */
@@ -252,7 +251,7 @@ export const NotificationDropdown = ({ onClose, onNotificationRead }: Notificati
                     />
                 ) : (
                     /* Show conversations list */
-                    <ScrollArea className="max-h-[500px]">
+                    <div className="max-h-[500px] overflow-y-auto">
                         {isLoadingConversations ? (
                             <div className="p-8 text-center text-muted-foreground">
                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
@@ -314,7 +313,7 @@ export const NotificationDropdown = ({ onClose, onNotificationRead }: Notificati
                                 <p className="text-sm mt-1">Start a conversation with users you follow!</p>
                             </div>
                         )}
-                    </ScrollArea>
+                    </div>
                 )
             )}
         </div>
