@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { assets, userAssets} from "@/db/schema";
+import { assets, userAssets, users} from "@/db/schema";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { eq, getTableColumns, isNotNull } from "drizzle-orm";
 import z from "zod";
@@ -14,9 +14,19 @@ export const assetsRouter = createTRPCRouter({
         return activeAssets
     }),
 
-    getAssetsByUser: protectedProcedure
+    getAssetsByUser: baseProcedure
     .query(async ({ctx}) => {
-        const {user} = ctx;
+        const { clerkUserId } = ctx;
+
+        if (!clerkUserId) {
+            return [];
+        }
+
+        const [user] = await db.select().from(users).where(eq(users.clerkId, clerkUserId));
+
+        if (!user) {
+            return [];
+        }
 
         const ownedItems = await db
         .select({
