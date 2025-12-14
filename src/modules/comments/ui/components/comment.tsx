@@ -5,6 +5,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { COMMENT_REPLIES_SIZE, COMMENT_SECTION_SIZE, } from "@/constants";
 import { compactDate, compactNumber } from "@/lib/utils";
 import { UserInfo } from "@/modules/users/ui/components/user-info";
+import { UserTitle } from "@/modules/users/ui/components/user-title";
 import { CommentOutput } from "@/modules/videos/types";
 import { trpc } from "@/trpc/client";
 import { useClerk, useAuth } from "@clerk/nextjs";
@@ -234,25 +235,23 @@ export const Comment = ({ parentComment, videoId, viewer, depth, maxDepth }: Com
                 <UserAvatar size="md" imageUrl={parentComment.user.imageUrl} name={parentComment.user.name} userId={parentComment.userId} badgeSize={5} />
 
                 <div className="flex-1 min-w-0 overflow-hidden">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <UserInfo size="xs" name={parentComment.user.name?.replace(/\s*null\s*$/i, "")} userId={parentComment.userId} />
+                    <div className="flex flex-col items-start gap-0 mb-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <UserInfo size="xs" name={parentComment.user.name?.replace(/\s*null\s*$/i, "")} userId={parentComment.userId} />
 
-
-                        {/* Icon between username and timestamp */}
-                        <div className="flex gap-2 items-center">
-                            {getUserIcons(parentComment.user.id, 4)}
                             <span className="text-xs text-gray-500 dark:text-gray-400">
                                 {compactDate(parentComment.createdAt) ?? ""}
                             </span>
-                        </div>
 
-                        <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            className="opacity-0 group-hover:opacity-100 transition-all text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1"
-                        >
-                            <MoreHorizontal className="w-4 h-4" />
-                        </motion.button>
+                            <motion.button
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                className="opacity-0 group-hover:opacity-100 transition-all text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1"
+                            >
+                                <MoreHorizontal className="w-4 h-4" />
+                            </motion.button>
+                        </div>
+                        <UserTitle userId={parentComment.userId} size="xs" />
                     </div>
 
                     <p

@@ -54,6 +54,7 @@ export const ExplorerNavBar = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
   // Simulate loading XP data
   useEffect(() => {
@@ -97,7 +98,7 @@ export const ExplorerNavBar = () => {
     >
       <div className="flex items-center justify-between w-full">
         {/* Menu and logo */}
-        <div className="flex items-center flex-shrink-0 z-50">
+        <div className={`flex items-center flex-shrink-0 z-50 ${isMobileSearchOpen ? 'hidden sm:flex' : 'flex'}`}>
           <SidebarTrigger />
           <Link
             href="/"
@@ -123,25 +124,25 @@ export const ExplorerNavBar = () => {
         </div>
 
         {/* Search bar */}
-        <div className="flex-1 flex justify-start max-w-[600px] mx-4 sm:ml-[12rem]">
-          <SearchInput />
+        <div className={`flex-1 flex justify-start max-w-[600px] mx-4 sm:ml-[12rem] ${isMobileSearchOpen ? 'w-full ml-0 max-w-full mx-0' : ''}`}>
+          <SearchInput isMobileSearchOpen={isMobileSearchOpen} setIsMobileSearchOpen={setIsMobileSearchOpen} />
         </div>
 
         {/* XP indicator + right controls */}
-        <div className="flex-shrink-0 items-center flex gap-3">
+        <div className={`flex-shrink-0 items-center flex gap-3 ${isMobileSearchOpen ? 'hidden sm:flex' : 'flex'}`}>
           {/* Desktop navigation */}
 
           <NavItem clerk={clerk} userId={userId} href={`/users/${userId}`}>
             <div className="flex items-center gap-2">
               <Tv2Icon className="size-4" />
-              My Channel
+              <span className="hidden sm:block">My Channel</span>
             </div>
           </NavItem>
 
           <NavItem clerk={clerk} userId={userId} href="/studio?create=true">
             <div className="flex items-center gap-2">
               <Upload className="size-4" />
-              Create
+              <span className="hidden sm:block">Create</span>
             </div>
           </NavItem>
 
