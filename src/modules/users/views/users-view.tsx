@@ -28,7 +28,7 @@ import { useFollow } from "@/modules/follows/hooks/follow-hook";
 import { SubButton } from "@/modules/subscriptions/ui/components/sub-button";
 import { Spinner } from "@/components/ui/shadcn-io/spinner";
 import { getUserIcons } from "@/modules/market/components/assetIcons/functions/get-user-icons";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { PersonalizeModal } from "../components/personalize-modal";
 import { useNotificationDropdown } from "@/contexts/notification-context";
 
@@ -52,6 +52,7 @@ const diff_time = (date?: Date | string | null): number => {
 
 export const UsersView = ({ userId }: Props) => {
   const { userId: clerkUserId } = useAuth();
+  const { user: clerkUser } = useUser();
   const { openMessages } = useNotificationDropdown();
   const [user] = trpc.users.getByUserId.useSuspenseQuery({ userId });
   const [followers] = trpc.follows.getFollowersByUserId.useSuspenseQuery({ userId, });
@@ -92,6 +93,16 @@ export const UsersView = ({ userId }: Props) => {
   const canMessage = mutualFollows?.some(user => user.id === userId) || false;
 
   const utils = trpc.useUtils();
+
+  useEffect(() => {
+    if (clerkUser && isOwnProfile) {
+      // Add a small delay to allow the webhook to process the changes in the database
+      const timeout = setTimeout(() => {
+        utils.users.getByUserId.invalidate({ userId });
+      }, 1000);
+      return () => clearTimeout(timeout);
+    }
+  }, [clerkUser?.updatedAt?.getTime(), isOwnProfile, userId, utils]);
 
   const prefetchRankings = useCallback(() => {
     utils.xp.getBoostersByCreatorId.prefetch({ creatorId: userId });
@@ -208,10 +219,15 @@ export const UsersView = ({ userId }: Props) => {
               <div className="flex flex-col items-center">
                 <div className="flex items-center justify-center text-center max-w-full">
                   <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent  line-clamp-2 max-w-[200px] md:max-w-[400px]">
-                    {/* Code With Antonio and Angelie for a good software development j */}
                     {user?.name || "Unknown User"}
                   </h1>
                 </div>
+
+                {user.username && (
+                  <div className="text-sm text-muted-foreground -mt-1 mb-1">
+                    @{user.username}
+                  </div>
+                )}
                 
                 {/* Title Display */}
                 {equippedTitle && (

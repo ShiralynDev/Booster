@@ -255,6 +255,24 @@ export const usersRouter = createTRPCRouter({
             return { success: true };
         }),
 
+    update: protectedProcedure
+        .input(z.object({
+            name: z.string().optional(),
+            // about: z.string().optional(), // Maybe add this too if needed later
+        }))
+        .mutation(async ({ input, ctx }) => {
+            const { name } = input;
+            const userId = ctx.user.id;
+
+            if (name) {
+                await db.update(users)
+                    .set({ name })
+                    .where(eq(users.id, userId));
+            }
+            
+            return { success: true };
+        }),
+
     updateBusinessProfile: protectedProcedure
         .input(z.object({
             businessDescription: z.string().optional(),

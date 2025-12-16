@@ -120,6 +120,7 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
     const [showAvatarModal, setShowAvatarModal] = useState(false);
     const { theme, setTheme } = useTheme();
     const [selectedAccent, setSelectedAccent] = useState(0);
+    const [displayName, setDisplayName] = useState("");
 
     // Fetch user's owned assets from marketplace
     const { data: ownedAssets, isLoading: loadingAssets } = trpc.assets.getAssetsByUser.useQuery();
@@ -156,6 +157,13 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
             setSelectedTitle(equippedTitle.name);
         }
     }, [equippedTitle]);
+
+    // Initialize displayName when user is loaded
+    React.useEffect(() => {
+        if (currentUser?.name) {
+            setDisplayName(currentUser.name);
+        }
+    }, [currentUser?.name]);
 
     // Calculate channel level and XP
     const channelLevel = currentUser && boostPoints 
@@ -195,6 +203,18 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
         },
         onError: (error) => {
             toast.error(error.message || 'Failed to update title');
+        }
+    });
+
+    const updateUserMutation = trpc.users.update.useMutation({
+        onSuccess: async () => {
+            if (currentUser?.id) {
+                utils.users.getByUserId.invalidate({ userId: currentUser.id });
+                utils.users.getByClerkId.invalidate({ clerkId: clerkUserId });
+            }
+        },
+        onError: (error) => {
+            toast.error(error.message || 'Failed to update profile');
         }
     });
 
@@ -314,6 +334,12 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
              }
              changesSaved = true;
         }
+
+        // Save display name if changed
+        if (displayName !== currentUser?.name) {
+            updateUserMutation.mutate({ name: displayName });
+            changesSaved = true;
+        }
         
         if (changesSaved) {
             toast.success('Profile updated successfully!');
@@ -368,7 +394,7 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
                                             <UserAvatar
                                                 size="xl"
                                                 imageUrl={currentUser?.imageUrl || undefined}
-                                                name={currentUser?.name || "User"}
+                                                name={displayName || currentUser?.name || "User"}
                                                 className="w-32 h-32 border-4 border-border"
                                                 userId={currentUser?.id || ''}
                                             />
@@ -379,7 +405,7 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
                                                 <Camera className="w-4 h-4" />
                                             </button>
                                         </div>
-                                        <h2 className="text-2xl font-bold">{currentUser?.name || 'Loading...'}</h2>
+                                        <h2 className="text-2xl font-bold">{displayName || currentUser?.name || 'Loading...'}</h2>
                                         <p className="text-muted-foreground">
                                             {selectedTitle ? (
                                                 <span className={cn(
@@ -475,12 +501,25 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
                                             <div>
                                                 <label className="block text-sm font-bold mb-2">Display Name</label>
                                                 <Input 
-                                                    value={currentUser?.name || ''} 
+                                                    value={displayName} 
+                                                    onChange={(e) => setDisplayName(e.target.value)}
+                                                    className="border-2 border-gray-300 dark:border-gray-600 bg-background"
+                                                    placeholder="Enter your display name"
+                                                />
+                                                <p className="text-xs text-muted-foreground mt-1">
+                                                    This is how you will appear to other users
+                                                </p>
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-sm font-bold mb-2">Username</label>
+                                                <Input 
+                                                    value={currentUser?.username ? `@${currentUser.username}` : ''} 
                                                     disabled
                                                     className="border-2 border-gray-300 dark:border-gray-600 bg-muted cursor-not-allowed"
                                                 />
                                                 <p className="text-xs text-muted-foreground mt-1">
-                                                    Name is managed through your account settings
+                                                    Change your username in account settings!
                                                 </p>
                                             </div>
 
