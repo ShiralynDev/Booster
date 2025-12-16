@@ -31,14 +31,14 @@ export const StudioBunnyUploader = ({ onSuccess, onUploadStarted, children }: St
       onUploadStarted?.(data.id);
     }
   });
-  const xhrRef = useRef<XMLHttpRequest | null>(null);
 
   const { data: video } = trpc.studio.getOne.useQuery(
     { id: videoIdRef.current ?? "" },
-    { 
+    {
       enabled: !!videoIdRef.current && state.progress === 100,
-      refetchInterval: (data) => {
-        return !data || (data.status !== 'completed' && data.status !== 'error') ? 1000 : false;
+      refetchInterval: (query) => {
+        const status = query.state.data?.bunnyStatus;
+        return !query.state.data || (status !== 'completed' && status !== 'error') ? 1000 : false;
       }
     }
   );
@@ -122,69 +122,12 @@ export const StudioBunnyUploader = ({ onSuccess, onUploadStarted, children }: St
     }
   }
 
-  const start = async (file: File) => {
-    try {
-      setState({ file, progress: 0, uploading: true });
-
-      // 1) get bunny video ID (guid)
-
-      const createRes = await fetch("/api/bunny/create", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ title: file.name }),
-      });
-
-      if (!createRes.ok) throw new Error(await createRes.text());
-      const { guid } = await createRes.json() as { guid: string };
-
-      await createAfterUpload.mutateAsync({
-        bunnyVideoId: guid,
-        title: file.name,
-      });
-
-      toast.success("Uploaded! Processing started.");
-      // 2) Upload bytes to proxy
-      const xhr = new XMLHttpRequest();
-      xhrRef.current = xhr;
-      xhr.open("PUT", `/api/bunny/upload?videoId=${encodeURIComponent(guid)}`, true);
-      xhr.setRequestHeader("content-type", "application/octet-stream");
-      xhr.upload.onprogress = (e) => {
-        if (e.lengthComputable) {
-          const pct = Math.min(99, Math.round((e.loaded / e.total) * 100));
-          setState((s) => ({ ...s, progress: pct }));
-        }
-      };
-      xhr.onerror = () => {
-        setState((s) => ({ ...s, uploading: false }));
-        toast.error("Upload failed.");
-      };
-      xhr.onload = async () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          setState((s) => ({ ...s, progress: 100, uploading: false }));
-
-          if (onSuccess && videoIdRef.current) {
-            onSuccess(videoIdRef.current);
-          } else if (!onSuccess && videoIdRef.current) {
-            router.push(`/studio/videos/${videoIdRef.current}`)
-          }
-        } else {
-          setState((s) => ({ ...s, uploading: false }));
-          toast.error(`Upload failed (${xhr.status}).`);
-        }
-      };
-      xhr.send(file);
-    } catch (e: any) {
-      setState((s) => ({ ...s, uploading: false }));
-      toast.error(e?.message ?? "Upload failed");
-    }
-  };
-
   const onPick = (e: ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]; if (f) void tusUploader(f);
   };
   const onDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    const f = e.dataTransfer.files?.[0]; if (f) void start(f);
+    const f = e.dataTransfer.files?.[0]; if (f) void tusUploader(f);
   };
 
   const { file, progress } = state;
@@ -207,7 +150,7 @@ export const StudioBunnyUploader = ({ onSuccess, onUploadStarted, children }: St
                 </div>
             </div>
         )}
-        {progress === 100 && (!video || (video.status !== 'completed' && video.status !== 'error')) && (
+        {progress === 100 && (!video || (video?.bunnyStatus !== 'completed' && video?.bunnyStatus !== 'error')) && (
             <div className="flex flex-col items-center justify-center gap-2 p-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
                 <div className="relative h-12 w-12 flex items-center justify-center bg-primary/5 rounded-full">
                     <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
@@ -232,7 +175,7 @@ export const StudioBunnyUploader = ({ onSuccess, onUploadStarted, children }: St
                             switch (video?.bunnyStatus) {
                                 case 'queued': return 'Waiting in line to be processed';
                                 case 'processing': return 'Analyzing video file';
-                                case 'encoding': return 'Converting to multiple formats';
+                                case 'encoding': return 'Converting formats';
                                 case 'resolution_finished': return 'You can preview it now in lower quality';
                                 case 'failed': return 'Something went wrong';
                                 default: return 'This might take a moment';

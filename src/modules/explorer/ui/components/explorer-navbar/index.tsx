@@ -147,7 +147,9 @@ export const ExplorerNavBar = () => {
           </NavItem>
 
           <NotificationBell />
-          <XpIndicator xp={myXp?.xp || 0} isLoading={isLoading} />
+          {user?.accountType !== 'business' && (
+            <XpIndicator xp={myXp?.xp || 0} isLoading={isLoading} />
+          )}
           <AuthButton />
         </div>
       </div>

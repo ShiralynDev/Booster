@@ -6,6 +6,11 @@ import {
     createUpdateSchema
 } from "drizzle-zod"
 
+export const userAccountType = pgEnum("user_account_type", [
+    'personal',
+    'business'
+])
+
 export const users = pgTable("users", {
     id: uuid("id").primaryKey().defaultRandom(),
     clerkId: text("clerk_id").unique().notNull(),
@@ -21,6 +26,9 @@ export const users = pgTable("users", {
     equippedAssetId: uuid("equipped_asset_id").references((): AnyPgColumn => assets.assetId), // The currently equipped/displayed asset icon
     equippedTitleId: uuid("equipped_title_id").references((): AnyPgColumn => assets.assetId), // The currently equipped title
     rewardedAdsEnabled: boolean("rewarded_ads_enabled").default(false),
+    accountType: userAccountType("account_type"),
+    businessDescription: text("business_description"),
+    businessImageUrls: text("business_image_urls").array(),
 }, (t) => [uniqueIndex("clerk_id_idx").on(t.clerkId)]);
 
 //create index on clerk_id to query faster. --> speed up WHERE, JOIN, ORDER BY clauses. B-Tree sorted by the column I index

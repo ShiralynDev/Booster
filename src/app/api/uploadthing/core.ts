@@ -90,6 +90,28 @@ export const ourFileRouter = {
             // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
             return { uploadedBy: metadata.user.id };
         }),
+
+    businessImageUploader: f({
+        image: {
+            maxFileSize: "4MB",
+            maxFileCount: 5,
+        },
+    })
+        .middleware(async () => {
+            const { userId: clerkUserId } = await auth();
+            if (!clerkUserId) throw new UploadThingError("Unauthorized");
+
+            const [user] = await db.select().from(users).where(eq(users.clerkId, clerkUserId));
+
+            if (!user || user.accountType !== 'business') {
+                throw new UploadThingError("Unauthorized: Business account required");
+            }
+
+            return { userId: user.id };
+        })
+        .onUploadComplete(async ({ metadata, file }) => {
+            return { url: file.url, key: file.key };
+        }),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;

@@ -4,6 +4,7 @@ import { comments, videoRatings, videos, videoViews } from "@/db/schema";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { eq, and, or, lt, desc, sql, getTableColumns, avg, count, sum } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
+import { getBunnyVideo, statusMap } from "@/lib/bunny";
 
 export const studioRouter = createTRPCRouter({
 
@@ -22,6 +23,50 @@ export const studioRouter = createTRPCRouter({
             if (!video) {
                 throw new TRPCError({ code: "NOT_FOUND" })
             }
+
+            // Sync with Bunny if processing
+            if (video.bunnyVideoId && video.bunnyLibraryId && 
+               (video.bunnyStatus === 'processing' || video.bunnyStatus === 'uploaded' || video.bunnyStatus === 'queued' || video.bunnyStatus === 'encoding')) {
+                try {
+                    const bunnyData = await getBunnyVideo(video.bunnyLibraryId, video.bunnyVideoId);
+                    const rawStatus = String(bunnyData.status);
+                    const newStatus = statusMap.get(rawStatus) || 'processing';
+                    
+                    if (newStatus !== video.bunnyStatus) {
+                         const dbStatus = rawStatus === '3' ? 'completed' : 'processing';
+                         const duration = bunnyData.length ? Math.round(bunnyData.length) : video.duration;
+                         
+                         let thumbnailUrl = video.thumbnailUrl;
+                         let thumbnailKey = video.thumbnailKey;
+                         
+                         if (rawStatus === '3' && bunnyData.thumbnailFileName) {
+                             const host = process.env.BUNNY_PULLZONE_HOST!;
+                             thumbnailKey = `/${video.bunnyVideoId}/${bunnyData.thumbnailFileName}`;
+                             thumbnailUrl = `https://${host}${thumbnailKey}`;
+                         }
+
+                         await db.update(videos).set({
+                             bunnyStatus: newStatus,
+                             status: dbStatus,
+                             duration: duration,
+                             thumbnailUrl: thumbnailUrl,
+                             thumbnailKey: thumbnailKey
+                         }).where(eq(videos.id, video.id));
+
+                         return {
+                             ...video,
+                             bunnyStatus: newStatus,
+                             status: dbStatus,
+                             duration: duration,
+                             thumbnailUrl: thumbnailUrl,
+                             thumbnailKey: thumbnailKey
+                         };
+                    }
+                } catch (error) {
+                    console.error("Failed to sync with Bunny:", error);
+                }
+            }
+
             return video;
         }),
 

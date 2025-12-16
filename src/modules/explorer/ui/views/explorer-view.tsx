@@ -130,7 +130,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
     const { data: user } = trpc.users.getByClerkId.useQuery({
         clerkId: clerkUserId,
     });
-    const rewardedAdsEnabled = user?.rewardedAdsEnabled ?? false;
+    const rewardedAdsEnabled = user?.accountType === 'business' ? true : (user?.rewardedAdsEnabled ?? false);
 
         const searchParams = useSearchParams();
         const aiQuery = searchParams?.get("q") ?? undefined;
@@ -177,7 +177,14 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
         ) as any;
 
     const videos = useMemo(() => (data ? (data.pages as any[]).flatMap((p: any) => p.items as any[]) : []), [data]);
-    const featuredVideo = (videos as any[]).find((v: any) => v.isFeatured);
+    
+    // Fetch featured videos separately to ensure they all appear
+    const { data: featuredVideosData } = trpc.explorer.getFeatured.useQuery(undefined, {
+        suspense: true,
+        staleTime: 60000, // Cache for 1 minute
+    });
+    
+    const featuredVideos = featuredVideosData || [];
 
 
 
@@ -221,7 +228,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
             </motion.div>
 
             {/* Placeholder for Featured Video when ads are disabled */}
-            {featuredVideo && !rewardedAdsEnabled && (
+            {featuredVideos.length > 0 && !rewardedAdsEnabled && (
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -261,7 +268,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
             )}
 
             {/* Enhanced Featured Video Section */}
-            {featuredVideo && rewardedAdsEnabled && (
+            {featuredVideos.length > 0 && rewardedAdsEnabled && (
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -282,91 +289,91 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
 
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {/* Enhanced Video Card 1 - Real Featured Video */}
-                            <Link href={`/videos/${featuredVideo.id}`}>
-                                <motion.div
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    transition={{ type: "spring", stiffness: 300 }}
-                                    className="relative group/card cursor-pointer"
-                                >
-                                    <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-transparent">
-                                        {(glowVisible || glowFading) && (
-                                            <div className={`absolute -inset-6 -z-10 pointer-events-none transition-opacity duration-300 ${glowFading ? 'opacity-0' : 'opacity-100'}`}>
-                                                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-amber-400/60 via-yellow-300/40 to-transparent animate-pulse blur-[40px] opacity-95 transform scale-105" />
-                                            </div>
-                                        )}
-
-                                        <div className="relative aspect-video overflow-hidden">
-                                            <VideoThumbnail
-                                                duration={featuredVideo.duration || 0}
-                                                title={featuredVideo.title}
-                                                imageUrl={featuredVideo.thumbnailUrl}
-                                                previewUrl={featuredVideo.previewUrl}
-                                            />
-                                        </div>
-
-                                        {/* Enhanced Gradient Overlay */}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-
-                                        {/* Enhanced Content Overlay */}
-                                        <div className="absolute inset-0 p-4 flex flex-col justify-between">
-                                            <div>
-                                                <div className="flex items-start justify-between mb-2">
-                                                    <h3 className="text-xl font-bold text-white line-clamp-2 pr-2 flex-1 leading-tight">
-                                                        {featuredVideo.title}
-                                                    </h3>
-                                                    <motion.div
-                                                        whileHover={{ scale: 1.1 }}
-                                                        className="bg-gradient-to-r from-primary to-secondary text-textprimary px-3 py-1.5 rounded-xl text-xs font-semibold shadow-lg whitespace-nowrap"
-                                                    >
-                                                        Featured
-                                                    </motion.div>
+                            {featuredVideos.map((featuredVideo) => (
+                                <Link key={featuredVideo.id} href={`/videos/${featuredVideo.id}`}>
+                                    <motion.div
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        transition={{ type: "spring", stiffness: 300 }}
+                                        className="relative group/card cursor-pointer"
+                                    >
+                                        <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-transparent">
+                                            {(glowVisible || glowFading) && (
+                                                <div className={`absolute -inset-6 -z-10 pointer-events-none transition-opacity duration-300 ${glowFading ? 'opacity-0' : 'opacity-100'}`}>
+                                                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-amber-400/60 via-yellow-300/40 to-transparent animate-pulse blur-[40px] opacity-95 transform scale-105" />
                                                 </div>
+                                            )}
 
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <UserAvatar
-                                                        size="md"
-                                                        imageUrl={featuredVideo.user?.imageUrl || "/public-user.png"}
-                                                        name={featuredVideo.user?.name || "Anonymous"}
-                                                        userId={featuredVideo.user?.id}
-                                                        badgeSize={5}
-                                                        disableLink
-                                                    />
-                                                    <div>
-                                                        <div className="flex items-center gap-1">
-                                                            <p className="text-white font-medium text-sm">{featuredVideo.user?.name}</p>
-                                                            <UserIcon userId={featuredVideo.user?.id} size={4} />
-                                                        </div>
-                                                        <div className="flex items-center gap-2 text-white/80 text-xs mt-0.5">
+                                            <div className="relative aspect-video overflow-hidden">
+                                                <VideoThumbnail
+                                                    duration={featuredVideo.duration || 0}
+                                                    title={featuredVideo.title}
+                                                    imageUrl={featuredVideo.thumbnailUrl}
+                                                    previewUrl={featuredVideo.previewUrl}
+                                                />
+                                            </div>
+
+                                            {/* Enhanced Gradient Overlay */}
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+
+                                            {/* Enhanced Content Overlay */}
+                                            <div className="absolute inset-0 p-4 flex flex-col justify-between">
+                                                <div>
+                                                    <div className="flex items-start justify-between mb-2">
+                                                        <h3 className="text-xl font-bold text-white line-clamp-2 pr-2 flex-1 leading-tight">
+                                                            {featuredVideo.title}
+                                                        </h3>
+                                                        <motion.div
+                                                            whileHover={{ scale: 1.1 }}
+                                                            className="bg-gradient-to-r from-primary to-secondary text-textprimary px-3 py-1.5 rounded-xl text-xs font-semibold shadow-lg whitespace-nowrap"
+                                                        >
+                                                            Featured
+                                                        </motion.div>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <UserAvatar
+                                                            size="md"
+                                                            imageUrl={featuredVideo.user?.imageUrl || "/public-user.png"}
+                                                            name={featuredVideo.user?.name || "Anonymous"}
+                                                            userId={featuredVideo.user?.id}
+                                                            badgeSize={5}
+                                                            disableLink
+                                                        />
+                                                        <div>
                                                             <div className="flex items-center gap-1">
-                                                                <Eye className="w-3 h-3" />
-                                                                <span>{formatCompactNumber(Number(featuredVideo.videoViews) || 0)}</span>
+                                                                <p className="text-white font-medium text-sm">{featuredVideo.user?.name}</p>
+                                                                <UserIcon userId={featuredVideo.user?.id} size={4} />
                                                             </div>
-                                                            <div className="flex items-center gap-1">
-                                                                <StarIcon className="w-3 h-3 text-yellow-300" />
-                                                                <span>{Number(featuredVideo.averageRating).toFixed(1)}</span>
+                                                            <div className="flex items-center gap-2 text-white/80 text-xs mt-0.5">
+                                                                <div className="flex items-center gap-1">
+                                                                    <Eye className="w-3 h-3" />
+                                                                    <span>{formatCompactNumber(Number(featuredVideo.videoViews) || 0)}</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-1">
+                                                                    <StarIcon className="w-3 h-3 text-yellow-300" />
+                                                                    <span>{Number(featuredVideo.averageRating).toFixed(1)}</span>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
+
+                                                {/* Play Button Overlay */}
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 20 }}
+                                                    whileHover={{ opacity: 1, y: 0 }}
+                                                    className="flex justify-center"
+                                                >
+                                                    <div className="bg-white/20 backdrop-blur-md rounded-full p-3 border border-white/30">
+                                                        <Play className="w-8 h-8 text-textprimary fill-white" />
+                                                    </div>
+                                                </motion.div>
                                             </div>
-
-                                            {/* Play Button Overlay */}
-                                            <motion.div
-                                                initial={{ opacity: 0, y: 20 }}
-                                                whileHover={{ opacity: 1, y: 0 }}
-                                                className="flex justify-center"
-                                            >
-                                                <div className="bg-white/20 backdrop-blur-md rounded-full p-3 border border-white/30">
-                                                    <Play className="w-8 h-8 text-textprimary fill-white" />
-                                                </div>
-                                            </motion.div>
                                         </div>
-                                    </div>
-                                </motion.div>
-                            </Link>
-
-                            
+                                    </motion.div>
+                                </Link>
+                            ))}
                         </div>
                 </motion.div>
             )}
@@ -422,7 +429,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                         transition={{ duration: 0.2 }}
                         className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6"
                     >
-                        {videos.filter(v => !v.isFeatured).map((video, index) => (
+                        {videos.filter(v => !featuredVideos.some(fv => fv.id === v.id)).map((video, index) => (
                             <motion.div
                                 key={video.id}
                                 initial={{ opacity: 0, y: 30,  }}

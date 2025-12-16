@@ -217,6 +217,18 @@ export const usersRouter = createTRPCRouter({
       const { enabled } = input;
       const userId = ctx.user.id;
 
+      // Check if user is business account
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId));
+
+      if (user?.accountType === 'business') {
+        // Business accounts cannot disable rewarded ads (featured videos)
+        // They are always enabled
+        return user;
+      }
+
       const [updatedUser] = await db
         .update(users)
         .set({ rewardedAdsEnabled: enabled })
@@ -227,5 +239,52 @@ export const usersRouter = createTRPCRouter({
     }),
 
   // getAssetsByUser
+
+    setAccountType: protectedProcedure
+        .input(z.object({
+            accountType: z.enum(['personal', 'business'])
+        }))
+        .mutation(async ({ input, ctx }) => {
+            const { accountType } = input;
+            const userId = ctx.user.id;
+
+            await db.update(users)
+                .set({ accountType })
+                .where(eq(users.id, userId));
+            
+            return { success: true };
+        }),
+
+    updateBusinessProfile: protectedProcedure
+        .input(z.object({
+            businessDescription: z.string().optional(),
+            businessImageUrls: z.array(z.string()).optional(),
+        }))
+        .mutation(async ({ input, ctx }) => {
+            const { businessDescription, businessImageUrls } = input;
+            const userId = ctx.user.id;
+
+            // Verify user is a business account
+            const [user] = await db
+                .select({ accountType: users.accountType })
+                .from(users)
+                .where(eq(users.id, userId));
+
+            if (!user || user.accountType !== 'business') {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Only business accounts can update business profile"
+                });
+            }
+
+            await db.update(users)
+                .set({ 
+                    ...(businessDescription !== undefined && { businessDescription }),
+                    ...(businessImageUrls !== undefined && { businessImageUrls }),
+                })
+                .where(eq(users.id, userId));
+            
+            return { success: true };
+        }),
 
 })

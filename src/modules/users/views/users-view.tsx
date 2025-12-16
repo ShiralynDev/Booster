@@ -32,6 +32,8 @@ import { useAuth } from "@clerk/nextjs";
 import { PersonalizeModal } from "../components/personalize-modal";
 import { useNotificationDropdown } from "@/contexts/notification-context";
 
+import { BusinessProfileSection } from "../components/business-profile-section";
+
 interface Props {
   userId: string;
 }
@@ -260,54 +262,59 @@ export const UsersView = ({ userId }: Props) => {
             </div>
 
             {/* XP POP UP */}
-            {showXpPopup && (
+            {showXpPopup && user.accountType !== 'business' && (
               <XpCard user={user} setShowAddXpModal={setShowXpPopup} />
             )}
 
             <div className="md:w-2/3 md:pl-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                  Channel Boost
-                </h2>
-                <div
-                  className={`text-primary font-bold flex items-center gap-2 ${showLevelUp ? "animate-bounce" : ""
-                    }`}
-                >
-                  Level {channelLevel}
-                  {showLevelUp && (
-                    <Sparkles className="w-4 h-4 text-yellow-500 animate-spin" />
-                  )}
-                </div>
-              </div>
+              {user.accountType === 'business' ? (
+                <BusinessProfileSection 
+                  userId={user.id}
+                  isOwnProfile={isOwnProfile}
+                  businessDescription={user.businessDescription}
+                  businessImageUrls={user.businessImageUrls}
+                />
+              ) : (
+                <>
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                      Channel Boost
+                    </h2>
+                    <div
+                      className={`text-primary font-bold flex items-center gap-2 ${showLevelUp ? "animate-bounce" : ""
+                        }`}
+                    >
+                      Level {channelLevel}
+                      {showLevelUp && (
+                        <Sparkles className="w-4 h-4 text-yellow-500 animate-spin" />
+                      )}
+                    </div>
+                  </div>
 
-              <div className="w-full h-6 bg-muted/20 rounded-full overflow-hidden border border-border mb-2 relative">
-                <div
-                  className="h-full bg-gradient-to-r from-primary to-secondary rounded-full relative overflow-hidden transition-all duration-1000 ease-out"
-                  style={{ width: `${xpPercentage}%` }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/40 mix-blend-overlay"></div>
+                  <div className="w-full h-6 bg-muted/20 rounded-full overflow-hidden border border-border mb-2 relative">
+                    <div
+                      className="h-full bg-gradient-to-r from-primary to-secondary rounded-full relative overflow-hidden transition-all duration-1000 ease-out"
+                      style={{ width: `${xpPercentage}%` }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/40 mix-blend-overlay"></div>
 
-                  {/* Animated shine effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-[-20deg] animate-shine"></div>
-                </div>
+                      {/* Animated shine effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-[-20deg] animate-shine"></div>
+                    </div>
+                  </div>
 
-                {/* Level up indicator notch */}
-                {/* <div 
-                  className="absolute top-0 h-full w-1 bg-yellow-400 shadow-lg"
-                  style={{ left: `${xpPercentage}%` }}
-                /> */}
-              </div>
-
-              <div className="flex justify-between text-muted-foreground text-sm mb-4">
-                <div className="flex items-start gap-1 text-center">
-                  <span className="font-semibold">Boost progress </span>
-                  <span>{xpPercentage.toFixed(2)}% </span>
-                </div>
-                <span>
-                  {(xpForNextLevel - boostPoints.boostPoints).toLocaleString()}{" "}
-                  XP for next level
-                </span>
-              </div>
+                  <div className="flex justify-between text-muted-foreground text-sm mb-4">
+                    <div className="flex items-start gap-1 text-center">
+                      <span className="font-semibold">Boost progress </span>
+                      <span>{xpPercentage.toFixed(2)}% </span>
+                    </div>
+                    <span>
+                      {(xpForNextLevel - boostPoints.boostPoints).toLocaleString()}{" "}
+                      XP for next level
+                    </span>
+                  </div>
+                </>
+              )}
               <div className="flex items-center justify-between gap-2">
 
                 {isOwnProfile ? (
@@ -358,7 +365,7 @@ export const UsersView = ({ userId }: Props) => {
                   </Button>
                 )}
 
-                {!isOwnProfile && (
+                {!isOwnProfile && user.accountType !== 'business' && (
                   <Button
                     onClick={() => setShowXpPopup(true)}
                     className="bg-gradient-to-r from-primary to-secondary text-primary-foreground font-bold py-2 px-6 rounded-full hover:opacity-90 transition-all hover:scale-105 active:scale-95"
@@ -371,34 +378,36 @@ export const UsersView = ({ userId }: Props) => {
               </div>
 
               <div className="flex justify-between ">
-                <div className="mt-6">
-                  <h3 className="text-primary font-semibold mb-3">
-                    Unlocked Rewards
-                  </h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center text-sm">
-                      <span className="text-primary mr-2">
-                        <Check className="size-4" />
-                      </span>
-                      <span>Custom Emotes</span>
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <span className="text-primary mr-2">
-                        <Check className="size-4" />
-                      </span>
-                      <span>Extended Video Upload Quality</span>
-                    </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <span className="text-primary mr-2">
-                        <Lock className="size-4" />
-                      </span>
-                      <span>Verified</span>
+                {user.accountType !== 'business' && (
+                  <div className="mt-6">
+                    <h3 className="text-primary font-semibold mb-3">
+                      Unlocked Rewards
+                    </h3>
+                    <div className="space-y-2">
+                      <div className="flex items-center text-sm">
+                        <span className="text-primary mr-2">
+                          <Check className="size-4" />
+                        </span>
+                        <span>Custom Emotes</span>
+                      </div>
+                      <div className="flex items-center text-sm">
+                        <span className="text-primary mr-2">
+                          <Check className="size-4" />
+                        </span>
+                        <span>Extended Video Upload Quality</span>
+                      </div>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <span className="text-primary mr-2">
+                          <Lock className="size-4" />
+                        </span>
+                        <span>Verified</span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 <div>
-                  {recentUpgrade && <LevelUpBadge newLevel={channelLevel} />}
+                  {recentUpgrade && user.accountType !== 'business' && <LevelUpBadge newLevel={channelLevel} />}
                 </div>
               </div>
             </div>
@@ -407,7 +416,14 @@ export const UsersView = ({ userId }: Props) => {
 
         {/* Content Tabs */}
         <div className="flex flex-wrap gap-2 my-6 bg-muted/50 p-2 rounded-xl border border-border w-fit">
-          {["videos", "community", "rewards", "about"].map((tab) => (
+          {["videos", "community", "rewards", "about"]
+            .filter(tab => {
+              if (user.accountType === 'business') {
+                return tab !== 'community' && tab !== 'rewards';
+              }
+              return true;
+            })
+            .map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}

@@ -149,6 +149,22 @@ export const xpRouter = createTRPCRouter({
             const userId = ctx.user.id;
             const { price, recipientId } = input;
 
+            const [recipient] = await db.select().from(users).where(eq(users.id, recipientId));
+            
+            if (!recipient) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "Recipient not found.",
+                });
+            }
+
+            if (recipient.accountType === 'business') {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "Business accounts cannot be boosted.",
+                });
+            }
+
             // Atomic decrement with balance check in WHERE
             const [updated] = await db
                 .update(users)

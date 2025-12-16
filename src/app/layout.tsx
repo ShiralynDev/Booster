@@ -5,6 +5,12 @@ import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
+import { auth } from "@clerk/nextjs/server";
+import { db } from "@/db";
+import { users } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { OnboardingCheck } from "@/components/onboarding-check";
+
 import { TRPCProvider } from "@/trpc/client";
 import { ThemeProvider } from "@/components/theme-provider";
 import { NotificationProvider } from "@/contexts/notification-context";
@@ -66,7 +72,16 @@ export const viewport: Viewport = {
     themeColor: [{ media: "(prefers-color-scheme: dark)", color: "#0b0b0b" }, { color: "#ffffff" }],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+    const { userId } = await auth();
+    let accountType = null;
+    if (userId) {
+        const [user] = await db.select({ accountType: users.accountType }).from(users).where(eq(users.clerkId, userId));
+        if (user) {
+            accountType = user.accountType;
+        }
+    }
+
     return (
         <ClerkProvider>
             <html lang="en" suppressHydrationWarning className={montserrat.variable}>
@@ -111,6 +126,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                         <TRPCProvider>
                             <NotificationProvider>
                                 <UnreadTitleUpdater />
+                                <OnboardingCheck accountType={accountType} userId={userId} />
                                 {children}
                                 <Toaster richColors closeButton />
                                 <Analytics />

@@ -570,7 +570,7 @@ export const videosRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { id: userId } = ctx.user;
+      const { id: userId, accountType } = ctx.user;
       const [row] = await db
         .insert(videos)
         .values({
@@ -583,6 +583,7 @@ export const videosRouter = createTRPCRouter({
           bunnyStatus: "uploaded", // webhook will flip to "ready"
           s3Name: "a",
           isAi: false,
+          isFeatured: accountType === 'business',
         })
         .returning();
       return row;

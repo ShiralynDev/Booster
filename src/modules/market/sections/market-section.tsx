@@ -4,15 +4,18 @@ import React, { useState, useEffect, Suspense, JSX } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { Coins, ShoppingCart, Filter, Star, Lock, Check, Box, Landmark, X, Video, CreditCard, Crown, Users, Zap } from "lucide-react"
+import { Coins, ShoppingCart, Filter, Star, Lock, Check, Box, Landmark, X, Video, CreditCard, Crown, Users, Zap, Store } from "lucide-react"
 import { XpIndicator } from "@/modules/xp/ui/components/xp-indicator"
 import { trpc } from "@/trpc/client"
 import { useAuth } from "@clerk/nextjs"
 import { ErrorBoundary } from "react-error-boundary"
 import { Spinner } from "@/components/ui/shadcn-io/spinner"
 import { useSearchParams } from "next/navigation"
+import Link from "next/link"
+import { type InferSelectModel } from "drizzle-orm"
+import { users } from "../../../db/schema"
 
-
+type User = InferSelectModel<typeof users>;
 
 export const MarketSection = () => {
   return (
@@ -37,23 +40,48 @@ export const MarketSectionSuspense = () => {
   }, [searchParams]);
 
   const { userId: clerkUserId } = useAuth();
-  const { data: user } = trpc.users.getByClerkId.useQuery({
+  const { data: userData } = trpc.users.getByClerkId.useQuery({
     clerkId: clerkUserId,
   }, {
     enabled: !!clerkUserId,
   });
+  
+  const user = userData as User | undefined;
+
+  if ((user as any)?.accountType === 'business') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-4">
+        <div className="bg-muted/30 p-8 rounded-2xl border border-border max-w-md">
+          <Store className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-2">Market Unavailable</h2>
+          <p className="text-muted-foreground">
+            The marketplace is not available for business accounts.
+          </p>
+          <Link href="/business">
+            <Button className="mt-6">
+              Go to Business Dashboard
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   const userId = user?.id;
   const { data: myXp } = trpc.xp.getXpByUserId.useQuery(
     { userId: userId! },
     { enabled: !!userId, staleTime: 60_000, refetchOnWindowFocus: false }
   );
 
-  const [ownedItems] = trpc.assets.getAssetsByUser.useSuspenseQuery();
+  const { data: ownedItemsData } = trpc.assets.getAssetsByUser.useQuery(undefined, {
+    enabled: !!userId && (user as any)?.accountType !== 'business'
+  });
+  const ownedItems = ownedItemsData || [];
 
   const utils = trpc.useUtils();
   const toggleAds = trpc.users.toggleRewardedAds.useMutation({
     onSuccess: (data) => {
-      utils.users.getByClerkId.setData({ clerkId: clerkUserId }, data);
+      utils.users.getByClerkId.setData({ clerkId: clerkUserId }, data as any);
       utils.users.getByClerkId.invalidate({ clerkId: clerkUserId });
     }
   });
@@ -185,14 +213,18 @@ export const MarketSectionSuspense = () => {
           </div>
 
           <div className="flex items-center gap-4 mt-4 md:mt-0 relative">
-            <XpIndicator xp={userCoins} />
-            <Button
-              className="flex rounded-full bg-gradient-to-r from-[#ffca55] to-[#FFA100] text-gray-900 font-semibold hover:opacity-90"
-              onClick={() => setShowXpPopup(true)}
-            >
-              <Landmark className="h-4 w-4 mr-2" />
-              <span>Get More XP</span>
-            </Button>
+            {(user as any)?.accountType !== 'business' && (
+              <>
+                <XpIndicator xp={userCoins} />
+                <Button
+                  className="flex rounded-full bg-gradient-to-r from-[#ffca55] to-[#FFA100] text-gray-900 font-semibold hover:opacity-90"
+                  onClick={() => setShowXpPopup(true)}
+                >
+                  <Landmark className="h-4 w-4 mr-2" />
+                  <span>Get More XP</span>
+                </Button>
+              </>
+            )}
           </div>
         </div>
 
@@ -248,12 +280,17 @@ export const MarketSectionSuspense = () => {
                     </div>
                   </div>
                   <Switch
-                    checked={user?.rewardedAdsEnabled ?? false}
+                    checked={(user as any)?.accountType === 'business' ? true : (user?.rewardedAdsEnabled ?? false)}
                     onCheckedChange={(checked) => toggleAds.mutate({ enabled: checked })}
-                    disabled={toggleAds.isPending}
+                    disabled={toggleAds.isPending || (user as any)?.accountType === 'business'}
                     className="data-[state=checked]:bg-blue-600 scale-125"
                   />
                 </div>
+                {(user as any)?.accountType === 'business' && (
+                  <p className="text-xs text-muted-foreground mt-2 ml-1">
+                    * Business accounts have Featured Videos permanently enabled.
+                  </p>
+                )}
               </div>
 
               {/* Paid Options */}

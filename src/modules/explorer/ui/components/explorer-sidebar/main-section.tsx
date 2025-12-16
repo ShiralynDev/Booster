@@ -1,10 +1,11 @@
 'use client';
 
 import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
-import { EarthIcon,  PlayIcon, ShoppingCart, Users, ShieldQuestionIcon } from "lucide-react";
+import { EarthIcon,  PlayIcon, ShoppingCart, Users, ShieldQuestionIcon, Building2 } from "lucide-react";
 import { useAuth, useClerk } from "@clerk/nextjs";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { trpc } from "@/trpc/client";
 
 const items = [
      {
@@ -37,14 +38,42 @@ const items = [
 ];
 
 export const MainSection = () => {
-    const { isSignedIn } = useAuth();
+    const { isSignedIn, userId } = useAuth();
     const clerk = useClerk();
     const [activeItem, setActiveItem] = useState("");
     const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
+    const { data: user } = trpc.users.getByClerkId.useQuery({ clerkId: userId }, { enabled: !!userId });
+
+    const displayItems = useMemo(() => {
+        const filtered = items.filter(item => {
+            if (user?.accountType === 'business' && item.title === 'Market') return false;
+            return true;
+        });
+
+        if (user?.accountType === 'business') {
+            // Insert Business item after Following (index 2)
+            const businessItem = {
+                title: "Business",
+                url: "/business",
+                icon: Building2,
+            };
+            
+            // Find index of Following to insert after, or just push if not found
+            const followingIndex = filtered.findIndex(i => i.title === "Following");
+            if (followingIndex !== -1) {
+                filtered.splice(followingIndex + 1, 0, businessItem);
+            } else {
+                filtered.push(businessItem);
+            }
+        }
+
+        return filtered;
+    }, [user?.accountType]);
+
     useEffect(() => {
         const currentPath = window.location.pathname;
-        const currentItem = items.find(item => 
+        const currentItem = displayItems.find(item => 
             item.url === currentPath || 
             (currentPath.startsWith(item.url) && item.url !== "/")
         );
@@ -54,13 +83,13 @@ export const MainSection = () => {
             // If no item matches (e.g. /rankings), clear the active item
             setActiveItem("");
         }
-    }, []);
+    }, [displayItems]);
 
     return (
         <SidebarGroup className="relative bg-background">
             <SidebarGroupContent className="relative z-10 bg-background">
                 <SidebarMenu>
-                    {items.map((item) => {
+                    {displayItems.map((item) => {
                         const isActive = activeItem === item.title;
                         const isHovered = hoveredItem === item.title;
                         const Icon = item.icon;
