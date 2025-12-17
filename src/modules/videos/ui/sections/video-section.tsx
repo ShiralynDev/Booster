@@ -191,7 +191,8 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
         const isFeatured = video.isFeatured;
 
         // If featured, reward after 5 seconds. Otherwise, reward after 30% watched.
-        if ((isFeatured && seconds >= 5) || (!isFeatured && percentage >= 30)) {
+        if (!isFeatured) return;
+        if (seconds >= 5 || percentage >= 99) {
             setHasViewed(true);
             hasViewedRef.current = true;
             createView.mutate({ videoId });
