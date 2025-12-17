@@ -96,7 +96,7 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
     useEffect(() => {
         setHasRewarded(false);
         isRewardingRef.current = false;
-        
+
         // If user has already viewed, mark as viewed to prevent re-submission
         // @ts-ignore
         if (video.viewerHasViewed) {
@@ -110,8 +110,8 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
             hasViewedRef.current = false;
         }
     }, [video.id, video.isFeatured, video.viewerHasViewed]);
-   
-    
+
+
     // console.log("BOOST AAAA",boostPoints.boostPoints)
 
     const [isPlaying, setIsPlaying] = useState(true)
@@ -119,7 +119,7 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
     const videoPlayerRef = useRef<{ play: () => void; pause: () => void }>(null);
 
     const { isSignedIn, } = useAuth();
-    
+
     const createView = trpc.videoViews.create.useMutation({
         onSuccess: (data) => {
             utils.videos.getOne.invalidate({ id: videoId }) //invalidate cache and get new updated views value
@@ -132,27 +132,25 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
             } else if (data.message) {
                 toast.info(data.message);
             }
-        },        onError: (error) => {
+        }, onError: (error) => {
             console.error("Failed to create view:", error);
             // toast.error("Failed to record view");
-        }    });
+        }
+    });
 
     // Handle video end for featured videos - give XP when video is watched to completion
     const handleVideoEnd = useCallback(() => {
-        console.log("Video ended for video:", video.id, "isFeatured:", video.isFeatured, "isSignedIn:", isSignedIn, "userId:", userId, "hasRewarded:", hasRewarded, "isRewarding:", isRewardingRef.current);
 
         // Prevent multiple executions with synchronous flag
         if (hasRewarded || isRewardingRef.current || hasViewedRef.current) {
-            console.log("XP already rewarded or currently rewarding for this video, skipping");
             return;
         }
 
         // If featured and short (< 5s), award XP on end
         if (video.isFeatured && durationRef.current > 0 && durationRef.current < 5) {
-             console.log("Short featured video ended, awarding XP");
-             setHasViewed(true);
-             hasViewedRef.current = true;
-             createView.mutate({ videoId });
+            setHasViewed(true);
+            hasViewedRef.current = true;
+            createView.mutate({ videoId });
         }
     }, [video.isFeatured, video.id, isSignedIn, userId, hasRewarded, createView, videoId]);
 
@@ -182,7 +180,7 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
         const seconds = data.seconds || data.currentTime;
         const duration = data.duration;
         durationRef.current = duration;
-        
+
         // console.log("TimeUpdate:", { seconds, duration, isSignedIn, hasViewed, isFeatured: video.isFeatured });
 
         if (!isSignedIn || hasViewedRef.current) return;
@@ -191,10 +189,9 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
 
         const percentage = (seconds / duration) * 100;
         const isFeatured = video.isFeatured;
-        
+
         // If featured, reward after 5 seconds. Otherwise, reward after 30% watched.
         if ((isFeatured && seconds >= 5) || (!isFeatured && percentage >= 30)) {
-            console.log(`User watched ${isFeatured ? '5 seconds of featured' : '30% of'} video, creating view and awarding XP`);
             setHasViewed(true);
             hasViewedRef.current = true;
             createView.mutate({ videoId });
@@ -262,12 +259,12 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
                         playbackId={video.muxPlaybackId}
                         thumbnailUrl={video.thumbnailUrl}
                     /> */}
-                     <BunnyEmbed 
-                        libraryId={video.bunnyLibraryId} 
-                        videoId={video.bunnyVideoId} 
+                    <BunnyEmbed
+                        libraryId={video.bunnyLibraryId}
+                        videoId={video.bunnyVideoId}
                         onVideoEnd={handleVideoEnd}
                         onTimeUpdate={handleTimeUpdate}
-                    /> 
+                    />
                     {/*<Player src={video.playbackUrl} autoPlay={shouldPlay} isAI={video.isAi} />*/}
                 </div>
 
@@ -295,7 +292,7 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
 
             <VideoBanner status={video.status || "processing"} />
             <VideoTopRow video={video} />
-           
+
         </div>
     )
 }
