@@ -1,9 +1,9 @@
 import { db } from "@/db";
-import { boostTransactions, notifications, userAssets, users, videos } from "@/db/schema";
+import { boostTransactions, notifications, userAssets, users, videos, bonusClaims } from "@/db/schema";
 import { stripe } from "@/lib/stripe";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
-import { and, desc, eq, gte, sql, sum } from "drizzle-orm";
+import { and, desc, eq, gte, sql, sum, count } from "drizzle-orm";
 import z from "zod";
 
 export const xpRouter = createTRPCRouter({
@@ -41,22 +41,144 @@ export const xpRouter = createTRPCRouter({
             return xp ?? { xp: 0 };
         }),
 
-    getTopRanked: baseProcedure
-        .input(z.object({ limit: z.number().min(1).max(100).default(100) }))
-        .query(async ({ input }) => {
-            const { limit } = input;
-            const topUsers = await db
-                .select({
-                    id: users.id,
-                    name: users.name,
-                    imageUrl: users.imageUrl,
-                    boostPoints: users.boostPoints,
-                    clerkId: users.clerkId,
-                })
-                .from(users)
-                .orderBy(desc(users.boostPoints))
-                .limit(limit);
-            return topUsers;
+    getWelcomeBonusStatus: protectedProcedure
+        .query(async ({ ctx }) => {
+            const userId = ctx.user.id;
+
+            if (ctx.user.accountType !== 'personal') {
+                return { canClaim: false, claimed: false, message: "Only personal accounts are eligible" };
+            }
+
+            // Check if user has already claimed any welcome bonus
+            const [existingClaim] = await db
+                .select()
+                .from(bonusClaims)
+                .where(and(
+                    eq(bonusClaims.userId, userId),
+                    sql`${bonusClaims.bonusType} IN ('welcome_2000', 'welcome_500')`
+                ));
+
+            if (existingClaim) {
+                return { canClaim: false, claimed: true };
+            }
+
+            // Check availability for 2000 XP bonus
+            const [claims2000] = await db
+                .select({ count: count() })
+                .from(bonusClaims)
+                .where(eq(bonusClaims.bonusType, 'welcome_2000'));
+            
+            const count2000 = claims2000?.count ?? 0;
+
+            if (count2000 < 100) {
+                return { 
+                    canClaim: true, 
+                    claimed: false, 
+                    amount: 2000, 
+                    remaining: 100 - count2000,
+                    type: 'welcome_2000' as const
+                };
+            }
+
+            // Check availability for 500 XP bonus
+            const [claims500] = await db
+                .select({ count: count() })
+                .from(bonusClaims)
+                .where(eq(bonusClaims.bonusType, 'welcome_500'));
+            
+            const count500 = claims500?.count ?? 0;
+
+            if (count500 < 1000) {
+                return { 
+                    canClaim: true, 
+                    claimed: false, 
+                    amount: 500, 
+                    remaining: 1000 - count500,
+                    type: 'welcome_500' as const
+                };
+            }
+
+            return { canClaim: false, claimed: false, message: "All welcome bonuses claimed" };
+        }),
+
+    claimWelcomeBonus: protectedProcedure
+        .mutation(async ({ ctx }) => {
+            const userId = ctx.user.id;
+
+            if (ctx.user.accountType !== 'personal') {
+                throw new TRPCError({ code: "FORBIDDEN", message: "Only personal accounts are eligible" });
+            }
+
+            // Use CTEs to handle the check-and-claim logic atomically in a single query
+            // This avoids the need for transactions which aren't supported by the neon-http driver
+            const result = await db.execute(sql`
+                WITH 
+                  user_status AS (
+                    SELECT 1 AS claimed 
+                    FROM bonus_claims 
+                    WHERE user_id = ${userId} 
+                      AND bonus_type IN ('welcome_2000', 'welcome_500')
+                  ),
+                  counts AS (
+                    SELECT 
+                      COUNT(*) FILTER (WHERE bonus_type = 'welcome_2000') as count_2000,
+                      COUNT(*) FILTER (WHERE bonus_type = 'welcome_500') as count_500
+                    FROM bonus_claims
+                  ),
+                  decision AS (
+                    SELECT 
+                      CASE 
+                        WHEN EXISTS (SELECT 1 FROM user_status) THEN NULL
+                        WHEN (SELECT count_2000 FROM counts) < 100 THEN 'welcome_2000'
+                        WHEN (SELECT count_500 FROM counts) < 1000 THEN 'welcome_500'
+                        ELSE NULL
+                      END as bonus_to_claim,
+                      CASE 
+                        WHEN EXISTS (SELECT 1 FROM user_status) THEN 0
+                        WHEN (SELECT count_2000 FROM counts) < 100 THEN 2000
+                        WHEN (SELECT count_500 FROM counts) < 1000 THEN 500
+                        ELSE 0
+                      END as xp_amount
+                  ),
+                  inserted_claim AS (
+                    INSERT INTO bonus_claims (user_id, bonus_type)
+                    SELECT ${userId}, bonus_to_claim::bonus_type
+                    FROM decision
+                    WHERE bonus_to_claim IS NOT NULL
+                    RETURNING bonus_type
+                  ),
+                  updated_user AS (
+                    UPDATE users
+                    SET xp = COALESCE(xp, 0) + (SELECT xp_amount FROM decision)
+                    WHERE id = ${userId} 
+                      AND EXISTS (SELECT 1 FROM decision WHERE bonus_to_claim IS NOT NULL)
+                    RETURNING xp
+                  )
+                SELECT 
+                  (SELECT bonus_to_claim FROM decision) as claimed_bonus,
+                  (SELECT xp_amount FROM decision) as claimed_amount
+            `);
+
+            const row = result.rows[0];
+            
+            if (!row || !row.claimed_bonus) {
+                // Check if it was because already claimed or no bonuses left
+                const [existingClaim] = await db
+                    .select()
+                    .from(bonusClaims)
+                    .where(and(
+                        eq(bonusClaims.userId, userId),
+                        sql`${bonusClaims.bonusType} IN ('welcome_2000', 'welcome_500')`
+                    ));
+
+                if (existingClaim) {
+                    throw new TRPCError({ code: "FORBIDDEN", message: "Bonus already claimed" });
+                }
+                
+                throw new TRPCError({ code: "NOT_FOUND", message: "No bonuses available" });
+            }
+
+            return { amount: Number(row.claimed_amount) };
         }),
 
     buyById: protectedProcedure
@@ -339,4 +461,4 @@ export const xpRouter = createTRPCRouter({
 
 
 
-})
+});

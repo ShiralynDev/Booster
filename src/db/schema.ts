@@ -15,7 +15,7 @@ export const users = pgTable("users", {
     id: uuid("id").primaryKey().defaultRandom(),
     clerkId: text("clerk_id").unique().notNull(),
     name: text().notNull(),
-    username: text("username").notNull(),
+    username: text("username"),
     imageUrl: text("image_url").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -30,6 +30,8 @@ export const users = pgTable("users", {
     accountType: userAccountType("account_type"),
     businessDescription: text("business_description"),
     businessImageUrls: text("business_image_urls").array(),
+    dailyWatchCount: integer("daily_watch_count").default(0).notNull(),
+    lastDailyXpReset: timestamp("last_daily_xp_reset").defaultNow().notNull(),
 }, (t) => [uniqueIndex("clerk_id_idx").on(t.clerkId)]);
 
 //create index on clerk_id to query faster. --> speed up WHERE, JOIN, ORDER BY clauses. B-Tree sorted by the column I index
@@ -307,4 +309,19 @@ export const messages = pgTable("messages", {
 
 export const messageInsertSchema = createInsertSchema(messages);
 export const messageSelectSchema = createSelectSchema(messages);
+
+export const bonusType = pgEnum("bonus_type", [
+    'welcome_2000',
+    'welcome_500'
+])
+
+export const bonusClaims = pgTable("bonus_claims", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    bonusType: bonusType("bonus_type").notNull(),
+    claimedAt: timestamp("claimed_at").defaultNow().notNull(),
+}, (t) => [
+    index("bonus_claims_user_idx").on(t.userId),
+    index("bonus_claims_type_idx").on(t.bonusType),
+])
 

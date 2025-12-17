@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { users } from '@/db/schema';
-import { auth } from '@clerk/nextjs/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
 import { initTRPC, TRPCError } from '@trpc/server';
 import { eq } from 'drizzle-orm';
 import { cache } from 'react';
@@ -46,7 +46,30 @@ export const protectedProcedure = t.procedure.use(async function isAuthed(opts){
     throw new TRPCError({code: "UNAUTHORIZED"});
   }
 
-  const [user] = await db.select().from(users).where(eq(users.clerkId,ctx.clerkUserId)).limit(1);
+  let [user] = await db.select().from(users).where(eq(users.clerkId,ctx.clerkUserId)).limit(1);
+
+  if (!user) {
+    // Fallback: Sync user from Clerk if not found in DB (e.g. webhook failed)
+    try {
+      const clerkUser = await currentUser();
+      
+      if (clerkUser && clerkUser.id === ctx.clerkUserId) {
+          const name = `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim();
+          
+          const [newUser] = await db.insert(users).values({
+              clerkId: clerkUser.id,
+              name: name || clerkUser.username || "User",
+              username: clerkUser.username,
+              imageUrl: clerkUser.imageUrl,
+          }).returning();
+          
+          user = newUser;
+      }
+    } catch (error) {
+      console.error("Failed to sync user from Clerk in protectedProcedure fallback:", error);
+      // Continue to throw UNAUTHORIZED below if user is still null
+    }
+  }
 
   if (!user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });

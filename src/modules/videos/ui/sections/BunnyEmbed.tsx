@@ -17,6 +17,7 @@ export function BunnyEmbed({
   onVideoEnd,
   onVideoPlay,
   onVideoPause,
+  onTimeUpdate,
 }: {
   libraryId: string | null;
   videoId: string | null;
@@ -27,25 +28,41 @@ export function BunnyEmbed({
   onVideoEnd?: () => void;
   onVideoPlay?: () => void;
   onVideoPause?: () => void;
+  onTimeUpdate?: (data: { seconds: number, duration: number, percent: number }) => void;
 }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const playerRef = useRef<any>(null);
+
+const onVideoEndRef = useRef(onVideoEnd);
+  const onVideoPlayRef = useRef(onVideoPlay);
+  const onVideoPauseRef = useRef(onVideoPause);
+  const onTimeUpdateRef = useRef(onTimeUpdate);
+
+  useEffect(() => {
+    onVideoEndRef.current = onVideoEnd;
+    onVideoPlayRef.current = onVideoPlay;
+    onVideoPauseRef.current = onVideoPause;
+    onTimeUpdateRef.current = onTimeUpdate;
+  }, [onVideoEnd, onVideoPlay, onVideoPause, onTimeUpdate]);
 
   const params = new URLSearchParams({ 
     autoplay: String(autoplay), 
     muted: String(muted) 
   });
   
-  if (token && expires && autoplay) { 
+  if (token && expires) { 
     params.set("token", token); 
     params.set("expires", String(expires)); 
-    params.set('autoplay', String(autoplay));
   }
   
   params.set('loading', 'lazy');
   params.set('loop', 'false');
 
   const src = `https://iframe.mediadelivery.net/embed/${libraryId}/${videoId}?${params}`;
+
+  if (!libraryId || !videoId) {
+    return <div className="w-full bg-black flex items-center justify-center text-white" style={{ paddingTop: '56.25%' }}>Video Unavailable</div>;
+  }
 
   useEffect(() => {
     if (!iframeRef.current) return;
@@ -68,33 +85,34 @@ export function BunnyEmbed({
           // Set up event listeners
           player.on('play', () => {
             console.log('Player.js: Video started playing');
-            onVideoPlay?.();
+            onVideoPlayRef.current?.();
           });
 
           player.on('pause', () => {
             console.log('Player.js: Video paused');
-            onVideoPause?.();
+            onVideoPauseRef.current?.();
           });
 
           player.on('ended', () => {
             console.log('Player.js: Video ended');
-            onVideoEnd?.();
+            onVideoEndRef.current?.();
           });
 
           player.on('error', (error: any) => {
             console.error('Player.js: Error occurred', error);
           });
 
-          // player.on('timeupdate', (data: any) => {
-          //   // Optional: Track progress
-          //   // console.log('Current time:', data.currentTime);
-          // });
+          player.on('timeupdate', (data: any) => {
+            // Optional: Track progress
+            // console.log('Current time:', data);
+            onTimeUpdateRef.current?.(data);
+          });
 
           // Apply initial settings
           if (player.supports('method', 'mute') && muted) {
             player.mute();
           }
-
+          
           if (player.supports('method', 'play') && autoplay) {
             player.play();
           }
@@ -141,7 +159,7 @@ export function BunnyEmbed({
         }
       }
     };
-  }, [libraryId, videoId, autoplay, muted, onVideoPlay, onVideoPause, onVideoEnd]);
+  }, [libraryId, videoId, autoplay, muted]);
 
   // // Methods to control the player
   // const play = () => {

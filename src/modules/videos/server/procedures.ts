@@ -113,6 +113,10 @@ export const videosRouter = createTRPCRouter({
                   Number
                 )
               : sql<number>`(NULL)`.mapWith(Number),
+            
+            viewerHasViewed: userId
+              ? sql<boolean>`EXISTS (SELECT 1 FROM ${videoViews} WHERE ${videoViews.userId} = ${userId} AND ${videoViews.videoId} = ${videos.id})`.mapWith(Boolean)
+              : sql<boolean>`false`.mapWith(Boolean),
           },
           videoRatings: db.$count(
             videoRatings,

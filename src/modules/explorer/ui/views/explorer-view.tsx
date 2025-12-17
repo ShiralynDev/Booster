@@ -16,6 +16,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { useAuth } from "@clerk/nextjs";
 
 import { UserIcon } from "@/modules/market/components/assetIcons/functions/get-user-icons";
+import { WelcomeBonusModal } from "@/modules/xp/ui/components/welcome-bonus-modal";
 
 interface HomeViewProps {
     categoryId?: string;
@@ -23,11 +24,14 @@ interface HomeViewProps {
 
 export const ExplorerView = ({ categoryId }: HomeViewProps) => {
     return (
-        <Suspense fallback={<ExplorerSkeleton />}>
-            <ErrorBoundary fallback={<p>Failed to load categories.</p>}>
-                <ExplorerViewSuspense categoryId={categoryId} />
-            </ErrorBoundary>
-        </Suspense>
+        <>
+            <WelcomeBonusModal />
+            <Suspense fallback={<ExplorerSkeleton />}>
+                <ErrorBoundary fallback={<p>Failed to load categories.</p>}>
+                    <ExplorerViewSuspense categoryId={categoryId} />
+                </ErrorBoundary>
+            </Suspense>
+        </>
     )
 }
 

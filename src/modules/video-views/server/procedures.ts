@@ -1,10 +1,77 @@
  import { db } from "@/db";
-import { videos, videoViews } from "@/db/schema";
+import { users, videos, videoViews } from "@/db/schema";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { and, eq, sql } from "drizzle-orm";
 import z from "zod";
 import { updateVideoScore } from "@/modules/videos/server/utils";
 
+async function awardXpForView(userId: string) {
+    console.log("Awarding XP for user:", userId);
+    const [user] = await db
+        .select({
+            dailyWatchCount: users.dailyWatchCount,
+            lastDailyXpReset: users.lastDailyXpReset,
+            xp: users.xp,
+        })
+        .from(users)
+        .where(eq(users.id, userId));
+
+    if (!user) {
+        console.log("User not found for XP award");
+        return { xpEarned: 0, message: "User not found" };
+    }
+
+    const now = new Date();
+    const lastReset = new Date(user.lastDailyXpReset);
+    
+    const isSameDay = now.getDate() === lastReset.getDate() && 
+                      now.getMonth() === lastReset.getMonth() && 
+                      now.getFullYear() === lastReset.getFullYear();
+    
+    console.log("XP Check - Is Same Day:", isSameDay, "Last Reset:", lastReset, "Now:", now);
+
+    const currentDailyCount = isSameDay ? user.dailyWatchCount : 0;
+    console.log("Current Daily Count:", currentDailyCount);
+    
+    let xpToAward = 0;
+    let message = undefined;
+
+    if (currentDailyCount < 5) {
+        xpToAward = 20;
+    } else if (currentDailyCount === 5) {
+        xpToAward = 15;
+    } else if (currentDailyCount === 6) {
+        xpToAward = 10;
+    } else if (currentDailyCount === 7) {
+        xpToAward = 5;
+    } else {
+        xpToAward = 0;
+        message = "Daily XP limit reached for watching videos.";
+    }
+
+    console.log("XP to award:", xpToAward);
+
+    if (xpToAward > 0 || !isSameDay) {
+         await db.update(users).set({
+            xp: (user.xp || 0) + xpToAward,
+            dailyWatchCount: currentDailyCount + 1,
+            lastDailyXpReset: now,
+        }).where(eq(users.id, userId));
+        console.log("User XP updated");
+    } else {
+        // Still need to increment count if it's 0 xp but same day? 
+        // The requirement says "After 5XP no longer XP should be given."
+        // But we should probably still track the count so they don't get XP later in the same day if they watch more.
+        // Yes, we must increment dailyWatchCount even if xpToAward is 0, to maintain the "no more XP" state.
+        await db.update(users).set({
+            dailyWatchCount: currentDailyCount + 1,
+            lastDailyXpReset: now,
+        }).where(eq(users.id, userId));
+        console.log("User watch count updated (no XP)");
+    }
+
+    return { xpEarned: xpToAward, message };
+}
 
 export const videoViewsRouter = createTRPCRouter({
 
@@ -52,11 +119,15 @@ export const videoViewsRouter = createTRPCRouter({
 
                 const now = new Date();
                 const last_update = new Date(existingVideoView.updatedAt);
-                const RATE_LIMIT_VIEWS_TIME = 1 * 60 * 60 * 1000; // 12 hours in ms 
+                const RATE_LIMIT_VIEWS_TIME = 1 * 60 * 60 * 1000; // 1 hour in ms 
 
                 if (now.getTime() - last_update.getTime() < RATE_LIMIT_VIEWS_TIME) {
                     console.log("rate limited")
-                    return existingVideoView;
+                    return {
+                        ...existingVideoView,
+                        xpEarned: 0,
+                        message: "You've already watched this video recently."
+                    };
                 } else {
                     const [updatedVideoViews] = await db
                         .update(videoViews)
@@ -76,7 +147,13 @@ export const videoViewsRouter = createTRPCRouter({
                         .where(eq(videos.id, videoId));
                     await updateVideoScore(videoId);
 
-                    return updatedVideoViews;
+                    const result = await awardXpForView(userId);
+
+                    return {
+                        ...updatedVideoViews,
+                        xpEarned: result.xpEarned,
+                        message: result.message
+                    };
                 }
                 // return existingVideoView;
             }
@@ -88,6 +165,12 @@ export const videoViewsRouter = createTRPCRouter({
             .where(eq(videos.id, videoId));
         await updateVideoScore(videoId);
 
-      return createdVideoView
+        const result = await awardXpForView(userId);
+
+      return {
+        ...createdVideoView,
+        xpEarned: result.xpEarned,
+        message: result.message
+      }
     })
 })
