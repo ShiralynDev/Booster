@@ -17,6 +17,7 @@ import { uploadRouter } from '@/modules/upload/server/procedures';
 import { assetsRouter } from '@/modules/assets/server/procedures';
 import { notificationsRouter } from '@/modules/notifications/server/procedure';
 import { messagesRouter } from '@/modules/messages/server/procedures';
+import { rewardedViewsRouter } from '@/modules/rewarded-views/server/procedure';
 // import { followsRouter } from '@/modules/follows/server/procedure';
 
 export const appRouter = createTRPCRouter({
@@ -38,6 +39,7 @@ export const appRouter = createTRPCRouter({
     assets: assetsRouter,
     notifications: notificationsRouter,
     messages: messagesRouter,
+    rewardView: rewardedViewsRouter,
     // userFollowers: followsRouter
     
 

@@ -62,9 +62,6 @@ export const HomeViewSuspense = () => {
         );
     }, [data]);
 
-    console.log("HomeViewSuspense - Data:", data);
-    console.log("HomeViewSuspense - Videos:", videos);
-    console.log("HomeViewSuspense - Videos length:", videos.length);
 
     const [videoIndex, setVideoIndex] = useState(0);
     const [direction, setDirection] = useState(0);
@@ -89,7 +86,6 @@ export const HomeViewSuspense = () => {
     }, []);
 
     const goToNextVideo = useCallback(() => {
-        console.log("NEXT")
         setDirection(1);
         if (videoIndex + 1 >= videos.length && !query.isFetchingNextPage) {
             query.fetchNextPage();
@@ -136,7 +132,6 @@ export const HomeViewSuspense = () => {
         preventScrollOnSwipe: true,
     });
 
-    console.log("VIDEO INDEX", videoIndex, "VIDEOS:", videos)
 
     // Show empty state if no videos are available
     if (videos.length === 0) {

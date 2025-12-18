@@ -109,7 +109,6 @@ export const videos = pgTable("videos", {
     isAi: boolean("is_ai").notNull().default(false),
     embedding: vector("embedding", { dimensions: 1536 } ), // OpenAI text-embedding-ada-002 dimension is 1536
 
-    viewCount: integer("view_count").default(0).notNull(),
     commentCount: integer("comment_count").default(0).notNull(),
     ratingCount: integer("rating_count").default(0).notNull(),
     averageRating: real("average_rating").default(0).notNull(),
@@ -157,6 +156,19 @@ export const videoViewSelectSchema = createSelectSchema(videoViews);
 export const videoViewInsertSchema = createInsertSchema(videoViews);
 export const videoViewUpdateSchema = createUpdateSchema(videoViews);
 
+
+export const rewardedView = pgTable("rewarded_view", {
+    userId: uuid("user_id").references(() => users.id, {onDelete: "cascade"}).notNull(),
+    videoId: uuid("video_id").references(() => videos.id, { onDelete: "cascade" }).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    xpEarned: integer("xp_earned"),
+}, (t) => [
+    primaryKey({
+        name: "video_views_pk",
+        columns: [t.userId, t.videoId]
+    })
+])
 
 
 export const videoRatings = pgTable("video_ratings", {

@@ -70,9 +70,6 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
     });
     const userId = user?.id;
 
-    const [hasRewarded, setHasRewarded] = useState(false);
-    const isRewardingRef = useRef(false);
-    const [hasViewed, setHasViewed] = useState(false); // Track if view has been counted
     const hasViewedRef = useRef(false); // Synchronous ref to prevent race conditions
     const durationRef = useRef(0);
     const utils = trpc.useUtils();
@@ -92,24 +89,7 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
     //     }
     // });
 
-    // Reset reward flag when video changes
-    useEffect(() => {
-        setHasRewarded(false);
-        isRewardingRef.current = false;
-
-        // If user has already viewed, mark as viewed to prevent re-submission
-        // @ts-ignore
-        if (video.viewerHasViewed) {
-            setHasViewed(true);
-            hasViewedRef.current = true;
-            if (video.isFeatured) {
-                toast.info("You've already watched this video.");
-            }
-        } else {
-            setHasViewed(false);
-            hasViewedRef.current = false;
-        }
-    }, [video.id, video.isFeatured, video.viewerHasViewed]);
+   
 
 
     // console.log("BOOST AAAA",boostPoints.boostPoints)
@@ -124,50 +104,32 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
         onSuccess: (data) => {
             utils.videos.getOne.invalidate({ id: videoId }) //invalidate cache and get new updated views value
             utils.users.getByClerkId.invalidate({ clerkId: clerkUserId }); // Update user XP in real-time
-            if (userId) {
-                utils.xp.getXpByUserId.invalidate({ userId });
-            }
-            if (data.xpEarned && data.xpEarned > 0) {
-                toast.success(`You earned ${data.xpEarned} XP!`);
-            } else if (data.message) {
-                toast.info(data.message);
-            }
+           
+            
         }, onError: (error) => {
             console.error("Failed to create view:", error);
             // toast.error("Failed to record view");
         }
     });
 
-    // Handle video end for featured videos - give XP when video is watched to completion
-    const handleVideoEnd = useCallback(() => {
-
-        // Prevent multiple executions with synchronous flag
-        if (hasRewarded || isRewardingRef.current || hasViewedRef.current) {
-            return;
+    const createRewardedView = trpc.rewardView.awardXpForView.useMutation({
+        onSuccess: (data) => {
+            utils.xp.getXpByUserId.invalidate({ userId });
+            if(data.xpEarned == 0){
+                toast.info(data.message);
+            }else{
+                toast.success(data.message);
+            }
         }
-
-        // If featured and short (< 5s), award XP on end
-        if (video.isFeatured && durationRef.current > 0 && durationRef.current < 5) {
-            setHasViewed(true);
-            hasViewedRef.current = true;
-            createView.mutate({ videoId });
-        }
-    }, [video.isFeatured, video.id, isSignedIn, userId, hasRewarded, createView, videoId]);
-
-    // const [shouldPlay, setShouldPlay] = useState(false);
-
-    // useEffect(() => {
-    //     setShouldPlay(true);
-    // }, []);
-
+    })
 
 
     // const followingList = []
 
     useEffect(() => {
         setIsPlaying(true)
-        // if (!isSignedIn) return;
-        // createView.mutate({ videoId })
+        if (!isSignedIn) return;
+        createView.mutate({ videoId })
     }, [videoId, isSignedIn]); // Removed createView to prevent infinite loop
 
     const handlePlayButtonClick = () => {
@@ -190,12 +152,12 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
         const percentage = (seconds / duration) * 100;
         const isFeatured = video.isFeatured;
 
-        // If featured, reward after 5 seconds. Otherwise, reward after 30% watched.
         if (!isFeatured) return;
-        if (seconds >= 5 || percentage >= 99) {
-            setHasViewed(true);
+
+        // If featured, reward after 5 seconds or video end
+        if (Math.floor(seconds) == 5 || percentage >= 99) {
             hasViewedRef.current = true;
-            createView.mutate({ videoId });
+            createRewardedView.mutate({ videoId });
         }
     }, [isSignedIn, videoId, createView, video.isFeatured]);
 
@@ -263,7 +225,6 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
                     <BunnyEmbed
                         libraryId={video.bunnyLibraryId}
                         videoId={video.bunnyVideoId}
-                        onVideoEnd={handleVideoEnd}
                         onTimeUpdate={handleTimeUpdate}
                     />
                     {/*<Player src={video.playbackUrl} autoPlay={shouldPlay} isAI={video.isAi} />*/}

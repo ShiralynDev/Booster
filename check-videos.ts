@@ -4,8 +4,6 @@ import { videos } from "./src/db/schema";
 import { eq, not } from "drizzle-orm";
 
 async function main() {
-    console.log("📊 Checking videos in database...\n");
-    
     // Get all videos
     const allVideos = await db.select().from(videos);
     console.log(`Total videos: ${allVideos.length}`);
