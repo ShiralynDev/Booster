@@ -83,7 +83,7 @@ export const BoosterRankingsSuspense = ({ userId }: Props) => {
                         <Card className="relative bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border-0 p-6 text-center">
                             <div className="relative mb-4">
                                 <div className="w-20 h-20 mx-auto bg-gradient-to-br from-gray-300 to-gray-400 rounded-full flex items-center justify-center border-4 border-gray-300">
-                                    <UserAvatar imageUrl={rankings.at(1)?.user.imageUrl} name={rankings.at(1)?.user.name} size='llg' userId={rankings.at(1)?.user.id} />
+                                    <UserAvatar imageUrl={rankings.at(1)?.user.imageUrl} name={rankings.at(1)?.user.name} size='llg' userId={rankings.at(1)?.user.id} trigger="hover" />
                                 </div>
                                 <AwardIcon className="w-6 h-6 text-gray-500 absolute -top-1 right-8" />
                                  <div className="absolute -top-2 -right-2 bg-slate-400 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-black">
@@ -113,7 +113,7 @@ export const BoosterRankingsSuspense = ({ userId }: Props) => {
                                 <div className="w-24 h-24 mx-auto bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center border-4 border-yellow-300 shadow-lg">
                                     <Crown className="absolute -top-7 w-8 h-8 text-yellow-300" />
 
-                                    <UserAvatar imageUrl={rankings.at(0)?.user.imageUrl} name={rankings.at(0)?.user.name} size='llg' userId={rankings.at(0)?.user.id} />
+                                    <UserAvatar imageUrl={rankings.at(0)?.user.imageUrl} name={rankings.at(0)?.user.name} size='llg' userId={rankings.at(0)?.user.id} trigger="hover" />
                                 </div>
 
                                 <Medal className="w-6 h-6  absolute -top-1 right-8 text-yellow-300" />
@@ -144,7 +144,7 @@ export const BoosterRankingsSuspense = ({ userId }: Props) => {
                            
                             <div className="relative mb-4">
                                 <div className="w-20 h-20 mx-auto bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center border-4 ">
-                                    <UserAvatar imageUrl={rankings.at(2)?.user.imageUrl} name={rankings.at(2)?.user.name} size='llg' userId={rankings.at(2)?.user.id} />
+                                    <UserAvatar imageUrl={rankings.at(2)?.user.imageUrl} name={rankings.at(2)?.user.name} size='llg' userId={rankings.at(2)?.user.id} trigger="hover" />
                                     
                                 </div>
                                
@@ -200,7 +200,7 @@ export const BoosterRankingsSuspense = ({ userId }: Props) => {
                                             {/* <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white font-bold">
                                                 {user.name.charAt(0)}
                                             </div> */}
-                                            <UserAvatar imageUrl={user.imageUrl} name={user.name} userId={user.id} />
+                                            <UserAvatar imageUrl={user.imageUrl} name={user.name} userId={user.id} trigger="hover" />
                                             {(loggedUserId && loggedUserId === user.id) && (
                                                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-500 rounded-full border-2 border-background flex items-center justify-center">
                                                     <div className="w-1 h-1 bg-white rounded-full"></div>

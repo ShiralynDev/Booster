@@ -51,17 +51,18 @@ export const RankingsView = () => {
                                 </div>
                                 
                                 <div className="col-span-7 md:col-span-8 min-w-0">
-                                    <Link href={`/users/${user.id}`} className="flex items-center gap-3 group">
+                                    <div className="flex items-center gap-3 group">
                                         <UserAvatar 
                                             userId={user.id} 
                                             imageUrl={user.imageUrl} 
                                             name={user.name}
                                             size="sm"
+                                            trigger="hover"
                                         />
-                                        <span className="font-medium truncate group-hover:text-primary transition-colors">
+                                        <Link href={`/users/${user.id}`} className="font-medium truncate group-hover:text-primary transition-colors">
                                             {user.name}
-                                        </span>
-                                    </Link>
+                                        </Link>
+                                    </div>
                                 </div>
 
                                 <div className="col-span-3 flex items-center justify-end gap-2">

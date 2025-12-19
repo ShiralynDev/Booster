@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 
 import { cva, type VariantProps } from "class-variance-authority";
 import Link from "next/link";
+import { UserProfilePopup } from "@/modules/users/ui/components/user-profile-popup";
 
 const avatarVariants = cva("", {
     variants: {
@@ -45,6 +46,7 @@ interface UserAvatarProps extends VariantProps<typeof avatarVariants> {
     userId: string | undefined;
     badgeSize?: number;
     disableLink?: boolean; // Prevent nested <a> tags
+    trigger?: "click" | "hover";
 }
 
 export const UserAvatar = ({
@@ -55,6 +57,7 @@ export const UserAvatar = ({
     size, //because it extends VariantProps
     userId,
     disableLink = false,
+    trigger = "click",
 }: UserAvatarProps) => {
     const avatar = (
         <Avatar className={cn(avatarVariants({ size, className }), '')} onClick={onClick}>
@@ -62,15 +65,19 @@ export const UserAvatar = ({
         </Avatar>
     );
 
+    if (disableLink) {
+        return (
+            <div className="relative ">
+                {avatar}
+            </div>
+        )
+    }
+
     return (
-        <div className="relative ">
-            {disableLink ? (
-                avatar
-            ) : (
-                <Link href={`/users/${userId}`}>
-                    {avatar}
-                </Link>
-            )}
-        </div>
+        <UserProfilePopup userId={userId || ""} trigger={trigger}>
+            <div className="relative cursor-pointer">
+                {avatar}
+            </div>
+        </UserProfilePopup>
     )
 }
