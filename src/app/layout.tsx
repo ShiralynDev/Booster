@@ -121,7 +121,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     />
                 </head>
                 <body className={`${montserrat.className} antialiased bg-background text-foreground`}>
-                    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+                    <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
                         <TRPCProvider>
                             <NotificationProvider>
                                 <UnreadTitleUpdater />
