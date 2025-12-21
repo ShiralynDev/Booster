@@ -56,7 +56,7 @@ export function WelcomePopup() {
 
                 <div className="space-y-3">
                     <h2 className="text-2xl font-bold tracking-tight bg-gradient-to-b from-foreground to-foreground/70 bg-clip-text text-transparent">
-                        Welcome to the Future
+                        Welcome to Booster
                     </h2>
                     <p className="text-muted-foreground text-sm leading-relaxed max-w-[260px] mx-auto">
                         Discover a new way to create, share, and earn. How would you like to start?
@@ -70,7 +70,7 @@ export function WelcomePopup() {
                     >
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
                         <span className="flex items-center justify-center gap-2 text-base">
-                            Take the Tour
+                            How does this work?
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </span>
                     </Button>

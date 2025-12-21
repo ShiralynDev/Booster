@@ -29,7 +29,7 @@ export default function WelcomePage() {
                 Boost Your Creativity
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl">
-                The next-generation video platform where creators thrive and viewers decide what&apos;s next.
+                The video platform where creators thrive and viewers decide what&apos;s next.
             </p>
             <div className="pt-8 flex flex-col items-center">
                 <DiveInButton />
@@ -56,12 +56,12 @@ export default function WelcomePage() {
                     <FeatureCard 
                         icon={<Users className="w-10 h-10 text-blue-500" />}
                         title="Join the Community"
-                        description="Engage with creators, build your network, and grow together."
+                        description="Engage with creators, build communities, and grow together."
                     />
                     <FeatureCard 
                         icon={<Sparkles className="w-10 h-10 text-purple-500" />}
                         title="Search with AI"
-                        description="Change your algorithm and discover recommended videos tailored by AI."
+                        description="Change your algorithm and discover recommended videos."
                     />
                 </div>
             </div>
