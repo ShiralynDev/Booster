@@ -24,6 +24,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 interface HomeViewProps {
     categoryId?: string;
@@ -32,7 +33,7 @@ interface HomeViewProps {
 export const ExplorerView = ({ categoryId }: HomeViewProps) => {
     return (
         <>
-            <WelcomePopup />
+            {/* <WelcomePopup /> */}
             <WelcomeBonusModal />
             <Suspense fallback={<ExplorerSkeleton />}>
                 <ErrorBoundary fallback={<p>Failed to load categories.</p>}>
@@ -400,14 +401,39 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                             transition={{ duration: 2, repeat: Infinity }}
                             className="w-2 h-12 bg-gradient-to-b from-primary to-secondary rounded-full shadow-lg"
                         />
-                        <div>
-                            <h2 className="text-3xl font-bold text-gray-900 dark:text-white ">
+                        <div className="flex items-center gap-2">
+                            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
                                 {selectedCategory === "all" ? "Trending Videos" : `${selectedCategory ?? "All"} Videos`}
                             </h2>
-                            {/* <p className="text-gray-600 dark:text-gray-400 mt-1 flex items-center gap-2">
-                                <TrendingUp className="w-4 h-4" />
-                                Curated selection of top-performing content
-                            </p> */}
+
+                            <TooltipProvider delayDuration={200} >
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Link
+                                            href="/about#recommendation_algorithm"
+                                            className="text-gray-400 hover:text-primary dark:text-gray-500 dark:hover:text-primary transition-colors"
+                                            aria-label="Learn about recommendation algorithm"
+                                        >
+                                            <svg
+                                                className="w-5 h-5"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                                />
+                                            </svg>
+                                        </Link>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p className="text-black text-base">Click me to know how does the algorithm work :)</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
                         </div>
                     </div>
 
