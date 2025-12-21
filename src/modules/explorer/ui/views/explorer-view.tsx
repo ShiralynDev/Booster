@@ -17,6 +17,7 @@ import { useAuth } from "@clerk/nextjs";
 
 import { UserIcon } from "@/modules/market/components/assetIcons/functions/get-user-icons";
 import { WelcomeBonusModal } from "@/modules/xp/ui/components/welcome-bonus-modal";
+import { WelcomePopup } from "@/components/welcome-popup";
 import {
   Carousel,
   CarouselContent,
@@ -32,6 +33,7 @@ interface HomeViewProps {
 export const ExplorerView = ({ categoryId }: HomeViewProps) => {
     return (
         <>
+            <WelcomePopup />
             <WelcomeBonusModal />
             <Suspense fallback={<ExplorerSkeleton />}>
                 <ErrorBoundary fallback={<p>Failed to load categories.</p>}>
@@ -261,7 +263,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-blue-500/5" />
                         <div className="relative z-10 flex items-center justify-between gap-4">
                             <div className="flex items-center gap-4">
-                                    <Image src="/xpicon.png" alt="XP" width={30} height={30} className="w-6 h-6" />
+                                    <Image src="/xpicon_plain_no_rgb_glow.png" alt="XP" width={30} height={30} className="w-6 h-6" />
                                 <div>
                                     <h3 className="text-base md:text-lg font-bold text-gray-900 dark:text-white leading-tight">
                                         Activate Featured Videos and Earn XP

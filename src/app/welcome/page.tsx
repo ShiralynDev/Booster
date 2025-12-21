@@ -1,7 +1,7 @@
 import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { DiveInButton } from "./dive-in-button";
-import { Play, Upload, Zap, Users, TrendingUp, Shield, Boxes, Sparkles } from "lucide-react";
+import { Play, Upload, Zap, Users, TrendingUp, Shield, Sparkles } from "lucide-react";
 import Image from "next/image";
 
 export default function WelcomePage() {
@@ -25,7 +25,7 @@ export default function WelcomePage() {
       <main className="flex-1 flex flex-col items-center">
         {/* Hero Section */}
         <section className="w-full py-20 px-6 flex flex-col items-center text-center max-w-4xl mx-auto space-y-8">
-            <h1 className="text-5xl md:text-7xl font-black tracking-tighter bg-gradient-to-r from-primary to-muted-foreground bg-clip-text text-transparent">
+            <h1 className="text-5xl md:text-7xl font-black tracking-tighter bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 Boost Your Creativity
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl">
@@ -48,9 +48,10 @@ export default function WelcomePage() {
                         description="Share your videos with a community that values quality and originality."
                     />
                     <FeatureCard 
-                        icon={<Boxes className="w-10 h-10 text-secondary" />}
+                        icon={<Image src="/xpicon_plain_no_rgb_glow.png" alt="XP" width={80} height={80} className="w-20 h-20 object-contain" />}
                         title="Boost Content"
                         description="Use XP to boost the videos you love and help them reach more viewers."
+                        noIconBackground
                     />
                     <FeatureCard 
                         icon={<Users className="w-10 h-10 text-blue-500" />}
@@ -99,10 +100,10 @@ export default function WelcomePage() {
   );
 }
 
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
+function FeatureCard({ icon, title, description, noIconBackground }: { icon: React.ReactNode, title: string, description: string, noIconBackground?: boolean }) {
     return (
         <div className="bg-card p-8 rounded-2xl shadow-sm border hover:shadow-md transition-shadow flex flex-col items-center text-center">
-            <div className="mb-6 p-4 bg-background rounded-full shadow-sm border">{icon}</div>
+            <div className={`mb-6 flex items-center justify-center ${noIconBackground ? '' : 'p-4 bg-background rounded-full shadow-sm border'}`}>{icon}</div>
             <h3 className="text-xl font-bold mb-3">{title}</h3>
             <p className="text-muted-foreground">{description}</p>
         </div>
