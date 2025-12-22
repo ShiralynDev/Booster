@@ -258,15 +258,30 @@ export const usersRouter = createTRPCRouter({
     update: protectedProcedure
         .input(z.object({
             name: z.string().optional(),
-            // about: z.string().optional(), // Maybe add this too if needed later
+            about: z.string().optional(),
+            instagram: z.string().optional(),
+            twitter: z.string().optional(),
+            youtube: z.string().optional(),
+            tiktok: z.string().optional(),
+            discord: z.string().optional(),
+            website: z.string().optional(),
         }))
         .mutation(async ({ input, ctx }) => {
-            const { name } = input;
+            const { name, about, instagram, twitter, youtube, tiktok, discord, website } = input;
             const userId = ctx.user.id;
 
-            if (name) {
+            if (name || about !== undefined || instagram !== undefined || twitter !== undefined || youtube !== undefined || tiktok !== undefined || discord !== undefined || website !== undefined) {
                 await db.update(users)
-                    .set({ name })
+                    .set({ 
+                        ...(name && { name }),
+                        ...(about !== undefined && { about }),
+                        ...(instagram !== undefined && { instagram }),
+                        ...(twitter !== undefined && { twitter }),
+                        ...(youtube !== undefined && { youtube }),
+                        ...(tiktok !== undefined && { tiktok }),
+                        ...(discord !== undefined && { discord }),
+                        ...(website !== undefined && { website }),
+                    })
                     .where(eq(users.id, userId));
             }
             

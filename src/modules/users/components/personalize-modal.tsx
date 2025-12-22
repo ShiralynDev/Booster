@@ -22,7 +22,14 @@ import {
     ShoppingBag,
     type LucideIcon,
     Users,
-    Zap
+    Zap,
+    Instagram,
+    Twitter,
+    Youtube,
+    Globe,
+    FileText,
+    Music,
+    Gamepad2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -113,7 +120,7 @@ interface PersonalizeModalProps {
 
 export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => {
     const { userId: clerkUserId } = useAuth();
-    const [activeTab, setActiveTab] = useState<'basic' | 'appearance'>('basic');
+    const [activeTab, setActiveTab] = useState<'basic' | 'appearance' | 'about'>('basic');
     const [previewIconIndex, setPreviewIconIndex] = useState<number | null>(null); // Preview state
     const [selectedTitle, setSelectedTitle] = useState<string | null>(null);
     const [showTitleModal, setShowTitleModal] = useState(false);
@@ -121,6 +128,13 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
     const { theme, setTheme } = useTheme();
     const [selectedAccent, setSelectedAccent] = useState(0);
     const [displayName, setDisplayName] = useState("");
+    const [about, setAbout] = useState("");
+    const [instagram, setInstagram] = useState("");
+    const [twitter, setTwitter] = useState("");
+    const [youtube, setYoutube] = useState("");
+    const [tiktok, setTiktok] = useState("");
+    const [discord, setDiscord] = useState("");
+    const [website, setWebsite] = useState("");
 
     // Fetch user's owned assets from marketplace
     const { data: ownedAssets, isLoading: loadingAssets } = trpc.assets.getAssetsByUser.useQuery();
@@ -160,10 +174,17 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
 
     // Initialize displayName when user is loaded
     React.useEffect(() => {
-        if (currentUser?.name) {
-            setDisplayName(currentUser.name);
+        if (currentUser) {
+            setDisplayName(currentUser.name || "");
+            setAbout(currentUser.about || "");
+            setInstagram(currentUser.instagram || "");
+            setTwitter(currentUser.twitter || "");
+            setYoutube(currentUser.youtube || "");
+            setTiktok(currentUser.tiktok || "");
+            setDiscord(currentUser.discord || "");
+            setWebsite(currentUser.website || "");
         }
-    }, [currentUser?.name]);
+    }, [currentUser]);
 
     // Calculate channel level and XP
     const channelLevel = currentUser && boostPoints 
@@ -335,9 +356,26 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
              changesSaved = true;
         }
 
-        // Save display name if changed
-        if (displayName !== currentUser?.name) {
-            updateUserMutation.mutate({ name: displayName });
+        // Save display name and other info if changed
+        if (displayName !== currentUser?.name || 
+            about !== (currentUser?.about || "") ||
+            instagram !== (currentUser?.instagram || "") ||
+            twitter !== (currentUser?.twitter || "") ||
+            youtube !== (currentUser?.youtube || "") ||
+            tiktok !== (currentUser?.tiktok || "") ||
+            discord !== (currentUser?.discord || "") ||
+            website !== (currentUser?.website || "")
+        ) {
+            updateUserMutation.mutate({ 
+                name: displayName,
+                about,
+                instagram,
+                twitter,
+                youtube,
+                tiktok,
+                discord,
+                website
+            });
             changesSaved = true;
         }
         
@@ -466,11 +504,11 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
                             <div className="lg:col-span-2">
                                 <div className="bg-card rounded-xl border shadow-lg p-6">
                                     {/* Tabs */}
-                                    <div className="flex space-x-2 mb-6 bg-muted p-1 rounded-xl">
+                                    <div className="flex space-x-2 mb-6 bg-muted p-1 rounded-xl overflow-x-auto">
                                         <button
                                             onClick={() => setActiveTab('basic')}
                                             className={cn(
-                                                "flex-1 py-2 px-4 rounded-lg font-medium transition-all text-sm",
+                                                "flex-1 py-2 px-4 rounded-lg font-medium transition-all text-sm whitespace-nowrap",
                                                 activeTab === 'basic' 
                                                     ? "text-white" 
                                                     : "text-muted-foreground hover:text-foreground"
@@ -481,9 +519,22 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
                                             Basic Info
                                         </button>
                                         <button
+                                            onClick={() => setActiveTab('about')}
+                                            className={cn(
+                                                "flex-1 py-2 px-4 rounded-lg font-medium transition-all text-sm whitespace-nowrap",
+                                                activeTab === 'about' 
+                                                    ? "text-white" 
+                                                    : "text-muted-foreground hover:text-foreground"
+                                            )}
+                                            style={activeTab === 'about' ? { background: currentAccent.bgSolid } : {}}
+                                        >
+                                            <FileText className="w-4 h-4 inline mr-2" />
+                                            About
+                                        </button>
+                                        <button
                                             onClick={() => setActiveTab('appearance')}
                                             className={cn(
-                                                "flex-1 py-2 px-4 rounded-lg font-medium transition-all text-sm",
+                                                "flex-1 py-2 px-4 rounded-lg font-medium transition-all text-sm whitespace-nowrap",
                                                 activeTab === 'appearance' 
                                                     ? "text-white" 
                                                     : "text-muted-foreground hover:text-foreground"
@@ -627,6 +678,95 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
 
                                             <div className="flex justify-end space-x-3 pt-4">
                                                 <Button type="button" variant="outline" onClick={handleCancel}>Cancel</Button>
+                                                <Button 
+                                                    type="submit" 
+                                                    className="text-white"
+                                                    style={{ background: currentAccent.bgSolid }}
+                                                >
+                                                    Save Changes
+                                                </Button>
+                                            </div>
+                                        </form>
+                                    )}
+
+                                    {/* About Tab */}
+                                    {activeTab === 'about' && (
+                                        <form onSubmit={handleSave} className="space-y-4">
+                                            <div>
+                                                <label className="block text-sm font-bold mb-2">About Me</label>
+                                                <textarea 
+                                                    value={about} 
+                                                    onChange={(e) => setAbout(e.target.value)}
+                                                    className="w-full min-h-[100px] p-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-background resize-y focus:outline-none focus:border-blue-500"
+                                                    placeholder="Tell us about yourself..."
+                                                />
+                                            </div>
+
+                                            <div className="space-y-3">
+                                                <label className="block text-sm font-bold">Social Links</label>
+                                                
+                                                <div className="relative">
+                                                    <Instagram className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                                                    <Input 
+                                                        value={instagram} 
+                                                        onChange={(e) => setInstagram(e.target.value)}
+                                                        className="pl-10 border-2 border-gray-300 dark:border-gray-600 bg-background"
+                                                        placeholder="Instagram username or URL"
+                                                    />
+                                                </div>
+
+                                                <div className="relative">
+                                                    <Twitter className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                                                    <Input 
+                                                        value={twitter} 
+                                                        onChange={(e) => setTwitter(e.target.value)}
+                                                        className="pl-10 border-2 border-gray-300 dark:border-gray-600 bg-background"
+                                                        placeholder="Twitter username or URL"
+                                                    />
+                                                </div>
+
+                                                <div className="relative">
+                                                    <Youtube className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                                                    <Input 
+                                                        value={youtube} 
+                                                        onChange={(e) => setYoutube(e.target.value)}
+                                                        className="pl-10 border-2 border-gray-300 dark:border-gray-600 bg-background"
+                                                        placeholder="YouTube channel URL"
+                                                    />
+                                                </div>
+
+                                                <div className="relative">
+                                                    <Music className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                                                    <Input 
+                                                        value={tiktok} 
+                                                        onChange={(e) => setTiktok(e.target.value)}
+                                                        className="pl-10 border-2 border-gray-300 dark:border-gray-600 bg-background"
+                                                        placeholder="TikTok username or URL"
+                                                    />
+                                                </div>
+
+                                                <div className="relative">
+                                                    <Gamepad2 className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                                                    <Input 
+                                                        value={discord} 
+                                                        onChange={(e) => setDiscord(e.target.value)}
+                                                        className="pl-10 border-2 border-gray-300 dark:border-gray-600 bg-background"
+                                                        placeholder="Discord server URL or username"
+                                                    />
+                                                </div>
+
+                                                <div className="relative">
+                                                    <Globe className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                                                    <Input 
+                                                        value={website} 
+                                                        onChange={(e) => setWebsite(e.target.value)}
+                                                        className="pl-10 border-2 border-gray-300 dark:border-gray-600 bg-background"
+                                                        placeholder="Website URL"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="flex justify-end pt-4">
                                                 <Button 
                                                     type="submit" 
                                                     className="text-white"

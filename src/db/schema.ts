@@ -20,6 +20,12 @@ export const users = pgTable("users", {
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
     about: text("about"),
+    instagram: text("instagram"),
+    twitter: text("twitter"),
+    youtube: text("youtube"),
+    tiktok: text("tiktok"),
+    discord: text("discord"),
+    website: text("website"),
     xp: integer("xp").default(0), // THis is the virtual currency to trade and boost a channel
     boostPoints: integer("boost_points").default(0), // to measure the amount of boost given to the channel (amount of XP given to the channel). Can only be done with xp
     // level: integer("level").default(1),
@@ -147,7 +153,6 @@ export const videoViews = pgTable("video_views", {
 
 }, (t) => [
     primaryKey({
-        name: "video_views_pk",
         columns: [t.userId, t.videoId]
     })
 ])

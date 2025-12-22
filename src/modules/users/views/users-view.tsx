@@ -18,6 +18,12 @@ import {
   MessageSquare,
   Clapperboard,
   VideoOff,
+  Instagram,
+  Twitter,
+  Youtube,
+  Music,
+  Gamepad2,
+  Globe
 } from "lucide-react";
 import { XpCard } from "@/modules/home/ui/components/xp-card";
 import { VideoThumbnail } from "@/modules/videos/ui/components/video-thumbnail";
@@ -524,9 +530,83 @@ export const UsersView = ({ userId }: Props) => {
         {activeTab === "about" && (
           <div className="bg-card rounded-xl p-6 border border-border">
             <h3 className="text-lg font-semibold mb-4">About</h3>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground whitespace-pre-wrap mb-6">
               {user.about || "No description available."}
             </p>
+
+            {(user.instagram || user.twitter || user.youtube || user.tiktok || user.discord || user.website) && (
+              <>
+                <h3 className="text-lg font-semibold mb-4">Socials</h3>
+                <div className="flex flex-wrap gap-4">
+                  {user.instagram && (
+                    <a 
+                      href={user.instagram.startsWith('http') ? user.instagram : `https://instagram.com/${user.instagram}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+                    >
+                      <Instagram className="size-5 text-pink-600" />
+                      <span>Instagram</span>
+                    </a>
+                  )}
+                  {user.twitter && (
+                    <a 
+                      href={user.twitter.startsWith('http') ? user.twitter : `https://twitter.com/${user.twitter}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+                    >
+                      <Twitter className="size-5 text-blue-400" />
+                      <span>Twitter</span>
+                    </a>
+                  )}
+                  {user.youtube && (
+                    <a 
+                      href={user.youtube.startsWith('http') ? user.youtube : `https://youtube.com/${user.youtube}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+                    >
+                      <Youtube className="size-5 text-red-600" />
+                      <span>YouTube</span>
+                    </a>
+                  )}
+                  {user.tiktok && (
+                    <a 
+                      href={user.tiktok.startsWith('http') ? user.tiktok : `https://tiktok.com/@${user.tiktok.replace('@', '')}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+                    >
+                      <Music className="size-5 text-black dark:text-white" />
+                      <span>TikTok</span>
+                    </a>
+                  )}
+                  {user.discord && (
+                    <a 
+                      href={user.discord.startsWith('http') ? user.discord : `https://discord.gg/${user.discord}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+                    >
+                      <Gamepad2 className="size-5 text-indigo-500" />
+                      <span>Discord</span>
+                    </a>
+                  )}
+                  {user.website && (
+                    <a 
+                      href={user.website.startsWith('http') ? user.website : `https://${user.website}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-muted hover:bg-muted/80 transition-colors"
+                    >
+                      <Globe className="size-5 text-green-600" />
+                      <span>Website</span>
+                    </a>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>
