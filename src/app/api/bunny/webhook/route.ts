@@ -42,6 +42,8 @@ async function getBunnyVideo(libraryId: string, videoId: string) {
     length?: number;
     status?: string;
     thumbnailFileName?: string;
+    width?: number;
+    height?: number;
   }>;
 }
 
@@ -109,6 +111,8 @@ export async function POST(req: Request) {
         previewUrl, // store for convenience (unsigned)
         updatedAt: new Date(),
         status: dbStatus,
+        width: meta.width,
+        height: meta.height,
       })
       .where(eq(videos.bunnyVideoId, videoId));
 

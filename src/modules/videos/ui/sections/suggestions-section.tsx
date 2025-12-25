@@ -57,8 +57,9 @@ export const SuggestionsSection = ({ videoId }: SuggestionsSectionProps) => {
                             <Link href={`/videos/${video.id}`}>
                                 <div className="flex items-start rounded-2xl transition-all duration-300 hover:shadow-2xl overflow-hidden relative">
                                     {/* Left: fixed thumbnail */}
-                                    <div className="relative w-44 h-24 flex-shrink-0">
+                                    <div className="relative w-64 h-40 flex-shrink-0">
                                         <VideoThumbnail
+                                            imageUrl={video.thumbnailUrl}
                                             previewUrl={video.previewUrl ?? video.thumbnailUrl ?? THUMBNAIL_FALLBACK}
                                             duration={video.duration}
                                             title={video.title}
@@ -131,7 +132,7 @@ export const SuggestionsSection = ({ videoId }: SuggestionsSectionProps) => {
                 />
 
                 {/* View all button */}
-                <motion.div
+                {/* <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4 }}
@@ -140,7 +141,7 @@ export const SuggestionsSection = ({ videoId }: SuggestionsSectionProps) => {
                     <button className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-amber-500/25 transition-all duration-300 transform hover:-translate-y-0.5">
                         View All Suggestions
                     </button>
-                </motion.div>
+                </motion.div> */}
             </div>
         </div>
     );

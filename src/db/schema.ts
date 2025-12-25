@@ -98,6 +98,9 @@ export const videos = pgTable("videos", {
     bunnyStatus: text("bunny_status"),                    
     bunnyDuration: integer("bunny_duration"),             
 
+    width: integer("width"),
+    height: integer("height"),
+
     duration: integer("duration").default(0).notNull(),
     visibility: videoVisibility('visibility').default('private').notNull(),
     status: videoStatus().default('processing').notNull(),

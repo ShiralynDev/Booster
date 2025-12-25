@@ -26,6 +26,8 @@ export async function getBunnyVideo(libraryId: string, videoId: string) {
     length?: number;
     status?: number; // Bunny returns number
     thumbnailFileName?: string;
+    width?: number;
+    height?: number;
   }>;
 }
 

@@ -214,14 +214,30 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
         return videos.filter((v: any) => !featuredVideos.some((fv: any) => fv.id === v.id));
     }, [videos, featuredVideos]);
 
+    const { horizontalVideos, verticalVideos } = useMemo(() => {
+        const horizontal: any[] = [];
+        const vertical: any[] = [];
+        
+        filteredVideos.forEach((video: any) => {
+            const isVertical = video.width && video.height && video.height > video.width;
+            if (isVertical) {
+                vertical.push(video);
+            } else {
+                horizontal.push(video);
+            }
+        });
+        
+        return { horizontalVideos: horizontal, verticalVideos: vertical };
+    }, [filteredVideos]);
+
     const columns = useGridColumns();
     
-    const displayVideos = useMemo(() => {
-        if (!query.hasNextPage) return filteredVideos;
-        const remainder = filteredVideos.length % columns;
-        if (remainder === 0) return filteredVideos;
-        return filteredVideos.slice(0, -remainder);
-    }, [filteredVideos, columns, query.hasNextPage]);
+    const displayHorizontalVideos = useMemo(() => {
+        if (!query.hasNextPage) return horizontalVideos;
+        const remainder = horizontalVideos.length % columns;
+        if (remainder === 0) return horizontalVideos;
+        return horizontalVideos.slice(0, -remainder);
+    }, [horizontalVideos, columns, query.hasNextPage]);
 
 
 
@@ -426,6 +442,68 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                 </motion.div>
             )}
 
+            {/* Vertical Videos Section */}
+            {verticalVideos.length > 0 && (
+                <motion.div
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4, duration: 0.7 }}
+                    className="relative mt-0"
+                >
+                  
+
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
+                        {verticalVideos.slice(0, 6).map((video: any) => (
+                            <div
+                                key={video.id}
+                                className="group cursor-pointer relative"
+                            >
+                                <Link href={`/videos/${video.id}`}>
+                                    <div className="relative bg-transparent rounded-2xl overflow-hidden">
+                                        <div className="relative overflow-hidden">
+                                            <VideoThumbnail
+                                                duration={video.duration || 0}
+                                                title={video.title}
+                                                imageUrl={video.thumbnailUrl}
+                                                previewUrl={video.previewUrl}
+                                                aspectRatio="vertical"
+                                            />
+                                        </div>
+                                        
+                                        <div className="pt-3">
+                                            <h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-1 line-clamp-2">
+                                                {video.title || "Untitled"}
+                                            </h3>
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <UserAvatar
+                                                    size="xs"
+                                                    imageUrl={video.user?.imageUrl || "/public-user.png"}
+                                                    name={video.user?.name || "Anonymous"}
+                                                    userId={video.user?.id}
+                                                />
+                                                <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
+                                                    {video.user?.name}
+                                                </p>
+                                            </div>
+                                            <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                                                <div className="flex items-center gap-1">
+                                                    <Eye className="w-3 h-3" />
+                                                    <span>{formatCompactNumber(Number(video.videoViews) || 0)}</span>
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <StarIcon className="w-3 h-3 text-yellow-500" />
+                                                    <span>{Number(video.averageRating).toFixed(1)}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Link>
+                            </div>
+                        ))}
+                    </div>
+                </motion.div>
+            )}
+
             {/* Enhanced Video Grid Section */}
             <motion.div
                 initial={{ opacity: 0, y: 40 }}
@@ -502,7 +580,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                         transition={{ duration: 0.2 }}
                         className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6"
                     >
-                        {displayVideos.map((video: any, index: number) => (
+                        {displayHorizontalVideos.map((video: any, index: number) => (
                             <div
                                 key={video.id}
                                 className="group cursor-pointer relative"
