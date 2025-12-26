@@ -1,6 +1,4 @@
 
-<img width="275" height="251" alt="FinishedBoosterIconLogo" src="https://github.com/user-attachments/assets/68b772ed-d8bb-434a-88ba-d491f3108186" />
-
 <img width="1170" height="220" alt="FinishedLongLogo" src="https://github.com/user-attachments/assets/aa896884-126b-40c7-aa61-1125a6e3d197" />
 
 <img width="3794" height="1885" alt="Boosterwithvertical" src="https://github.com/user-attachments/assets/4f4a0e9e-75d6-450f-846c-521877520537" />
