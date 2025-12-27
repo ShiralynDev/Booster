@@ -1,7 +1,7 @@
 'use client';
 
 import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
-import { EarthIcon,  PlayIcon, ShoppingCart, Users, ShieldQuestionIcon, Building2 } from "lucide-react";
+import { EarthIcon,  PlayIcon, ShoppingCart, Users, ShieldQuestionIcon, Building2, Megaphone, TrophyIcon } from "lucide-react";
 import { useAuth, useClerk } from "@clerk/nextjs";
 import Link from "next/link";
 import { useState, useEffect, useMemo } from "react";
@@ -30,6 +30,16 @@ const items = [
         url: "/market",
         icon: ShoppingCart,
     },
+    {
+        title: "Communities",
+        url: "/c",
+        icon: Megaphone,
+    },
+    {
+        title:"Top Channels",
+        url: "/rankings",
+        icon: TrophyIcon,
+    }
 ];
 
 export const MainSection = () => {

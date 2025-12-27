@@ -204,7 +204,7 @@ export const CommunityChat = ({ channelId, isFollowing }: CommunityChatProps) =>
   return (
     <div className="flex flex-col h-[600px] border rounded-lg bg-background">
       <div className="p-4 border-b">
-        <h3 className="font-semibold">Community Chat</h3>
+        <h3 className="font-semibold">Channel Chat</h3>
       </div>
 
       <div

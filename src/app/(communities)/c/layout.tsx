@@ -1,3 +1,5 @@
+//layout for this (home) group only
+
 import { ExplorerLayout } from "@/modules/explorer/ui/layouts/explorer-layout";
 
 interface LayoutProps {
@@ -12,4 +14,5 @@ const Layout = ({children}: LayoutProps) => {
     )
 }
 
-export default Layout;
+export default Layout
+

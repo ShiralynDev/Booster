@@ -1,11 +1,11 @@
 'use client'
 import { motion, AnimatePresence } from "framer-motion";
 import { CategoriesSection } from "../sections/categories-section";
-import { Play, Eye, ArrowRight, StarIcon, Calendar1, RocketIcon, Trophy, Loader2 } from "lucide-react";
+import { Play, Eye, ArrowRight, StarIcon, Calendar1, RocketIcon } from "lucide-react";
 import { useState, useMemo, Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { trpc } from "@/trpc/client";
-import { DEFAULT_LIMIT, getTitleGradient } from "@/constants";
+import { getTitleGradient } from "@/constants";
 import { compactDate, cn } from "@/lib/utils";
 import { VideoThumbnail } from "@/modules/videos/ui/components/video-thumbnail";
 import { UserAvatar } from "@/components/user-avatar";
@@ -47,14 +47,14 @@ export const ExplorerView = ({ categoryId }: HomeViewProps) => {
 const ExplorerSkeleton = () => {
     return (
         <div className="overflow-hidden mb-10 px-4 flex flex-col gap-y-12 animate-pulse">
-            {/* Categories Skeleton */}
+            {/* Categories Skeleton
             <div className="relative mt-5">
                 <div className="flex gap-4 overflow-hidden">
                     {[...Array(12)].map((_, i) => (
                         <div key={i} className="w-24 h-10 bg-gray-200 dark:bg-gray-800 rounded-xl flex-shrink-0"></div>
                     ))}
                 </div>
-            </div>
+            </div> */}
 
             {/* Featured Video Section Skeleton */}
             <div className="w-full">
@@ -278,17 +278,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
 
 
             {/* Enhanced Categories Section */}
-            <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.6 }}
-                className="relative mt-5"
-            >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/5 to-transparent blur-xl transform scale-110" />
-                <div className="relative z-10">
-                    <CategoriesSection categoryId={selectedCategory || "all"} setSelectedCategory={setSelectedCategory}/>
-                </div>
-            </motion.div>
+            w
 
             {/* Placeholder for Featured Video when ads are disabled */}
             {featuredVideos.length > 0 && !rewardedAdsEnabled && (

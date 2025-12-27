@@ -70,8 +70,9 @@ export const FilterCarousel = ({
                             <Badge
                                 variant={!value ? "default" : "secondary"}
                                 className={cn(
-                                    "rounded-2xl px-3 py-1 cursor-pointer whitespace-nowrap text-sm",
-                                    !value ? "bg-gray-400 text-white hover:bg-[#333333]/90" : "bg-gray-300 text-black hover:bg-[#333333]/80"
+                                  "rounded-md px-3 py-1 cursor-pointer whitespace-nowrap text-sm border border-gray-200 ",
+                                        !value ? "bg-gradient-to-b from-primary to-secondary text-textprimary hover:bg-gray-600 " : "bg-gray-100 text-black hover:bg-gray-200"
+
                                 )}
                             >
                                 All
@@ -96,8 +97,8 @@ export const FilterCarousel = ({
                                 <Badge
                                     variant={value === item.value ? "default" : "secondary"}
                                     className={cn(
-                                        "rounded-2xl px-3 py-1 cursor-pointer whitespace-nowrap text-sm",
-                                        active === item.value ? "bg-gradient-to-b from-primary to-secondary text-textprimary hover:bg-gray-600 " : "bg-gray-300 text-black hover:bg-gray-600"
+                                        "rounded-md px-3 py-1 cursor-pointer whitespace-nowrap text-sm border border-gray-200 ",
+                                        active === item.value ? "bg-gradient-to-b from-primary to-secondary text-textprimary hover:bg-gray-600 " : "bg-gray-100 text-black hover:bg-gray-200"
                                     )}
                                 >
                                     {item.label}

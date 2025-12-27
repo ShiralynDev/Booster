@@ -17,7 +17,7 @@ export const CategoriesSection = ({categoryId,setSelectedCategory}: CategoriesSe
         <Suspense fallback={<FilterCarousel isLoading data={[]} onSelect={() => {}}/>}>
             <ErrorBoundary fallback={<p>Failed to load categories.</p>}>
                 <CategoriesSectionSuspense categoryId={categoryId} setSelectedCategory={setSelectedCategory} />
-            </ErrorBoundary>
+            </ErrorBoundary> 
         </Suspense>
     )
 }
@@ -36,7 +36,7 @@ export const CategoriesSection = ({categoryId,setSelectedCategory}: CategoriesSe
             if(label) setSelectedCategory(label)
         }else{
             url.searchParams.delete('categoryId');
-            setSelectedCategory("All")
+            setSelectedCategory("all")
         }
         router.push(url.toString());
         // router.push does not prefetch so it is a bit slower than Link component

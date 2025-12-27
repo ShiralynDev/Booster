@@ -9,13 +9,13 @@ export const RankingsView = () => {
     const [users] = trpc.xp.getTopRanked.useSuspenseQuery({ limit: 100 });
 
     return (
-        <div className="max-w-4xl mx-auto p-4 pt-6">
+        <div className="max-w-4xl mx-auto  pt-6">
             <div className="flex items-center gap-3 mb-8">
                 <div className="p-3 bg-amber-100 dark:bg-amber-900/20 rounded-full">
                     <Trophy className="w-8 h-8 text-amber-600 dark:text-amber-500" />
                 </div>
                 <div>
-                    <h1 className="text-2xl font-bold">Channel Rankings</h1>
+                    <h1 className="text-2xl font-bold">Global Leaderboard</h1>
                     <p className="text-muted-foreground">Top 100 channels by level</p>
                 </div>
             </div>

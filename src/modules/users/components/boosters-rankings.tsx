@@ -46,9 +46,9 @@ export const BoosterRankingsSuspense = ({ userId }: Props) => {
             {/* Ranking Header */}
             <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-500 to-pink-600 bg-clip-text text-transparent mb-2">
-                    Community Rankings
+                    Channel Leaderboard
                 </h2>
-                <p className="text-muted-foreground">Top boosters in the community</p>
+                <p className="text-muted-foreground">Top boosters in the channel</p>
             </div>
 
             {/* Time Filter Tabs */}

@@ -41,7 +41,7 @@ import { PersonalizeModal } from "../components/personalize-modal";
 import { useNotificationDropdown } from "@/contexts/notification-context";
 
 import { BusinessProfileSection } from "../components/business-profile-section";
-import { CommunityChat } from "@/modules/community/ui/components/community-chat";
+import { CommunityChat } from "@/modules/community/ui/components/channel-chat";
 
 interface Props {
   userId: string;
@@ -129,7 +129,7 @@ export const UsersView = ({ userId }: Props) => {
   // Handle navigation to specific tab via URL hash
   useEffect(() => {
     const hash = window.location.hash.substring(1); // Remove the # symbol
-    if (hash === "community" || hash === "about" || hash === "rewards") {
+    if (hash === "leaderboard" || hash === "about" || hash === "rewards") {
       setActiveTab(hash);
     }
   }, []);
@@ -171,7 +171,7 @@ export const UsersView = ({ userId }: Props) => {
     previousLevelRef.current = channelLevel;
   }, [channelLevel, isInitialLoad, userId, prefetchRankings, updateLevel]);
 
-  //TODO: implement community rankings
+  
 
   // Calculate XP bar percentage
   const xpPercentage = Math.max(
@@ -430,10 +430,10 @@ export const UsersView = ({ userId }: Props) => {
 
         {/* Content Tabs */}
         <div className="flex flex-wrap gap-2 my-6 bg-muted/50 p-2 rounded-xl border border-border w-fit">
-          {["videos", "community", "rewards", "about", "chat"]
+          {["videos", "leaderboard", "rewards", "about", "chat"]
             .filter(tab => {
               if (user.accountType === 'business') {
-                return tab !== 'community' && tab !== 'rewards';
+                return tab !== 'leaderboard' && tab !== 'rewards';
               }
               return true;
             })
@@ -524,7 +524,7 @@ export const UsersView = ({ userId }: Props) => {
           );
         })()}
 
-        {activeTab === "community" && <BoosterRankings userId={userId} />}
+        {activeTab === "leaderboard" && <BoosterRankings userId={userId} />}
 
         {activeTab === "rewards" && <RewardsView userId={userId} />}
 

@@ -37,7 +37,7 @@ export const ExplorerLayout = ({ children }: { children: React.ReactNode }) => {
     <SidebarProvider open={open} onOpenChange={setOpen}>
       <div className="w-full">
         <ExplorerNavBar />
-        <div className={`${video ? "" : "flex"} -ml-2 min-h-screen pt-[4rem] bg-background relative`}
+        <div className={`${video ? "" : "flex"} -ml-2 min-h-screen pt-[4rem] bg-background relative gap-3`}
         >
 
           {/* overlay for offcanvas/floating sidebar to close when clicking outside */}

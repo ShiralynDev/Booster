@@ -1,8 +1,8 @@
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { db } from "@/db";
-import { userFollows, users, assets } from "@/db/schema";
+import { userFollows, users, assets, communities, communityMembers, posts } from "@/db/schema";
 import { z } from "zod";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, desc, lt, count } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { createClient } from "@supabase/supabase-js";
 
@@ -14,6 +14,146 @@ const supabaseAdmin = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPAB
     : null;
 
 export const communityRouter = createTRPCRouter({
+    getMany: baseProcedure
+        .input(z.object({
+            categoryId: z.string().uuid().optional(),
+            limit: z.number().min(1).max(100).default(20),
+            cursor: z.string().nullish(),
+        }))
+        .query(async ({ input }) => {
+            const { categoryId, limit, cursor } = input;
+
+            const data = await db
+                .select()
+                .from(communities)
+                .where(and(
+                    categoryId ? eq(communities.categoryId, categoryId) : undefined,
+                    cursor ? lt(communities.createdAt, new Date(cursor)) : undefined
+                ))
+                .limit(limit + 1)
+                .orderBy(desc(communities.createdAt));
+
+            let nextCursor: string | undefined = undefined;
+            if (data.length > limit) {
+                const nextItem = data.pop();
+                if (nextItem) {
+                    nextCursor = nextItem.createdAt.toISOString();
+                }
+            }
+
+            return {
+                items: data,
+                nextCursor,
+            };
+        }),
+
+    get: baseProcedure
+        .input(z.object({ id: z.string().uuid() }))
+        .query(async ({ input, ctx }) => {
+            const [community] = await db
+                .select()
+                .from(communities)
+                .where(eq(communities.communityId, input.id));
+
+            if (!community) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            }
+
+            // Check if user is a member
+            let isMember = false;
+            if (ctx.user) {
+                const [membership] = await db
+                    .select()
+                    .from(communityMembers)
+                    .where(and(
+                        eq(communityMembers.communityId, input.id),
+                        eq(communityMembers.userId, ctx.user.id)
+                    ));
+                isMember = !!membership;
+            }
+
+            // Get member count
+            const [memberCount] = await db
+                .select({ count: count() })
+                .from(communityMembers)
+                .where(eq(communityMembers.communityId, input.id));
+
+            return {
+                ...community,
+                isMember,
+                memberCount: memberCount.count,
+            };
+        }),
+
+    join: protectedProcedure
+        .input(z.object({ communityId: z.string().uuid() }))
+        .mutation(async ({ input, ctx }) => {
+            const userId = ctx.user.id;
+
+            await db.insert(communityMembers).values({
+                communityId: input.communityId,
+                userId,
+            }).onConflictDoNothing();
+
+            return { success: true };
+        }),
+
+    leave: protectedProcedure
+        .input(z.object({ communityId: z.string().uuid() }))
+        .mutation(async ({ input, ctx }) => {
+            const userId = ctx.user.id;
+
+            await db.delete(communityMembers)
+                .where(and(
+                    eq(communityMembers.communityId, input.communityId),
+                    eq(communityMembers.userId, userId)
+                ));
+
+            return { success: true };
+        }),
+
+    getPosts: baseProcedure
+        .input(z.object({
+            communityId: z.string().uuid(),
+            limit: z.number().min(1).max(100).default(20),
+            cursor: z.string().nullish(),
+        }))
+        .query(async ({ input }) => {
+            const { communityId, limit, cursor } = input;
+
+            const data = await db
+                .select({
+                    post: posts,
+                    user: {
+                        id: users.id,
+                        name: users.name,
+                        imageUrl: users.imageUrl,
+                        username: users.username,
+                    }
+                })
+                .from(posts)
+                .innerJoin(users, eq(posts.userId, users.id))
+                .where(and(
+                    eq(posts.communityId, communityId),
+                    cursor ? lt(posts.createdAt, new Date(cursor)) : undefined
+                ))
+                .limit(limit + 1)
+                .orderBy(desc(posts.createdAt));
+
+            let nextCursor: string | undefined = undefined;
+            if (data.length > limit) {
+                const nextItem = data.pop();
+                if (nextItem) {
+                    nextCursor = nextItem.post.createdAt.toISOString();
+                }
+            }
+
+            return {
+                items: data,
+                nextCursor,
+            };
+        }),
+
     getMessages: baseProcedure
         .input(z.object({
             channelId: z.string().uuid(),
