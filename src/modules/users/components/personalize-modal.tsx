@@ -146,6 +146,8 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
         { clerkId: clerkUserId },
         { enabled: !!clerkUserId }
     );
+
+    const utils = trpc.useUtils();
     
     // Fetch boost points for XP bar
     const { data: boostPoints } = trpc.xp.getBoostByUserId.useQuery(
@@ -197,8 +199,6 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
     const xpProgress = boostPoints 
         ? Math.max(0, Math.min(100, ((boostPoints.boostPoints - xpOnCurrentLevel) / (xpForNextLevel - xpOnCurrentLevel)) * 100))
         : 0;
-
-    const utils = trpc.useUtils();
 
     // Mutation to equip/unequip assets
     const equipAssetMutation = trpc.users.equipAsset.useMutation({

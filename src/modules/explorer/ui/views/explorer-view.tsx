@@ -191,16 +191,26 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
         const [data, query] = (
             isAiMode
                 ? trpc.explorer.aiSearch.useSuspenseInfiniteQuery(
-                        { text: aiQuery || "", limit: 12 },
+                        { text: aiQuery || "", limit: 30 },
                         { getNextPageParam: (lastPage) => lastPage.nextCursor }
                     )
                 : trpc.explorer.getMany.useSuspenseInfiniteQuery(
-                        { limit: 12, categoryId },
+                        { limit: 30, categoryId },
                         { getNextPageParam: (lastPage) => lastPage.nextCursor }
                     )
         ) as any;
 
-    const videos = useMemo(() => (data ? (data.pages as any[]).flatMap((p: any) => p.items as any[]) : []), [data]);
+    const videos = useMemo(() => {
+        if (!data) return [];
+        const allItems = (data.pages as any[]).flatMap((p: any) => p.items as any[]);
+        // Deduplicate videos by ID to prevent duplicates in the grid
+        const seen = new Set();
+        return allItems.filter(item => {
+            if (seen.has(item.id)) return false;
+            seen.add(item.id);
+            return true;
+        });
+    }, [data]);
     
     // Fetch featured videos separately to ensure they all appear
     const { data: featuredVideosData } = trpc.explorer.getFeatured.useQuery(undefined, {

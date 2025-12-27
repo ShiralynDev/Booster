@@ -33,6 +33,7 @@ export const users = pgTable("users", {
     equippedAssetId: uuid("equipped_asset_id").references((): AnyPgColumn => assets.assetId), // The currently equipped/displayed asset icon
     equippedTitleId: uuid("equipped_title_id").references((): AnyPgColumn => assets.assetId), // The currently equipped title
     rewardedAdsEnabled: boolean("rewarded_ads_enabled").default(false),
+    verticalVideosEnabled: boolean("vertical_videos_enabled").default(true),
     accountType: userAccountType("account_type"),
     businessDescription: text("business_description"),
     businessImageUrls: text("business_image_urls").array(),

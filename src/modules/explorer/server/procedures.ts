@@ -298,7 +298,7 @@ export const explorerRouter = createTRPCRouter({
       const items = hasMore ? rows.slice(0, -1) : rows;
       const last = items[items.length - 1];
       const nextCursor = hasMore && last
-        ? { id: last.id, distance: Number((last as any).distance), embedding: embeddingArr }
+        ? { id: last.id, distance: Number((last as any).distance) }
         : null;
 
       return {
@@ -389,6 +389,10 @@ export const explorerRouter = createTRPCRouter({
         ),
       ];
 
+      if (user && user.verticalVideosEnabled === false) {
+        whereParts.push(sql`${videos.width} >= ${videos.height}`);
+      }
+
       if (cursor && cursor.score != null) {
         whereParts.push(
           or(
@@ -452,7 +456,7 @@ export const explorerRouter = createTRPCRouter({
         .leftJoin(commentsAgg, eq(commentsAgg.videoId, videos.id))
         .leftJoin(categories, eq(videos.categoryId, categories.id))
         .where(and(...whereParts))
-        .orderBy(desc(sql`score`))
+        .orderBy(desc(sql`score`), desc(videos.id))
         .limit(limit + 1);
 
       const hasMore = rows.length > limit;

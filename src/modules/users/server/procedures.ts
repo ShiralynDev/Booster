@@ -238,6 +238,21 @@ export const usersRouter = createTRPCRouter({
       return updatedUser;
     }),
 
+  toggleVerticalVideos: protectedProcedure
+    .input(z.object({ enabled: z.boolean() }))
+    .mutation(async ({ input, ctx }) => {
+      const { enabled } = input;
+      const userId = ctx.user.id;
+
+      const [updatedUser] = await db
+        .update(users)
+        .set({ verticalVideosEnabled: enabled })
+        .where(eq(users.id, userId))
+        .returning();
+
+      return updatedUser;
+    }),
+
   // getAssetsByUser
 
     setAccountType: protectedProcedure
