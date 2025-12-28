@@ -50,8 +50,9 @@ export const usersRouter = createTRPCRouter({
 
    getVideosByUserId: baseProcedure
   .input(z.object({ userId: z.string().uuid() }))
-  .query(async ({ input }) => {
+  .query(async ({ input, ctx }) => {
     const { userId } = input;
+    const { clerkUserId } = ctx;
 
     const [user] = await db
       .select()
@@ -62,6 +63,16 @@ export const usersRouter = createTRPCRouter({
         code: "NOT_FOUND",
         message: `User with id ${userId} not found`, // ← was "clerkId"
       });
+    }
+
+    // Fetch viewer settings
+    let viewerSettings = null;
+    if (clerkUserId) {
+        const [viewer] = await db
+            .select({ aiContentEnabled: users.aiContentEnabled })
+            .from(users)
+            .where(eq(users.clerkId, clerkUserId));
+        viewerSettings = viewer;
     }
 
     const userVideos = await db
@@ -79,7 +90,10 @@ export const usersRouter = createTRPCRouter({
         
       })
       .from(videos)
-      .where(eq(videos.userId, userId))
+      .where(and(
+        eq(videos.userId, userId),
+        viewerSettings?.aiContentEnabled === false ? eq(videos.isAi, false) : undefined
+      ))
       .orderBy(desc(videos.createdAt));
 
     return { userVideos,  };
@@ -247,6 +261,21 @@ export const usersRouter = createTRPCRouter({
       const [updatedUser] = await db
         .update(users)
         .set({ verticalVideosEnabled: enabled })
+        .where(eq(users.id, userId))
+        .returning();
+
+      return updatedUser;
+    }),
+
+  toggleAiContent: protectedProcedure
+    .input(z.object({ enabled: z.boolean() }))
+    .mutation(async ({ input, ctx }) => {
+      const { enabled } = input;
+      const userId = ctx.user.id;
+
+      const [updatedUser] = await db
+        .update(users)
+        .set({ aiContentEnabled: enabled })
         .where(eq(users.id, userId))
         .returning();
 

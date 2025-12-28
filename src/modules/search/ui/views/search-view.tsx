@@ -359,7 +359,7 @@ export const SearchViewSuspense = ({ query }: SearchViewProps) => {
                         >
                             {/* Thumbnail */}
                             <div className="relative lg:w-96 xl:w-[400px] h-48 lg:h-56 flex-shrink-0">
-                                <VideoThumbnail title={video.title} duration={video.duration} imageUrl={video.thumbnailUrl}
+                                <VideoThumbnail title={video.title} duration={video.duration} imageUrl={video.thumbnailUrl} isAi={video.isAi}
                                 />
 
                                 {/* {video.isLive && (

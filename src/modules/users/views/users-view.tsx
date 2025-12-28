@@ -493,6 +493,7 @@ export const UsersView = ({ userId }: Props) => {
                       title={video.title}
                       imageUrl={video.thumbnailUrl}
                       previewUrl={video.previewUrl}
+                      isAi={video.isAi}
                     />
                     {video.visibility === 'private' && (
                       <div className="absolute top-2 left-2 bg-black/60 rounded-md p-1">

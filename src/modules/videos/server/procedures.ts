@@ -244,6 +244,10 @@ export const videosRouter = createTRPCRouter({
         ),
       ];
 
+      if (user && user.aiContentEnabled === false) {
+        whereParts.push(eq(videos.isAi, false));
+      }
+
       if (cursor && cursor.score != null) {
         whereParts.push(
           or(

@@ -5,8 +5,10 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { MoreVerticalIcon, MousePointerClick, Share2, Sparkle, ThumbsDown, TrashIcon } from "lucide-react";
+import { FlagIcon, MoreVerticalIcon, Share2, TrashIcon } from "lucide-react";
 import { toast } from "sonner";
+import { useState } from "react";
+import { VideoReportModal } from "./video-report-modal";
 
 interface VideoMenuProps {
     videoId: string;
@@ -19,6 +21,8 @@ export const VideoMenu = ({
     variant,
     onRemove,
 }: VideoMenuProps) => {
+    const [isReportOpen, setIsReportOpen] = useState(false);
+
     const onShare = () => {
         //TODO: Change if deploying outside vercel
         const fullUrl = `${process.env.NEXT_PUBLIC_VERCEL_URL || "http://localhost:3000"}/videos/${videoId}`
@@ -27,52 +31,36 @@ export const VideoMenu = ({
         toast.success("Link Copied!")
     }
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant={variant} size='icon' className="rounded-full">
-                    <MoreVerticalIcon />
+        <>
+            <VideoReportModal 
+                videoId={videoId}
+                open={isReportOpen}
+                onOpenChange={setIsReportOpen}
+            />
+            <div className="flex items-center gap-2">
+                <Button variant={variant} size='icon' className="rounded-full" onClick={onShare}>
+                    <Share2 />
                 </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-                <DropdownMenuItem onClick={onShare}>
-                    <Button className="flex items-center bg-emerald-200 w-full">
-
-                        <Share2 className="mr-2 size-4" />
-                        Share
-                    </Button>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem>
-                    <Button className='flex items-center bg-red-300 w-full' >
-                        <MousePointerClick className='size-4' />
-                        <p>Report AI</p>
-                        <Sparkle className='size-4' />
-                    </Button>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem>
-                    <Button className='flex items-center justify-between bg-red-300 w-full'
-
-                    >
-                        <MousePointerClick className='size-4' />
-                        <p>Report ClickBait!</p>
-                        <ThumbsDown className='size-4' />
-                    </Button>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <Button className='flex items-center bg-red-300 w-full' >
-                        <MousePointerClick className='size-4' />
-                        <p>Report Inappropriate</p>
-                        <ThumbsDown className='size-4' />
-                    </Button>
-                </DropdownMenuItem>
-                {onRemove && (
-                    <DropdownMenuItem onClick={() => { }}>
-                        <TrashIcon className="mr-2 size-4" />
-                        Remove
-                    </DropdownMenuItem>
-                )}
-            </DropdownMenuContent>
-        </DropdownMenu>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant={variant} size='icon' className="rounded-full">
+                            <MoreVerticalIcon />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                        <DropdownMenuItem onClick={() => setIsReportOpen(true)}>
+                            <FlagIcon className="mr-2 size-4" />
+                            Report
+                        </DropdownMenuItem>
+                        {onRemove && (
+                            <DropdownMenuItem onClick={onRemove}>
+                                <TrashIcon className="mr-2 size-4" />
+                                Remove
+                            </DropdownMenuItem>
+                        )}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
+        </>
     )
 }

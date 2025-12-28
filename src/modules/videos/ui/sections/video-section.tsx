@@ -8,9 +8,10 @@ import { VideoBanner } from "../components/video-banner";
 import { VideoTopRow } from "../components/video-top-row";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Eye, Clock, Loader2 } from "lucide-react";
+import { Play, Eye, Clock, Loader2, Sparkles } from "lucide-react";
 import { BunnyEmbed } from "./BunnyEmbed";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 // import Player from "./Player";
 
 interface VideoSectionProps {
@@ -214,6 +215,14 @@ const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
 
                 {/* Video layer */}
                 <div className="relative z-10 w-full h-full overflow-hidden rounded-3xl">
+                    {video.isAi && (
+                        <div className="absolute top-4 right-4 z-50">
+                            <Badge variant="secondary" className="bg-purple-100/90 backdrop-blur-sm text-purple-800 hover:bg-purple-200/90 border-purple-200 gap-1 whitespace-nowrap shadow-sm">
+                                <Sparkles className="size-3" />
+                                AI Generated
+                            </Badge>
+                        </div>
+                    )}
                     {/* <VideoPlayer
                         ref={videoPlayerRef}
                         autoPlay={isPlaying}

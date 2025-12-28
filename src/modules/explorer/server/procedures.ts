@@ -120,7 +120,8 @@ export const explorerRouter = createTRPCRouter({
         .where(and(
           eq(videos.visibility, "public"),
           not(eq(videos.status, "processing")),
-          eq(videos.isFeatured, true)
+          eq(videos.isFeatured, true),
+          user?.aiContentEnabled === false ? eq(videos.isAi, false) : undefined
         ))
         .orderBy(desc(videos.createdAt))
         .limit(20);
@@ -237,7 +238,8 @@ export const explorerRouter = createTRPCRouter({
       const whereParts: any[] = [
         and(
           eq(videos.visibility, "public"),
-          not(eq(videos.status, "processing"))
+          not(eq(videos.status, "processing")),
+          user?.aiContentEnabled === false ? eq(videos.isAi, false) : undefined
         ),
       ];
 
@@ -391,6 +393,10 @@ export const explorerRouter = createTRPCRouter({
 
       if (user && user.verticalVideosEnabled === false) {
         whereParts.push(sql`${videos.width} >= ${videos.height}`);
+      }
+
+      if (user && user.aiContentEnabled === false) {
+        whereParts.push(eq(videos.isAi, false));
       }
 
       if (cursor && cursor.score != null) {

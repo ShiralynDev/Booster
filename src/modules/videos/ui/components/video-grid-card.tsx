@@ -12,6 +12,7 @@ interface VideoGridCardProps {
       previewUrl: string | null;
       duration: number;
       createdAt: Date;
+      isAi: boolean;
       // views: number;
     };
     user: {
@@ -31,6 +32,7 @@ export const VideoGridCard = ({ data }: VideoGridCardProps) => {
           previewUrl={data.video.previewUrl}
           title={data.video.title}
           duration={data.video.duration}
+          isAi={data.video.isAi}
         />
       </Link>
       <div className="flex gap-3 items-start">

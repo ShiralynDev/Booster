@@ -7,6 +7,7 @@ import { trpc } from "@/trpc/client"
 import { VideoDescription } from "./video-description"
 import { VideoReactions } from "./video-reactions"
 import { useAuth } from "@clerk/nextjs"
+import { Poll } from "@/modules/reports/ui/components/poll";
 type Tab = "videos" | "comments" | "info";
 
 export const SectionSelector = ({ videoId }: { videoId: string }) => {
@@ -102,6 +103,9 @@ export const SectionSelector = ({ videoId }: { videoId: string }) => {
                     expandedDate={new Date(video.createdAt).toLocaleDateString()}
                     description={video.description}
                   />
+                  
+                  <Poll videoId={videoId} />
+
                 </div>
               ) : (
                 <div className="text-sm text-gray-500">Loading info…</div>

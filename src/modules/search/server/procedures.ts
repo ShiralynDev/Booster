@@ -14,6 +14,16 @@ export const searchRouter = createTRPCRouter({
             const { query, limit } = input;
             const { clerkUserId } = ctx;
 
+            // Fetch user settings
+            let userSettings = null;
+            if (clerkUserId) {
+                const [user] = await db
+                    .select({ aiContentEnabled: users.aiContentEnabled })
+                    .from(users)
+                    .where(eq(users.clerkId, clerkUserId));
+                userSettings = user;
+            }
+
             const hasQuery = query && query.trim().length > 0;
 
             if (!hasQuery) {
@@ -46,7 +56,8 @@ export const searchRouter = createTRPCRouter({
                                     ilike(videos.description, `%${query}%`),
                                     sql`${categories.name} IS NOT NULL AND LOWER(${categories.name}) LIKE LOWER(${`%${query}%`})`
                                 ),
-                                eq(videos.visibility, 'public')
+                                eq(videos.visibility, 'public'),
+                                userSettings?.aiContentEnabled === false ? eq(videos.isAi, false) : undefined
                             )
                         )
                         .groupBy(videos.userId)
@@ -124,9 +135,20 @@ export const searchRouter = createTRPCRouter({
             }).nullish(),
             limit: z.number().min(1).max(100)
         }))
-        .query(async ({  input }) => {
+        .query(async ({  input, ctx }) => {
 
             const { cursor, limit, query } = input;
+            const { clerkUserId } = ctx;
+
+            // Fetch user settings
+            let userSettings = null;
+            if (clerkUserId) {
+                const [user] = await db
+                    .select({ aiContentEnabled: users.aiContentEnabled })
+                    .from(users)
+                    .where(eq(users.clerkId, clerkUserId));
+                userSettings = user;
+            }
 
             const hasQuery = query && query.trim().length > 0;
 
@@ -216,6 +238,7 @@ export const searchRouter = createTRPCRouter({
                         )
                         : undefined,
                     eq(videos.visibility, 'public'),
+                    userSettings?.aiContentEnabled === false ? eq(videos.isAi, false) : undefined,
                     // Pagination: if client provides `cursor.score` use a row-wise comparator on (score, id)
                     cursor && cursor.score != null
                         ? sql`(${scoreExpr}, ${videos.id}) < (${cursor.score}, ${cursor.id})`

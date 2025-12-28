@@ -3,6 +3,8 @@ import { formatDuration } from "@/lib/utils";
 import Image from "next/image"
 import { THUMBNAIL_FALLBACK } from "../../constants";
 import { useRef, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Sparkles } from "lucide-react";
 
 interface VideoThumbnailProps {
     imageUrl?: string | null;
@@ -10,9 +12,10 @@ interface VideoThumbnailProps {
     title: string;
     duration: number;
     aspectRatio?: "video" | "vertical" | "square";
+    isAi?: boolean;
 }
 
-export const VideoThumbnail = ({imageUrl,previewUrl, duration, title, aspectRatio = "video"}: VideoThumbnailProps) => {
+export const VideoThumbnail = ({imageUrl,previewUrl, duration, title, aspectRatio = "video", isAi = false}: VideoThumbnailProps) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const [showVideo, setShowVideo] = useState(false);
     
@@ -82,6 +85,14 @@ export const VideoThumbnail = ({imageUrl,previewUrl, duration, title, aspectRati
                 />
             </div>
 
+            {isAi && (
+                <div className="absolute top-2 right-2 z-20">
+                    <Badge variant="secondary" className="bg-purple-100/90 backdrop-blur-sm text-purple-800 border-purple-200 gap-1 whitespace-nowrap shadow-sm px-1.5 py-0.5 h-auto text-[10px]">
+                        <Sparkles className="size-2.5" />
+                        AI
+                    </Badge>
+                </div>
+            )}
                 
             {/* Duration box */}
             <div className="absolute bottom-2 right-2 px-1 py-0.5 rounded bg-amber-700 text-white text-xs font-medium z-20">

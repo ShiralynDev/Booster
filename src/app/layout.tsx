@@ -62,8 +62,8 @@ export const metadata: Metadata = {
         creator: "@BoosterVideos",
     },
     icons: [
-        { rel: "icon", url: "/favicon.ico" },
-        { rel: "apple-touch-icon", url: "/apple-touch-icon.png" },
+        { rel: "icon", url: "/logo.png" },
+        { rel: "apple-touch-icon", url: "/logo.png" },
     ],
 };
 

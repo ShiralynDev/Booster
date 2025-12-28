@@ -63,6 +63,7 @@ export const SuggestionsSection = ({ videoId }: SuggestionsSectionProps) => {
                                             previewUrl={video.previewUrl ?? video.thumbnailUrl ?? THUMBNAIL_FALLBACK}
                                             duration={video.duration}
                                             title={video.title}
+                                            isAi={video.isAi}
                                         />
                                     </div>
 

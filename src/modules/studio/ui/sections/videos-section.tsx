@@ -154,6 +154,7 @@ export const VideosSectionSuspense = () => {
                           title={video.title} 
                           imageUrl={video.thumbnailUrl}
                           previewUrl={video.previewUrl} 
+                          isAi={video.isAi}
                         />
                         {video.visibility === 'private' && (
                           <div className="absolute top-1 left-1 bg-black/60 rounded-md p-1">

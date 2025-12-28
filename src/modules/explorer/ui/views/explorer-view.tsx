@@ -380,6 +380,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                                                     title={featuredVideo.title}
                                                     imageUrl={featuredVideo.thumbnailUrl}
                                                     previewUrl={featuredVideo.previewUrl}
+                                                    isAi={featuredVideo.isAi}
                                                 />
                                             </div>
 
@@ -477,6 +478,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                                                 imageUrl={video.thumbnailUrl}
                                                 previewUrl={video.previewUrl}
                                                 aspectRatio="vertical"
+                                                isAi={video.isAi}
                                             />
                                         </div>
                                         
@@ -611,6 +613,7 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                                                 title={video.title}
                                                 imageUrl={video.thumbnailUrl}
                                                 previewUrl={video.previewUrl}
+                                                isAi={video.isAi}
                                             />
 
                                             {/* Enhanced Overlay */}

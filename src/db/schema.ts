@@ -34,6 +34,7 @@ export const users = pgTable("users", {
     equippedTitleId: uuid("equipped_title_id").references((): AnyPgColumn => assets.assetId), // The currently equipped title
     rewardedAdsEnabled: boolean("rewarded_ads_enabled").default(false),
     verticalVideosEnabled: boolean("vertical_videos_enabled").default(true),
+    aiContentEnabled: boolean("ai_content_enabled").default(true),
     accountType: userAccountType("account_type"),
     businessDescription: text("business_description"),
     businessImageUrls: text("business_image_urls").array(),
@@ -191,6 +192,36 @@ export const videos = pgTable("videos", {
 export const videoInsertSchema = createInsertSchema(videos);
 export const videoUpdateSchema = createUpdateSchema(videos);
 export const videoSelectSchema = createSelectSchema(videos);
+
+export const reportReason = pgEnum("report_reason", [
+    'ai',
+    'clickbait',
+    'inappropriate',
+    'spam',
+    'harassment'
+])
+
+export const reports = pgTable("reports", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    videoId: uuid("video_id").references(() => videos.id, { onDelete: "cascade" }).notNull(),
+    reporterId: uuid("reporter_id").references(() => users.id, { onDelete: "set null" }),
+    reason: reportReason("reason").notNull(),
+    details: text("details"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+}, (t) => [
+    index("reports_video_idx").on(t.videoId),
+    index("reports_expires_idx").on(t.expiresAt)
+])
+
+export const reportVotes = pgTable("report_votes", {
+    reportId: uuid("report_id").references(() => reports.id, { onDelete: "cascade" }).notNull(),
+    userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+    voteType: text("vote_type").notNull(), // 'agree' or 'disagree'
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (t) => [
+    primaryKey({ columns: [t.reportId, t.userId] })
+])
 
 
 //might not be necessary in postgresql because foreign keys already exist
