@@ -230,6 +230,25 @@ export const videosRouter = createTRPCRouter({
           .groupBy(videos.categoryId)
       );
 
+      const similarViewers = db.$with("similar_viewers").as(
+        db
+          .select({ userId: videoViews.userId })
+          .from(videoViews)
+          .where(eq(videoViews.videoId, videoId ?? "00000000-0000-0000-0000-000000000000"))
+          .limit(50)
+      );
+
+      const collaborativeMatch = db.$with("collaborative_match").as(
+        db
+          .select({
+            videoId: videoViews.videoId,
+            matchCount: count(videoViews.userId).as("matchCount"),
+          })
+          .from(videoViews)
+          .innerJoin(similarViewers, eq(videoViews.userId, similarViewers.userId))
+          .groupBy(videoViews.videoId)
+      );
+
       const ratingStats = db.$with("video_stats").as(
         db
           .select({
@@ -278,6 +297,7 @@ export const videosRouter = createTRPCRouter({
                             + (CASE WHEN ${videos.categoryId} = ${currentCategoryId ?? null} THEN 50 ELSE 0 END)
                             + (CASE WHEN ${currentEmbedding ? sql`(${videos.embedding} <=> ${JSON.stringify(currentEmbedding)}::vector)` : sql`1`} < 0.5 THEN 100 ELSE 0 END)
                             + (CASE WHEN ${currentTags && currentTags.length > 0 ? sql`${videos.tags} && ${sql.raw(`'{${currentTags.join(',')}}'`)}` : sql`false`} THEN 50 ELSE 0 END)
+                            + (COALESCE(${collaborativeMatch.matchCount}, 0) * 20)
                     `;
 
       const whereParts: any[] = [
@@ -302,7 +322,7 @@ export const videosRouter = createTRPCRouter({
         whereParts.push(not(eq(videos.id, cursor.id)));
       }
       const rows = await db
-        .with(viewerFollow, ratingStats, videoViewsStats, viewerView, userCategoryAffinity)
+        .with(viewerFollow, ratingStats, videoViewsStats, viewerView, userCategoryAffinity, similarViewers, collaborativeMatch)
         .select({
           ...getTableColumns(videos),
           user: {
@@ -338,6 +358,7 @@ export const videosRouter = createTRPCRouter({
         .leftJoin(commentsAgg, eq(commentsAgg.videoId, videos.id))
         .leftJoin(viewerView, eq(viewerView.videoId, videos.id))
         .leftJoin(userCategoryAffinity, eq(userCategoryAffinity.categoryId, videos.categoryId))
+        .leftJoin(collaborativeMatch, eq(collaborativeMatch.videoId, videos.id))
         .where(and(...whereParts))
         .orderBy(desc(sql`score`), desc(videos.id))
         .limit(limit + 1);
