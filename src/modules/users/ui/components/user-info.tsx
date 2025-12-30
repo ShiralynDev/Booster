@@ -38,6 +38,9 @@ export const UserInfo = ({
     size,
     userId,
 }: UserInfoProps) => {
+
+    console.log("Size in UserInfo:", size);
+
     return (
         <div className={cn(userInfoVariants({ size, className }))}>
             <div className="flex items-center gap-1">
@@ -52,7 +55,7 @@ export const UserInfo = ({
                             <p>{name}</p>
                         </TooltipContent>
                     </Tooltip>
-                    <UserIcon userId={userId} size={size === 'lg' ? 5 : 4} />
+                    <UserIcon userId={userId} size={size === 'lg' ?6 : 4} />
                 </Link>
             </div>
         </div>

@@ -59,6 +59,16 @@ const CommunityViewSuspense = ({ communityId }: Props) => {
         }
     });
 
+    const removeVideoMutation = trpc.community.removeVideo.useMutation({
+        onSuccess: () => {
+            utils.community.getVideos.invalidate({ communityId });
+            toast.success("Video removed from community");
+        },
+        onError: (err) => {
+            toast.error(err.message);
+        }
+    });
+
     const handleJoinToggle = () => {
         if (community.isMember) {
             leaveMutation.mutate({ communityId });
@@ -128,6 +138,7 @@ const CommunityViewSuspense = ({ communityId }: Props) => {
                                     <VideoGridCard 
                                         key={item.video.id} 
                                         data={item} 
+                                        onRemove={community.isModerator ? () => removeVideoMutation.mutate({ videoId: item.video.id, communityId }) : undefined}
                                     />
                                 ))}
                             </div>

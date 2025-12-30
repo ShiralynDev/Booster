@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense, JSX } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
-import { Coins, ShoppingCart, Filter, Star, Lock, Check, Box, Landmark, X, Video, CreditCard, Crown, Users, Zap, Store } from "lucide-react"
+import {  ShoppingCart,  Star, Lock, Check, Box, Landmark, X, Video, CreditCard, Crown, Users, Zap, Store } from "lucide-react"
 import { XpIndicator } from "@/modules/xp/ui/components/xp-indicator"
 import { trpc } from "@/trpc/client"
 import { useAuth } from "@clerk/nextjs"
@@ -14,6 +14,7 @@ import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { type InferSelectModel } from "drizzle-orm"
 import { users } from "../../../db/schema"
+import { AnimatedPlanetIcon } from "../components/assetIcons/planet-animated-icon"
 
 type User = InferSelectModel<typeof users>;
 
@@ -105,6 +106,7 @@ export const MarketSectionSuspense = () => {
     [1, <Zap className="w-12 h-12 text-yellow-400" key={1} />],
     [2, <Users className="w-12 h-12 text-blue-400" key={2} />],
     [3, <Star className="w-12 h-12 text-purple-400" key={3} />],
+    [4, <AnimatedPlanetIcon size={12} key={4} className="text-amber-400" />]
   ])
 
   const filteredItems = activeAssets.filter(item => {

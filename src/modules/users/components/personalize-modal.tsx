@@ -42,6 +42,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { AnimatedPlanetIcon } from "@/modules/market/components/assetIcons/planet-animated-icon";
 
 // Default icons available to everyone (free)
 const DEFAULT_ICONS = [
@@ -251,7 +252,7 @@ export const PersonalizeModal = ({ isOpen, onClose }: PersonalizeModalProps) => 
             [1, Zap],
             [2, Users],
             [3, Star],
-            // [0, AnimatedPlanetIcon], // Founder Member Icon - Removed
+            [4, AnimatedPlanetIcon],
             // Add more icons here as marketplace grows
         ]);
         return iconMap.get(iconNumber);

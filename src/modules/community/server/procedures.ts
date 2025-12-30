@@ -15,6 +15,50 @@ const supabaseAdmin = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPAB
     : null;
 
 export const communityRouter = createTRPCRouter({
+  getJoined: protectedProcedure
+    .query(async ({ ctx }) => {
+      const userId = ctx.user.id;
+
+      const joinedCommunities = await db
+        .select({
+          community: communities,
+        })
+        .from(communityMembers)
+        .innerJoin(communities, eq(communityMembers.communityId, communities.communityId))
+        .where(eq(communityMembers.userId, userId));
+
+      const communitiesWithVideos = await Promise.all(
+        joinedCommunities.map(async ({ community }) => {
+          const recentVideos = await db
+            .select({
+              video: videos,
+              user: {
+                id: users.id,
+                name: users.name,
+                imageUrl: users.imageUrl,
+              },
+            })
+            .from(videos)
+            .innerJoin(users, eq(videos.userId, users.id))
+            .where(
+              and(
+                eq(videos.communityId, community.communityId),
+                eq(videos.visibility, "public")
+              )
+            )
+            .limit(10)
+            .orderBy(desc(videos.createdAt));
+
+          return {
+            ...community,
+            recentVideos,
+          };
+        })
+      );
+
+      return communitiesWithVideos;
+    }),
+
   getMany: baseProcedure
     .input(
       z.object({
@@ -596,6 +640,44 @@ export const communityRouter = createTRPCRouter({
         items: enrichedMessages, // Return newest to oldest for pagination
         nextCursor,
       };
+    }),
+
+  removeVideo: protectedProcedure
+    .input(z.object({
+      videoId: z.string().uuid(),
+      communityId: z.string().uuid(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const { videoId, communityId } = input;
+      const { id: userId } = ctx.user;
+
+      // Check if user is moderator
+      const [moderatorship] = await db
+        .select()
+        .from(communityModerators)
+        .where(
+          and(
+            eq(communityModerators.communityId, communityId),
+            eq(communityModerators.userId, userId)
+          )
+        );
+
+      if (!moderatorship) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "You are not a moderator of this community" });
+      }
+
+      // Update video
+      await db
+        .update(videos)
+        .set({ communityId: null })
+        .where(
+          and(
+            eq(videos.id, videoId),
+            eq(videos.communityId, communityId)
+          )
+        );
+
+      return { success: true };
     }),
 
   sendMessage: protectedProcedure

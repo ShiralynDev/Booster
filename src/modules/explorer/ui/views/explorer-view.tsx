@@ -25,6 +25,9 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel"
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { FollowedCommunitiesView } from "@/modules/community/ui/views/followed-communities-view";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FollowedUsersView } from "@/modules/follows/ui/views/followed-users-view";
 
 interface HomeViewProps {
     categoryId?: string;
@@ -254,44 +257,31 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
 
     return (
         <div className="overflow-hidden mb-10 px-4 flex flex-col gap-y-12">
-            {/* Enhanced Header Section */}
-            {/* <motion.div
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="relative text-center mb-8"
-            >
+            <Tabs defaultValue="videos" className="w-full">
+                <div className="flex justify-center mb-6">
+                    <TabsList className="grid w-full max-w-md grid-cols-3">
+                        <TabsTrigger value="videos">Videos</TabsTrigger>
+                        <TabsTrigger value="communities">Communities</TabsTrigger>
+                        <TabsTrigger value="following">Following</TabsTrigger>
+                    </TabsList>
+                </div>
 
-
-                <div className="relative z-10">
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
+                <TabsContent value="videos" className="space-y-12">
+                    {/* Enhanced Categories Section */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3, duration: 0.6 }}
-                        className="text-5xl md:text-7xl font-bold text-textprimary mt-2 pt-2 leading-tight"
+                        transition={{ delay: 0.5, duration: 0.6 }}
+                        className="relative mt-5"
                     >
-                        Explorer
-                    </motion.h1>
-                </div>
-            </motion.div> */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/5 to-transparent blur-xl transform scale-110" />
+                        <div className="relative z-10">
+                            <CategoriesSection categoryId={selectedCategory || "all"} setSelectedCategory={setSelectedCategory}/>
+                        </div>
+                    </motion.div> 
 
-
-
-            {/* Enhanced Categories Section */}
-            <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.6 }}
-                className="relative mt-5"
-            >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/5 to-transparent blur-xl transform scale-110" />
-                <div className="relative z-10">
-                    <CategoriesSection categoryId={selectedCategory || "all"} setSelectedCategory={setSelectedCategory}/>
-                </div>
-            </motion.div> 
-
-            {/* Placeholder for Featured Video when ads are disabled */}
-            {featuredVideos.length > 0 && !rewardedAdsEnabled && (
+                    {/* Placeholder for Featured Video when ads are disabled */}
+                    {featuredVideos.length > 0 && !rewardedAdsEnabled && (
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -721,6 +711,16 @@ export const ExplorerViewSuspense = ({ categoryId }: HomeViewProps) => {
                 isFetchingNextPage={query.isFetchingNextPage}
                 fetchNextPage={query.fetchNextPage}
             />
+                </TabsContent>
+
+                <TabsContent value="communities">
+                    <FollowedCommunitiesView />
+                </TabsContent>
+
+                <TabsContent value="following">
+                    <FollowedUsersView />
+                </TabsContent>
+            </Tabs>
         </div>
     );
 };
