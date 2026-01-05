@@ -417,7 +417,7 @@ export const explorerRouter = createTRPCRouter({
       const whereParts: any[] = [
         and(
           eq(videos.visibility, "public"),
-          not(eq(videos.status, "processing"))
+          // not(eq(videos.status, "processing"))
         ),
       ];
 

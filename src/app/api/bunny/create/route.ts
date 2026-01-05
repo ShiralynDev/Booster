@@ -1,7 +1,19 @@
 // app/api/bunny/create/route.ts
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
+import { uploadRateLimit } from "@/lib/ratelimit";
 
 export async function POST(req: Request) {
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { success } = await uploadRateLimit.limit(userId);
+  if (!success) {
+    return NextResponse.json({ error: "Daily upload limit reached" }, { status: 429 });
+  }
+
   const { title } = await req.json();
   const lib = process.env.BUNNY_STREAM_LIBRARY_ID!;
   const r = await fetch(`https://video.bunnycdn.com/library/${lib}/videos`, {

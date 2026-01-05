@@ -12,6 +12,7 @@ import YTDlpWrap from 'yt-dlp-wrap';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
+import { uploadRateLimit } from "@/lib/ratelimit";
 
 export const studioRouter = createTRPCRouter({
 
@@ -211,6 +212,12 @@ export const studioRouter = createTRPCRouter({
                 // Check if already synced
                 const [existing] = await db.select().from(videos).where(eq(videos.youtubeVideoId, videoId));
                 if (existing) continue;
+
+                const { success } = await uploadRateLimit.limit(userId);
+                if (!success) {
+                    console.log(`Rate limit reached for user ${userId}`);
+                    break;
+                }
 
                 try {
                     console.log(`Starting sync for video: ${title} (${videoId})`);

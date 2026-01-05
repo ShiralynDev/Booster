@@ -91,7 +91,7 @@ export const homeRouter = createTRPCRouter({
             // Common Where Clauses
             const baseWhere = and(
                 eq(videos.visibility, "public"), 
-                not(eq(videos.status, "processing"))
+                // not(eq(videos.status, "processing"))
             );
 
             // --- Normal Videos ---

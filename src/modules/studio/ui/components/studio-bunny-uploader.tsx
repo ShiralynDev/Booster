@@ -74,7 +74,10 @@ export const StudioBunnyUploader = ({ onSuccess, onUploadStarted, children }: St
         body: JSON.stringify({ title: file.name }),
       });
 
-      if (!createRes.ok) throw new Error(await createRes.text());
+      if (!createRes.ok) {
+        const errorData = await createRes.json();
+        throw new Error(errorData.error || "Failed to create video");
+      }
       const { guid } = await createRes.json() as { guid: string };
 
       const signRes = await fetch("/api/bunny/sign", {
@@ -246,6 +249,9 @@ export const StudioBunnyUploader = ({ onSuccess, onUploadStarted, children }: St
             </div>
             <p className="text-xs text-muted-foreground mt-2 text-center">
               Video duration is limited to 10 minutes!
+            </p>
+            <p className="text-xs text-muted-foreground mt-1 text-center">
+              Daily upload limit: 5 videos
             </p>
           </div>
         </div>

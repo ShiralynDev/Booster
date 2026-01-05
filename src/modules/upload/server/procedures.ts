@@ -3,6 +3,8 @@ import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { z } from "zod";
+import { uploadRateLimit } from "@/lib/ratelimit";
+import { TRPCError } from "@trpc/server";
 
 const s3 = new S3Client({
   region: process.env.AWS_REGION!,
@@ -24,6 +26,12 @@ export const uploadRouter = createTRPCRouter({
       const { fileName,videoId } = input;
       
       const userId = ctx.user.id
+
+      const { success } = await uploadRateLimit.limit(userId);
+      if (!success) {
+        throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Daily upload limit reached" });
+      }
+
       const key = `videos/${videoId}_${userId}_${fileName}`; // unique key
       console.log(key);
 
