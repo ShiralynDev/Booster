@@ -718,7 +718,7 @@ export const videosRouter = createTRPCRouter({
         thumbnailUrl: z.string(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx,input }) => {
       const { videoId, fileUrl, thumbnailUrl } = input;
 
       await db
@@ -727,7 +727,7 @@ export const videosRouter = createTRPCRouter({
           playbackUrl: fileUrl,
           thumbnailUrl,
         })
-        .where(eq(videos.id, videoId));
+        .where(and(eq(videos.id, videoId),eq(videos.userId, ctx.user.id)));
     }),
 
   getUserByVideoId: baseProcedure
